@@ -22,10 +22,19 @@ window.onload = function(){
   }
   return "anonymous";
 }
+// test
 var pb = function(){
   var a = getName(arguments.callee);
   alert(a)
 }
 pb()
-
+// 扩展map()
+Array.prototype.map = function(fn,thisObj){
+  var scope = thisObj || window,
+      last = [];
+  for(var i = 0,j = this.length;i < j;++i){
+    last.push(fn.call(scope,this[i],i,this))
+  }
+  return last;
+}
 }
