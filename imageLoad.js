@@ -24,6 +24,7 @@ var scrollLoad = (function(options){
     return value == 'auto' ? '' : value;
   }
   var init = function(){
+    // IE8及以下不支持window.pageXOffset与window.pageYOffset，window.innerWindow与window.innerHeight,用window.document.documentElement.scrollTop，window.document.documentElement.scrollLeft，document.documentElement.clientHeight代替
     var offsetPage = window.pageYOffset ? window.pageYOffset : window.document.documentElement.scrollTop,
         offsetWindow = offsetPage + Number(window.innerHeight ? window.innerHeight : document.documentElement.clientHeight),
         docImg = document.images,
