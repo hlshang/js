@@ -37,4 +37,10 @@ Array.prototype.map = function(fn,thisObj){
   }
   return last;
 }
+// 程序执行时间
+function doTime(){
+  var d = new Date;
+  return +d;
+  // return Date.parse(d)+d.milliiseconds()
+}
 }
