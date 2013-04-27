@@ -15,6 +15,12 @@ if (!document.getElementsByClassName) {
 		return elements;
 	};
 }
+// var 
+var toString = Object.prototype.toString,
+	hasOwnProperty = Object.prototype.hasOwnProperty,
+	push = Array.prototype.push,
+	slice = Array.prototype.slice,
+	indexOf = Array.prototype.indexOf;
 var leba = {
 	init: function() {
 		this.history();
@@ -51,13 +57,24 @@ var leba = {
 		}
 		return -1;
 	},
+	size:function(el){
+		return el.length
+	},
+	toArray:function(el){
+		return slice.call(el,0)
+	},
+	get:function(el,num){
+		// num = null 时 取全部
+		// num < 0 时 取最后一个
+		return num == null ? this.toArray(el) : (num < 0 ? slice.call(el,el.length-1) : slice.call(el,num,++num))
+	},
 	history: function() {
+		// todo
 		var page = document.getElementsByClassName("page");
 		index = window.location.href.replace("http://www.17leba.com/page/","");
 		var index = index == "http://www.17leba.com/" ? 1 : index;
 		index = parseInt(index)-1;
 		this.addHandler(page[index],"click",function(){
-			history.pushState(index,document.title,page[]);
 		})
 	}
 };
