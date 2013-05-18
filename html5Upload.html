@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>html5 upload</title>
+	<style>
+	*{
+		padding:0;
+		margin:0;
+	}
+	.thumb{
+		height:100px;
+		float: left;
+		margin:10px;
+	}
+	.thumb img{
+		height: 100px;
+	}
+	#drag-area{
+		width:890px;
+		height: 300px;
+		border:1px dashed #eee;
+		text-align: center;
+		background: orange;
+		vertical-align: middle;
+		float: right;
+	}
+	</style>
+	<script src="jquery.js"></script>
+</head>
+<body>
+	<div class="html5">
+		<form action="" id="uploadform" method="post">
+			<div class="upload-main">
+				<input type="file" name="fileSelect[]" size="40" id="file-select" multiple/>
+				<span id="drag-area">将图片拖拽到这吧！</span>
+			</div>
+			<div class="submit">
+				<input type="submit" value="upload" id="up-btn"/>
+			</div>
+		</form>
+	</div>
+	<script>
+	$(function(){
+		 if(window.File && window.FileReader && window.FileList && window.Blob){
+		 	var $preview = $("#drag-area"),
+		 		$upBtn = $("#up-btn");
+		 	var html5Upload= {
+		 		init :function(){
+		 			this.fileChange()
+		 			this.fileDrag()
+		 		},
+		 		imgPreview:function(files){
+		 			var html = '';
+		 			for(var i = 0,f;f = files[i];i++){
+		 				var reader = new FileReader();
+		 				reader.onload = (function(f){
+		 					return function(e){
+		 						html += '<div class="thumb"><img src="'+e.target.result+'"/></div>';
+		 						$preview.html(html);
+		 					}
+		 				})(f);
+		 				reader.readAsDataURL(f);
+		 			}
+		 		},
+		 		handFileSelect:function(e){
+		 			this.dragHover(e);
+		 			var files = e.target.files || e.dataTransfer.files;
+		 			if(!this.fileFilter(files,2000)){
+			 			return false
+		 			}
+		 			this.imgPreview(files);
+		 		},
+		 		fileDrag:function(){
+		 			var that = this;
+					$preview[0].addEventListener('dragover', function(e){that.dragHover(e)}, false);
+  					$preview[0].addEventListener('drop', function(e){that.handFileSelect(e)}, false);
+		 		},
+		 		dragHover:function(e){
+		 			e.stopPropagation();
+		 			e.preventDefault();
+		 		},
+		 		fileChange:function(){
+		 			var that = this;
+		 			$("#file-select").on("change",function(e){
+		 				that.handFileSelect(e);
+		 			})
+		 		},
+		 		fileFilter:function(files,size){
+	 				var size = size || 512;
+		 			$(files).each(function(){
+		 				var $this = $(this);
+		 				if($this[0].type.indexOf("image") !== 0){
+		 					$preview.html("您选择的文件不是图片类型！");
+		 					$upBtn.attr("disabled",true);
+		 					return false;
+		 				}
+		 				if($this[0].size > size*1024){
+		 					$preview.html("您选择图片中的"+$this[0].name+"的大小大于"+size+"k");
+			 					$upBtn.attr("disabled",true);
+			 					return false;
+		 				}
+		 				$upBtn.attr("disabled",false)
+		 			})
+		 			if($upBtn.attr("disabled") === "disabled"){
+		 				return false
+		 			}else{
+		 				return true
+		 			}
+		 		}
+		 	}
+		 	html5Upload.init();
+		 }else{
+		 	alert("您的浏览器不支持本地预览！")
+		 }
+	})
+	</script>
+</body>
+</html>

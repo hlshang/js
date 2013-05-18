@@ -20,7 +20,8 @@ var toString = Object.prototype.toString,
 	hasOwnProperty = Object.prototype.hasOwnProperty,
 	push = Array.prototype.push,
 	slice = Array.prototype.slice,
-	indexOf = Array.prototype.indexOf;
+	indexOf = Array.prototype.indexOf,
+	rtrim = /^(\s|\u00A0)+|(\s|\u00A0)+$/g;
 var leba = {
 	init: function() {
 		this.history();
@@ -68,6 +69,9 @@ var leba = {
 		// num < 0 时 取最后一个
 		return num == null ? this.toArray(el) : (num < 0 ? slice.call(el,el.length-1) : slice.call(el,num,++num))
 	},
+	trim:function(text){
+		return (text || "").replace(rtrim,"")
+	},
 	history: function() {
 		// todo
 		var page = document.getElementsByClassName("page");
@@ -79,4 +83,6 @@ var leba = {
 	}
 };
 // init
-leba.init()
+leba.init();
+var a = "wo s";
+alert(a)
