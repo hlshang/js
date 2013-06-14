@@ -1,7 +1,7 @@
 if (!document.getElementsByClassName) {
 	document.getElementsByClassName = function(className, element) {
 		var children = (element || document).getElementsByTagName('*');
-		var elements = new Array();
+		var elements = [];
 		for (var i = 0; i < children.length; i++) {
 			var child = children[i];
 			var classNames = child.className.split(' ');
@@ -26,7 +26,7 @@ var leba = {
 	init: function() {
 		this.history();
 	},
-	// �¼�����
+	// ÊÂ¼þ´¦Àí
 	addHandler: function(el, type, handler) {
 		var el = el || this;
 		if (el.addEventListener) {
@@ -65,8 +65,8 @@ var leba = {
 		return slice.call(el,0)
 	},
 	get:function(el,num){
-		// num = null ʱ ȡȫ��
-		// num < 0 ʱ ȡ���һ��
+		// num = null Ê± È¡È«²¿
+		// num < 0 Ê± È¡×îºóÒ»¸ö
 		return num == null ? this.toArray(el) : (num < 0 ? slice.call(el,el.length-1) : slice.call(el,num,++num))
 	},
 	trim:function(text){
@@ -84,5 +84,40 @@ var leba = {
 };
 // init
 leba.init();
-var a = "wo s";
-alert(a)
+
+/*
+*test
+*ÔÚjsÖÐ£¬ËùÓÐ¹ØÏµ¶¼¿ÉÒÔ×÷Îª¶ÔÏóµÄÒ»¸ö¹ØÁªÊý×é¶ø´æÔÚ ¶¼ÊÇ¶ÔÏó
+*/ 
+/*window.name = "1a";
+var object = {
+	name : "1b",
+	run : function(word){
+		console.log(this.name + word)
+	}
+}
+
+function bind(context,fn){
+	var args = slice.call(arguments,2);
+	return args.length === 0 ? function(){
+		return fn.apply(context,arguments)
+	} : function(){
+		var a = args.concat.apply(args,arguments).toString();
+		return fn.apply(context,a)
+	}
+}
+var pb = bind(window,object.run,["a","sd"])
+pb(" is a shift!");*/
+
+// 深度拷贝
+var deepExtend = function(destination, source) {
+	for (var property in source) {
+		if (source[property] && source[property].constructor && source[property].constructor === Object) {
+			destination[property] = destination[property] || {}
+			arguments.callee(destination[property], source[property])
+		} else {
+			destination[property] = source[property]
+		}
+	}
+	return destination
+}
