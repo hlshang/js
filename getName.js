@@ -1,4 +1,6 @@
 window.onload = function(){
+
+  
   var getName = function(callee){
 // \s匹配任何空白符 \?匹配? /g全局匹配 否则之匹配第一个 *0或多次 []匹配其中任何一个
   var _callee = callee.toString().replace(/[\s\?]*/g,""),
