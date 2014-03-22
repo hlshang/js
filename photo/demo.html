@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			简单图片轮播
+		</title>
+		<link rel="stylesheet" href="style.css" type="text/css">
+		<script src="jquery.js" type="text/javascript">
+</script>
+<script>
+	$(function(){
+		var $proPhotoS = $(".pro-photo-s"),
+			$bigPhoto = $("#big-photo"),
+			$proPhotoBtn = $(".pro-photo-btn"),
+			$bigPhotoWrap = $(".big-photo-wrap"),
+			$li = $proPhotoS.find("li"),
+			$cur = $proPhotoS.find(".cur"),
+			len = $li.length,
+			width = $li.width() *6 + 10*6,
+			flag = false;
+		$proPhotoS.on("click","li",function(){
+			var $this = $(this),
+				index = $this.index(),
+				left = $this.position().left,
+				src = $this.data("src");
+			$bigPhoto.attr("src","loading.gif")
+			imgComplete(src,function(){
+				$bigPhoto.attr("src",src);
+			})
+			$this.addClass("selected").siblings().removeClass("selected");
+			$cur.css({
+				"left":left,
+				"opacity":0
+			});
+			$cur.clearQueue().animate({
+				"opacity":1
+			},400);
+		})
+		$proPhotoBtn.on("click",function(){
+			var $this = $(this),
+				left = $proPhotoS.css("left").replace("px","") - 0;
+			if(flag) return;
+			flag = true;
+			if($this.hasClass("left")){
+				if(left === 0){
+					flag = false;
+					return;
+				}
+				left += width;
+				$proPhotoS.clearQueue().animate({
+					"left":left
+				},500,function(){
+					flag = false;
+				})
+			}else{
+				if(left === -Math.floor(len/6) * width){
+					flag = false;
+					return;
+				}
+				left -= width;
+				$proPhotoS.clearQueue().animate({
+					"left":left
+				},500,function(){
+					flag = false;
+				})
+			}
+		})
+		$bigPhotoWrap.on("click",function(event){
+			var w1 = $("body").width() -1080,
+				w2 = $("body").width()/2,
+				i = $li.filter(".selected").index();
+			if(event.pageX > w1/2 && event.pageX < w2){
+				if(i === 0) return;
+				if(i%6 === 0){
+					$proPhotoBtn.filter(".left").trigger("click");
+				}
+				$li.eq(--i).trigger("click");
+			}else{
+				if(i === (len-2)) return;
+				if(i%6 === 5){
+					$proPhotoBtn.filter(".right").trigger("click");
+				}
+				$li.eq(++i).trigger("click");
+			}
+		})
+		// function imgClick($this,i){
+		// 	if($this.hasClass("left")){
+		// 		if(i === 0) return;
+		// 		if(i%6 === 0){
+		// 			$proPhotoBtn.filter(".left").trigger("click");
+		// 		}
+		// 		$li.eq(--i).trigger("click");
+		// 	}else{
+		// 		if(i === (len-1)) return;
+		// 		if(i%6 === 5){
+		// 			$proPhotoBtn.filter(".right").trigger("click");
+		// 		}
+		// 		$li.eq(++i).trigger("click");
+		// 	}
+		// }
+		function imgComplete(src,callback){
+			var img = new Image();
+			img.src = src;
+			if(img.complete){
+				callback.call(img);
+				return;
+			}
+			img.onload = function(){
+				callback.call(img);
+			}
+		}
+	})
+</script>
+	</head>
+	<body>
+		<div class="pro-photo">
+			<div class="big-photo-wrap">
+				<img src="j1s-big-1.jpg" alt="极壹S实拍图" id="big-photo"> <a href="javascript:void(0)" class="big-photo-btn left"></a> <a href="javascript:void(0)" class="big-photo-btn right"></a>
+			</div>
+			<div class="small-photo-wrap">
+				<div class="pro-photo-btn left">
+					&lt;
+				</div>
+				<div class="pro-photo-btn right">
+					&gt;
+				</div>
+				<ul class="pro-photo-s clearfix">
+					<li class="selected" data-src="j1s-big-1.jpg">
+						<img src="j1s-small-1.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-2.jpg">
+						<img src="j1s-small-2.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-3.jpg">
+						<img src="j1s-small-3.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-4.jpg">
+						<img src="j1s-small-4.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-5.jpg">
+						<img src="j1s-small-5.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-6.jpg">
+						<img src="j1s-small-6.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-7.jpg">
+						<img src="j1s-small-7.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-8.jpg">
+						<img src="j1s-small-8.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-9.jpg">
+						<img src="j1s-small-9.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-10.jpg">
+						<img src="j1s-small-10.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-11.jpg">
+						<img src="j1s-small-11.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-12.jpg">
+						<img src="j1s-small-12.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-13.jpg">
+						<img src="j1s-small-13.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-14.jpg">
+						<img src="j1s-small-14.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-15.jpg">
+						<img src="j1s-small-15.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-16.jpg">
+						<img src="j1s-small-16.jpg" alt="">
+					</li>
+					<li class="cur"></li>
+				</ul>
+			</div>
+		</div>
+	</body>
+</html>
