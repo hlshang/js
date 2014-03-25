@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+		</title>
+		<style>
+			*{padding:0;margin:0;}
+			ol,ul {list-style: none;}
+			html {overflow-y: scroll;font-size: 100%;}
+			img{display: block;}
+			.pro-photo{width:1080px;margin:0 auto 50px;overflow: hidden;left:10px;}
+			.big-photo-wrap{width:1080px;height:608px;line-height:608px;margin-bottom: 27px;text-align:center;position: relative;}
+			.big-photo-wrap.left{cursor: url("cursor_left.cur"), auto;}
+			.big-photo-wrap.right{cursor: url("cursor_right.cur"), auto;}
+			.big-photo-wrap img{display: inline-block;}
+			.big-photo-wrap:hover .big-photo-btn{display: block;}
+			.small-photo-wrap{position: relative;padding-left:45px;}
+			.pro-photo-s{width: 9999px;position: relative;left:0;overflow: hidden;}
+			.pro-photo-s li{float: left;margin:0 5px;cursor: pointer;}
+			.pro-photo-s .cur{width:155px;height:95px;background: red;position: absolute;top:-8px;left: 0}
+			.pro-photo-btn{background: #c9c7c5;width: 40px;height:87px;line-height:87px;font-size:60px;font-family:SimSun;color:#fff;margin:0;text-align:center;position: absolute;bottom:0;z-index:10;cursor: pointer;}
+			.pro-photo-btn:hover{background: #00B4FA}
+			.pro-photo-btn.left{left:0;}
+			.pro-photo-btn.right{right: 0}
+		</style>
+
+	</head>
+	<body>
+		<div class="pro-photo">
+			<div class="big-photo-wrap">
+				<img src="j1s-big-1.jpg" alt="" id="big-photo"/></a>
+			</div>
+			<div class="small-photo-wrap">
+				<div class="pro-photo-btn left">
+					&lt;
+				</div>
+				<div class="pro-photo-btn right">
+					&gt;
+				</div>
+				<ul class="pro-photo-s clearfix">
+					<li class="selected" data-src="j1s-big-1.jpg">
+						<img src="j1s-small-1.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-2.jpg">
+						<img src="j1s-small-2.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-3.jpg">
+						<img src="j1s-small-3.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-4.jpg">
+						<img src="j1s-small-4.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-5.jpg">
+						<img src="j1s-small-5.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-6.jpg">
+						<img src="j1s-small-6.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-7.jpg">
+						<img src="j1s-small-7.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-8.jpg">
+						<img src="j1s-small-8.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-9.jpg">
+						<img src="j1s-small-9.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-10.jpg">
+						<img src="j1s-small-10.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-11.jpg">
+						<img src="j1s-small-11.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-12.jpg">
+						<img src="j1s-small-12.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-13.jpg">
+						<img src="j1s-small-13.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-14.jpg">
+						<img src="j1s-small-14.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-15.jpg">
+						<img src="j1s-small-15.jpg" alt="">
+					</li>
+					<li data-src="j1s-big-16.jpg">
+						<img src="j1s-small-16.jpg" alt="">
+					</li>
+					<!-- <li class="cur"></li> -->
+				</ul>
+			</div>
+		</div>
+	</body>
+	<script>
+			var imgSlide = {
+				photoS:getClass("pro-photo-s")[0],
+				photoBtn:getClass("pro-photo-btn"),
+				init:function(){
+					this.imgClick();
+					this.smallImgSlide();
+					this.bigImgSlide()
+				},
+				imgClick:function(){
+					var $li = this.photoS.getElementsByTagName("li"),
+						len = $li.length;
+					for(var i = 0;i < len;i++){
+						this.imgChange($li[i]);
+					}
+				},
+				smallImgSlide:function(){
+					var	step = this.photoS.getElementsByTagName("li")[0].offsetWidth * 6 + 10 * 6;
+						len = this.photoS.getElementsByTagName("li").length,
+						that = this,
+						flag = false;
+					addHandler(this.photoBtn[0],"click",function(e){
+						stopPropagation(e);
+						var leftLimit = 0;
+						that.imgAniJduge(leftLimit,true);
+					})
+					addHandler(this.photoBtn[1],"click",function(e){
+						stopPropagation(e);
+						var leftLimit = -Math.floor(len/6) * step;
+						that.imgAniJduge(leftLimit);
+					})
+				},
+				bigImgSlide:function(){
+					var	$bigPhotoW = getClass("big-photo-wrap")[0],
+					    $li = this.photoS.getElementsByTagName("li"),
+						len = $li.length,
+						w1 = document.getElementsByTagName("body")[0].offsetWidth,
+						w2 = $bigPhotoW.offsetWidth,
+						index;
+					addHandler($bigPhotoW,"mousemove",function(e){
+						stopPropagation(e);
+						e = e || window.e;
+						if(e.clientX > (w1 - w2)/2 && e.clientX < w1/2){
+							$bigPhotoW.className = "big-photo-wrap  left";
+						}else{
+							$bigPhotoW.className = "big-photo-wrap right";
+						}
+					})
+					addHandler($bigPhotoW,"click",function(e){
+						stopPropagation(e);
+						e = e || window.e;
+						for(var i = 0;i < len;i++){
+							if($li[i].className === "selected"){
+								index = i;
+								break;
+							}
+						}
+						if(e.clientX > (w1 - w2)/2 && e.clientX < w1/2){
+							if(index === 0){
+								return;
+							}
+							if(i%6 === 0){
+								trigger(this.photoBtn[0],"click")
+							}
+							trigger($li[--index],"click");
+						}else{
+							if(index === len-1){
+								return;
+							}
+							if(i%6 === 5){
+								trigger(this.photoBtn[1],"click")
+							}
+							trigger($li[++index],"click");
+						}
+					})
+				},
+				imgAniJduge:function(leftLimit,bool){
+					var	oLeft = parseInt(getStyle(this.photoS).left),
+						step = this.photoS.getElementsByTagName("li")[0].offsetWidth * 6 + 10 * 6,
+					    left;
+					if(flag){
+						return;
+					}
+					flag = true;
+					if(oLeft === leftLimit){
+						flag = false;
+						return;
+					}
+					if(!!bool){
+						left = oLeft  + step;
+					}else{
+						left = oLeft - step;
+					}
+					that.imgAni(this.photoS,left,500,function(){
+						flag = false;
+					});
+				},
+				imgChange:function(ele){
+					var	$bigPhoto = document.getElementById("big-photo"),
+						$li = this.photoS.getElementsByTagName("li"),
+						src = ele.getAttribute("data-src"),
+						len = $li.length;
+					return (function(){
+						addHandler(ele,"click",function(){
+							for(var i = 0;i < len;i++){
+								$li[i].className = "";
+							}
+							ele.className = "selected";
+							$bigPhoto.setAttribute("src","loading.gif");
+							imgComplete(src,function(){
+								$bigPhoto.setAttribute("src",src)
+							})
+						})
+					})()
+				},
+				imgAni:function(obj,leftN,aniTime,fn){
+					var	oldLeft = obj.style.left ? parseInt(obj.style.left) : 0,
+						time = 10,
+						that = this,
+						step,
+						flag;
+					flag = setInterval(function(){
+						var newLeft = obj.style.left ? parseInt(obj.style.left) : 0;
+						step = Math.floor((leftN-oldLeft)/(aniTime/time));
+						if(leftN === newLeft){
+							clearInterval(flag);
+							fn.call(obj);
+							return;
+						}
+						if(Math.abs(leftN - newLeft) < Math.abs(step)){
+							step = Math.abs(leftN - newLeft);
+						}
+						obj.style.left = (newLeft + step) + "px";
+					},time);
+				}				
+			}
+
+			imgSlide.init();
+
+			function stopPropagation(e){
+				if(e.stopPropagation){
+					e.stopPropagation()
+				}else{
+					e.cancelBubble = true;
+				}
+			}
+			function getStyle(obj){
+				var cur;
+				if(obj.currentStyle){
+					cur = obj.currentStyle;
+				}else{
+					cur = document.defaultView.getComputedStyle(obj,null);
+				}
+				return cur;
+			}
+			function addHandler(ele,type,fn){
+				if(ele.addEventListener){
+					ele.addEventListener(type,fn,false)
+				}else if(ele.attachEvent){
+					ele.attachEvent("on" + type,fn)
+				}
+			}
+			function getClass(className,node,tag){
+				if(document.getElementsByClassName){
+					return (node || document).getElementsByClassName(className);
+				}
+				var node = node || document,
+					tag = tag || "*",
+					childs = node.getElementsByTagName(tag),
+					arr = [],
+					len = childs.length;
+				for(var i = 0;i < len;i++){
+					var classNames = childs[i].className.split(" ");
+					for(var j = 0;j < classNames.length;j++){
+						if(classNames[j] === className){
+							arr.push(childs[i]);
+							break;
+						}
+					}
+				}
+				return arr;
+			}
+			function trigger(ele,type){
+				var ele = ele || document;
+				if(document.createEvent){
+					event = document.createEvent("Events");
+					event.initEvent(type,false,false);
+					ele.dispatchEvent(event);
+				}else{
+					ele.fireEvent("on" + type);
+				}
+			}
+			function imgComplete(src,fn){
+				var img = new Image();
+				img.src = src;
+				if(img.complete){
+					fn.call(img);
+					return;
+				}
+				img.onload = function(){
+					fn.call(img)
+				}
+			}
+		</script>
+</html>
