@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="common.js"></script>
+	<script src="animator.js"></script>
+	<script src="sprite.js"></script>
+	<script src="load.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas" width="1024" height="768" style="border:1px solid red">
+		Your browser do not support canvas!
+	</canvas>
+	<img src="0.png" alt="">
+	<div id="load-precent-nums"></div>
+	<script>
+		var canvas,context;
+
+		var sourceList = [
+					["bg.jpg"],
+					["video.mp4"],
+					["a.json"]
+				],
+		sourceObj = {
+			"images":["bg.jpg"],
+			"audio":["video.mp4"],
+			"json":["a.json"]
+		};
+		document.addEventListener("DOMContentLoaded",function(){
+			canvas = pb.init("myCanvas");
+			context = canvas.getContext("2d"); 
+			loadSources.init(sourceObj,function(){
+				var stop = new AnimationTimer();
+				stop.start();
+				for(var i = 0;i < 1000;i++){
+				}
+				stop.stop();
+			});
+		},false)
+		
+	</script>
+</body>
+</html>

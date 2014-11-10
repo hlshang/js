@@ -1,0 +1,160 @@
+(function(){
+	
+	var	sourceNums = 0,
+		sourceArr = [],
+		imageArr = [];
+
+	var loadSources = {
+		progress:0,
+		init:function(source,callback){
+			if(!pb.checkType(source)){
+				alert("载入资源格式为数组或者对象！");
+				return false;
+			}
+			if(pb.isArray(source)){
+				// 数组格式
+				var len = source.length;
+				for(var i = 0;i < len;i++){
+					sourceNums += source[i].length;
+				}
+				sourceArr = source;
+			}
+
+			if(pb.isObject(source)){
+				// 对象格式
+				for(var i in source){
+					// 统计资源总数
+					sourceNums += source[i].length;
+					sourceArr.push(source[i]);
+				}
+			}
+			this.loadMain(sourceArr,callback)
+		},
+		loadMain:function(obj,callback){
+			var that = this,
+				imageObj = obj[0],
+				mediaObj = obj[1],
+				jsonObj = obj[2],
+				imageId = 0,
+				mediaId = 0,
+				jsonId = 0,
+				jsonFailId = 0;
+			var loadImg = function(){
+				var	image = new Image();
+				image.src = imageObj[imageId];
+
+				image.onload = function(){
+					if(image.complete === true){
+						imageArr.push(image);
+						imageId++;
+						if(imageId < imageObj.length){
+							loadImg();							
+						}
+						that.progress = parseFloat(imageId/sourceNums).toFixed(2);
+						that.showProgressBar(that.progress,imageObj[imageId - 1]);
+						if(imageId === imageObj.length){
+							loadMedia();
+						}
+					}
+				}
+				image.error = function(){
+					imageId++;
+					loadImg();
+					that.progress = parseFloat(imageId/sourceNums).toFixed(2);
+					that.showProgressBar(that.progress,imageObj[imageId - 1]);
+				}
+			}
+
+			function loadMedia() {
+				var media = document.createElement("audio");
+				media.src = mediaObj[mediaId];
+				// 不支持video/audio，则跳过，不要音频文件也罢！
+				if(!media.play){
+					mediaId = mediaObj.length;
+					that.progress = parseFloat((imageId + mediaId)/sourceNums).toFixed(2);
+					that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
+					loadJson();
+					return;
+				}
+				media.addEventListener("canplay",function(){
+					mediaId++;
+					if(mediaId < mediaObj.length){
+						loadMedia();
+					}
+					that.progress = parseFloat((imageId + mediaId)/sourceNums).toFixed(2);
+					that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
+					if(mediaId === mediaObj.length){
+						loadJson();
+					}
+				},false)
+			}
+
+			function loadJson(){
+				var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
+				xmlHttp.onreadystatechange = function(){
+					if(xmlHttp.readyState === 4){
+						if(xmlHttp.status === 200){
+							jsonId++;
+							if(jsonId < jsonObj.length){
+								loadJson();
+							}
+							that.progress = parseFloat((imageId + mediaId + jsonId)/sourceNums).toFixed(2);
+							that.showProgressBar(that.progress,jsonObj[jsonId - 1]);
+							if(jsonId === jsonObj.length){
+								callback();
+							}
+						}else{
+							jsonFailId++;
+							if(jsonFailId === 3){
+								return false;
+							}
+							loadJson()
+						}
+					}
+				}
+				xmlHttp.open("GET",jsonObj[jsonId],true);
+				xmlHttp.send(null);
+			}
+
+			loadImg();
+		},
+		showProgressBar:function(progress,sourceName){
+			// height 必须为 radius 的2倍
+			var width = 360,
+				height = 28,
+				radius = 14,
+				cWidth = canvas.width,
+				cHeight = canvas.height;
+
+			// context.clearRect(cWidth/2 - width/2 - radius,cHeight/2 - height/2 - radius,width + radius,height);
+			context.clearRect(0,0,cWidth,cHeight);
+
+			context.beginPath();
+			context.arc(cWidth/2 - width/2,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
+			context.lineTo(cWidth/2 + width/2 - radius,cHeight/2 - height);
+			context.arc(cWidth/2 + width/2 - radius,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
+			context.lineTo(cWidth/2 - width/2,cHeight/2 - height/2 + radius);
+			context.closePath();
+
+			context.strokeStyle = "rgba(255,60,0,1)";
+			context.lineWidth = 2;
+			context.stroke();
+			
+			context.beginPath();
+			context.arc(cWidth/2 - width/2,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
+			context.lineTo(cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height);
+			context.arc(cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
+			context.lineTo(cWidth/2 - width/2,cHeight/2 - height/2 + radius);
+			context.closePath();
+			context.fillStyle = "rgba(255,60,10,.8)";
+			context.fill();
+
+			this.showPrecentNums(progress * 100);
+		},
+		showPrecentNums:function(precents){
+			pb.init("load-precent-nums").innerHTML = precents + "%";
+		}
+	};
+
+	window.loadSources = loadSources;
+})()
