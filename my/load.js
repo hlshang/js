@@ -1,5 +1,6 @@
 (function(){
-	
+	var resumeImg = new Image();
+		resumeImg.src = "resume.png";
 	var	sourceNums = 0,
 		sourceArr = [],
 		imageArr = [];
@@ -113,6 +114,7 @@
 					}
 				}
 				xmlHttp.open("GET",jsonObj[jsonId],true);
+				xmlHttp.setRequestHeader("Content-Type","application/json");
 				xmlHttp.send(null);
 			}
 
@@ -120,20 +122,18 @@
 		},
 		showProgressBar:function(progress,sourceName){
 			// height 必须为 radius 的2倍
-			var width = 360,
-				height = 28,
-				radius = 14,
+			var width = 450,
+				height = 30,
+				radius = 15,
 				cWidth = canvas.width,
 				cHeight = canvas.height;
-
-			// context.clearRect(cWidth/2 - width/2 - radius,cHeight/2 - height/2 - radius,width + radius,height);
+			
 			context.clearRect(0,0,cWidth,cHeight);
-
 			context.beginPath();
-			context.arc(cWidth/2 - width/2,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
+			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
 			context.lineTo(cWidth/2 + width/2 - radius,cHeight/2 - height);
 			context.arc(cWidth/2 + width/2 - radius,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
-			context.lineTo(cWidth/2 - width/2,cHeight/2 - height/2 + radius);
+			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
 			context.closePath();
 
 			context.strokeStyle = "rgba(255,60,0,1)";
@@ -141,13 +141,15 @@
 			context.stroke();
 			
 			context.beginPath();
-			context.arc(cWidth/2 - width/2,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
+			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
 			context.lineTo(cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height);
 			context.arc(cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
-			context.lineTo(cWidth/2 - width/2,cHeight/2 - height/2 + radius);
+			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
 			context.closePath();
 			context.fillStyle = "rgba(255,60,10,.8)";
 			context.fill();
+			
+			context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height,height,height)
 
 			this.showPrecentNums(progress * 100);
 		},
