@@ -20,12 +20,36 @@ function Sprite(name,painter,behaviors){
 Sprite.prototype = {
 	paint:function(context){
 		if(this.visible && this.painter){
-			this.painter.paint(context,this);
+			this.painter.paint(this,context);
 		}
 	},
 	update:function(context,time){
 		for(var i = this.behaviors.length;i > 0;--i){
 			this.behaviors[i - 1].execute(this,context,time);
 		}
+	}
+}
+
+// spriteSheets
+function SpriteSheets(spriteSheet,cells){
+	this.spriteSheet = spriteSheet;
+	this.cells = cells;
+	this.cellsIndex = 0;
+}
+SpriteSheets.prototype = {
+	advance:function(){
+		if(this.cellsIndex >= this.cells.length - 1){
+			this.cellsIndex = 0;
+		}else{
+			this.cellsIndex++;
+		}
+	},
+	paint:function(sprite,context){
+		var cells = this.cells[this.cellsIndex],
+			x = cells.frame.x,
+			y = cells.frame.y,
+			w = cells.frame.w,
+			h = cells.frame.h;
+		context.drawImage(this.spriteSheet,x,y,w,h,sprite.left,sprite.top,w,h);
 	}
 }

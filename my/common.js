@@ -21,3 +21,14 @@
 
 	window.pb = pb;
 })(window)
+
+window.requestAnimationFrame = (function(){
+	return 	window.requestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame ||
+			function(callback,element){
+				setTimeout(callback,1000/60);
+			}
+})()

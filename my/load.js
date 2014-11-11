@@ -2,8 +2,7 @@
 	var resumeImg = new Image();
 		resumeImg.src = "resume.png";
 	var	sourceNums = 0,
-		sourceArr = [],
-		imageArr = [];
+		sourceArr = [];
 
 	var loadSources = {
 		progress:0,
@@ -46,7 +45,7 @@
 
 				image.onload = function(){
 					if(image.complete === true){
-						imageArr.push(image);
+						Config.imgSource.push(image);
 						imageId++;
 						if(imageId < imageObj.length){
 							loadImg();							
@@ -78,6 +77,7 @@
 					return;
 				}
 				media.addEventListener("canplay",function(){
+					Config.mediaSource.push(media);
 					mediaId++;
 					if(mediaId < mediaObj.length){
 						loadMedia();
@@ -95,6 +95,7 @@
 				xmlHttp.onreadystatechange = function(){
 					if(xmlHttp.readyState === 4){
 						if(xmlHttp.status === 200){
+							Config.jsonSource.push(xmlHttp);
 							jsonId++;
 							if(jsonId < jsonObj.length){
 								loadJson();
@@ -121,10 +122,9 @@
 			loadImg();
 		},
 		showProgressBar:function(progress,sourceName){
-			// height 必须为 radius 的2倍
-			var width = 450,
-				height = 30,
-				radius = 15,
+			var width = Config.progressBarW,
+				height = Config.progressBarH,
+				radius = Config.progressRadius,
 				cWidth = canvas.width,
 				cHeight = canvas.height;
 			
