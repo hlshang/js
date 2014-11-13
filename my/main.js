@@ -1,4 +1,3 @@
-var launchTime;
 function Game(){
 	var that = this;
 	this.lastTime = 0;
@@ -25,7 +24,7 @@ function Game(){
 			if(this.lastAdvanceTime === 0){
 				this.lastAdvanceTime = time;
 			}
-			if(time - this.lastAdvanceTime > 1000/60){
+			if(time - this.lastAdvanceTime > 100){
 				sprite.painter.advance();
 				this.lastAdvanceTime = time;
 			}
@@ -62,7 +61,7 @@ function Game(){
 			if(this.lastAdvanceTime === 0){
 				this.lastAdvanceTime = time;
 			}
-			if(time - this.lastAdvanceTime > 1000/60){
+			if(time - this.lastAdvanceTime > 100){
 				sprite.painter.advance();
 				this.lastAdvanceTime = time;
 			}
@@ -89,6 +88,18 @@ function Game(){
 	};
 	this.diceTwoBehaivor = [this.diceTwoPaintBehaivor,this.diceTwoMoveBehaivor];
 
+	this.windmillTwoBehavior = {
+		lastAdvanceTime:0,
+		execute:function(sprite,context,time){
+			if(this.lastAdvanceTime === 0){
+				this.lastAdvanceTime = time;
+			}
+			if(time - this.lastAdvanceTime > 150){
+				sprite.painter.advance();
+				this.lastAdvanceTime = time;
+			}
+		}
+	};
 	this.sprites = [];
 }
 Game.prototype = {
@@ -125,16 +136,25 @@ Game.prototype = {
 
 		this.diceTwo.paint(context);
 		this.diceTwo.update(context,time);
+
+		this.windmillTwo.paint(context);
+		this.windmillTwo.update(context,time);
+		this.windmillTwo.left = canvas.width - this.windmillTwo.width;
+		this.windmillTwo.top = canvas.height - this.windmillTwo.height;
 	},
 
 	createSprites:function(){
 		this.nameJsonData("dice-one");
 		this.nameJsonData("dice-two");
+		this.nameJsonData("windmillTwo");
 		this.diceOne = new Sprite("dice-one",new SpriteSheets(Config.imgSource[0],
 																this.jsonObj["dice-one"]),this.diceOneBehaivor);
 		this.diceTwo = new Sprite("dice-two",new SpriteSheets(Config.imgSource[0],
 																this.jsonObj["dice-two"]),
 																this.diceTwoBehaivor);
+		this.windmillTwo = new Sprite("windmillTwo",new SpriteSheets(Config.imgSource[1],
+																this.jsonObj["windmillTwo"]),
+																[this.windmillTwoBehavior]);
 		this.diceOne.diceAnimationTimer = new AnimationTimer(720,AnimationTimer.makeEaseInOutTransducer());
 		this.diceTwo.diceAnimationTimer = new AnimationTimer(900,AnimationTimer.makeEaseInTransducer(1.1));
 

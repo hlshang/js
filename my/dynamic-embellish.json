@@ -1,0 +1,123 @@
+﻿{"frames": {
+
+"cow-1":
+{
+	"frame": {"x":303,"y":286,"w":81,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":81,"h":69},
+	"sourceSize": {"w":81,"h":69}
+},
+"cow-2":
+{
+	"frame": {"x":303,"y":355,"w":81,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":81,"h":69},
+	"sourceSize": {"w":81,"h":69}
+},
+"cow-3":
+{
+	"frame": {"x":384,"y":286,"w":81,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":81,"h":69},
+	"sourceSize": {"w":81,"h":69}
+},
+"cow-4":
+{
+	"frame": {"x":303,"y":355,"w":81,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":81,"h":69},
+	"sourceSize": {"w":81,"h":69}
+},
+"cow-5":
+{
+	"frame": {"x":384,"y":286,"w":81,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":81,"h":69},
+	"sourceSize": {"w":81,"h":69}
+},
+"cow-6":
+{
+	"frame": {"x":303,"y":355,"w":81,"h":69},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":81,"h":69},
+	"sourceSize": {"w":81,"h":69}
+},
+"windmillOne-1":
+{
+	"frame": {"x":0,"y":0,"w":153,"h":148},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":153,"h":148},
+	"sourceSize": {"w":153,"h":148}
+},
+"windmillOne-2":
+{
+	"frame": {"x":0,"y":148,"w":153,"h":148},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":153,"h":148},
+	"sourceSize": {"w":153,"h":148}
+},
+"windmillOne-3":
+{
+	"frame": {"x":0,"y":296,"w":153,"h":148},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":153,"h":148},
+	"sourceSize": {"w":153,"h":148}
+},
+"windmillOne-4":
+{
+	"frame": {"x":153,"y":0,"w":153,"h":148},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":153,"h":148},
+	"sourceSize": {"w":153,"h":148}
+},
+"windmillTwo-5":
+{
+	"frame": {"x":153,"y":148,"w":150,"h":138},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":138},
+	"sourceSize": {"w":150,"h":138}
+},
+"windmillTwo-6":
+{
+	"frame": {"x":153,"y":286,"w":150,"h":138},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":138},
+	"sourceSize": {"w":150,"h":138}
+},
+"windmillTwo-7":
+{
+	"frame": {"x":303,"y":148,"w":150,"h":138},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":138},
+	"sourceSize": {"w":150,"h":138}
+},
+"windmillTwo-8":
+{
+	"frame": {"x":306,"y":0,"w":150,"h":138},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":150,"h":138},
+	"sourceSize": {"w":150,"h":138}
+}},
+"meta": {
+	"app": "Adobe Flash CS6",
+	"version": "12.0.0.481",
+	"image": "未命名-1.png",
+	"format": "RGBA8888",
+	"size": {"w":512,"h":512},
+	"scale": "1"
+}
+}

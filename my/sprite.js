@@ -35,6 +35,7 @@ function SpriteSheets(spriteSheet,cells){
 	this.spriteSheet = spriteSheet;
 	this.cells = cells;
 	this.cellsIndex = 0;
+	this.globalCompositeOperation = "lighter";
 }
 SpriteSheets.prototype = {
 	advance:function(){
