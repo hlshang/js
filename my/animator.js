@@ -21,6 +21,7 @@ StopWatch.prototype = {
 			this.unpause();
 		}
 		this.elapsed = +new Date() - this.startTime - this.totalPauseTime;
+		this.running = false;
 	},
 	pause:function(){
 		if(this.pause) return;
@@ -96,8 +97,56 @@ AnimationTimer.prototype = {
 			precentComplete = 1.0;
 		}
 		if(!!this.transducer && precentComplete > 0){
-			elapsedTime = elapsedTime * (this.transducer(elapsedTime)/precentComplete);
+			elapsedTime = elapsedTime * (this.transducer(precentComplete)/precentComplete);
 		}
 		return elapsedTime;
 	}
 }
+
+AnimationTimer.makeEaseOutTransducer = function (strength) {
+   return function (percentComplete) {
+      strength = strength ? strength : 1.0;
+
+      return 1 - Math.pow(1 - percentComplete, strength*2);
+   };
+};
+
+AnimationTimer.makeEaseInTransducer = function (strength) {
+   strength = strength ? strength : 1.0;
+
+   return function (percentComplete) {
+      return Math.pow(percentComplete, strength*2);
+   };
+};
+
+AnimationTimer.makeEaseInOutTransducer = function () {
+   return function (percentComplete) {
+      return percentComplete - Math.sin(percentComplete*2*Math.PI) / (2*Math.PI);
+   };
+};
+
+AnimationTimer.makeElasticTransducer = function (passes) {
+   passes = passes || 3;
+
+   return function (percentComplete) {
+       return ((1-Math.cos(percentComplete * Math.PI * passes)) *
+               (1 - percentComplete)) + percentComplete;
+   };
+};
+
+AnimationTimer.makeBounceTransducer = function (bounces) {
+   var fn = AnimationTimer.makeElasticTransducer(bounces);
+
+   bounces = bounces || 2;
+
+   return function (percentComplete) {
+      percentComplete = fn(percentComplete);
+      return percentComplete <= 1 ? percentComplete : 2-percentComplete;
+   }; 
+};
+
+AnimationTimer.makeLinearTransducer = function () {
+   return function (percentComplete) {
+      return percentComplete;
+   };
+};

@@ -47,9 +47,9 @@ SpriteSheets.prototype = {
 	paint:function(sprite,context){
 		var cells = this.cells[this.cellsIndex],
 			x = cells.frame.x,
-			y = cells.frame.y,
-			w = cells.frame.w,
-			h = cells.frame.h;
-		context.drawImage(this.spriteSheet,x,y,w,h,sprite.left,sprite.top,w,h);
+			y = cells.frame.y;
+		sprite.width = cells.frame.w,
+		sprite.height = cells.frame.h;
+		context.drawImage(this.spriteSheet,x,y,sprite.width,sprite.height,sprite.left,sprite.top,sprite.width,sprite.height);
 	}
 }
