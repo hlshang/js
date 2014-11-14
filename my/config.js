@@ -4,7 +4,7 @@ var Config = {
 	imgSource : [],
 	mediaSource : [],
 	jsonSource : [],
-	jsonObj : [],
+	jsonObj : {},
 	// 进度条长度
 	progressBarW : 450,
 	// 进度条高度

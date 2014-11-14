@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="sprite.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas" width="1024" height="768" style="border:1px solid red">
+		Your browser do not support canvas!
+	</canvas>
+	<script>
+	var canvas = document.getElementById("myCanvas"),
+		context = canvas.getContext("2d");
+	var painter = {
+		paint:function(sprite,context){
+			// context.beginPath();
+			// context.arc(sprite.left + sprite.width/2,sprite.top + sprite.height/2,RADIUS,0,2 * Math.PI,false);
+			// context.clip();
+			// // context.closePath();
+			// context.lineWidth = 2;
+			// context.strokeStyle = "rgba(0,0,0,.5)";
+			// context.fillStyle = "rgba(10,10,10,.8)";
+			// context.fill();
+			// context.stroke();
+			var x = sprite.left + sprite.width/2,
+				y = sprite.top + sprite.height/2,
+				radius = sprite.width/2;
+
+			context.save();
+			context.beginPath();
+			context.arc(x,y,radius,0,2 * Math.PI,false);
+			context.clip();
+			// context.lineWidth = 2;
+			// context.stroke();
+			context.restore();
+		},
+
+	}
+	var ball = new Sprite("ball",painter)
+	ball.left = 200;
+	ball.top = 100;
+	ball.width = 50;
+	ball.height = 50;
+	ball.paint(context)
+	</script>
+</body>
+</html>

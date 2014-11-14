@@ -95,7 +95,7 @@
 				xmlHttp.onreadystatechange = function(){
 					if(xmlHttp.readyState === 4){
 						if(xmlHttp.status === 200){
-							Config.jsonSource.push(xmlHttp);
+							that.dealXmlHttp(xmlHttp);
 							jsonId++;
 							if(jsonId < jsonObj.length){
 								loadJson();
@@ -120,6 +120,11 @@
 			}
 
 			loadImg();
+		},
+		dealXmlHttp:function(xmlHttp){
+			var responseText = JSON.parse(xmlHttp.responseText),
+				jsonName = responseText.meta.image.replace(/(.png|.jpeg|.jpg|.gif)$/i,"");
+			Config.jsonObj[jsonName] = responseText.frames;
 		},
 		showProgressBar:function(progress,sourceName){
 			var width = Config.progressBarW,

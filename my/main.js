@@ -2,8 +2,9 @@ function Game(){
 	var that = this;
 	this.lastTime = 0;
 	this.INTERVAL_TIME = 90;
-	this.jsonObj = [];
 	this.lastFrameTime = 0;
+	// 最后一个骰子中设置
+	this.diceStartFlag = false;
 	// 骰子最终数
 	this.diceOneNum = 0;
 	this.diceTwoNum = 0;
@@ -19,18 +20,25 @@ function Game(){
 	this.commonFps = 60;
 
 	this.diceOnePaintBehaivor = {
+		lastAdvance:0,
 		lastAdvanceTime:0,
+		changeFrequencyTime:100,
 		execute:function(sprite,context,time){
+			if(!that.diceStartFlag) return;
 			if(this.lastAdvanceTime === 0){
 				this.lastAdvanceTime = time;
 			}
-			if(time - this.lastAdvanceTime > 100){
-				sprite.painter.advance();
+			if(time - this.lastAdvanceTime > this.changeFrequencyTime--){
+				if(sprite.painter.cellsIndex < 6){
+					sprite.painter.cellsIndex = 6;
+				}else{
+					sprite.painter.cellsIndex = ++this.lastAdvance;
+				}
 				this.lastAdvanceTime = time;
 			}
-			if(that.diceOne.diceAnimationTimer.isExpired()){
+			if(sprite.diceAnimationTimer.isExpired()){
 				// 确定骰子数
-				that.diceOne.painter.cellsIndex = that.diceOneNum;
+				sprite.painter.cellsIndex = that.diceOneNum;
 			}
 		}
 	};
@@ -56,18 +64,26 @@ function Game(){
 	this.diceOneBehaivor = [this.diceOnePaintBehaivor,this.diceOneMoveBehaivor];
 
 	this.diceTwoPaintBehaivor = {
+		lastAdvance:0,
 		lastAdvanceTime:0,
+		changeFrequencyTime:150,
 		execute:function(sprite,context,time){
+			if(!that.diceStartFlag) return;
 			if(this.lastAdvanceTime === 0){
 				this.lastAdvanceTime = time;
 			}
-			if(time - this.lastAdvanceTime > 100){
-				sprite.painter.advance();
+			if(time - this.lastAdvanceTime > (this.changeFrequencyTime-=2)){
+				if(sprite.painter.cellsIndex < 6){
+					sprite.painter.cellsIndex = 6;
+				}else{
+					sprite.painter.cellsIndex = ++this.lastAdvance;
+				}
 				this.lastAdvanceTime = time;
 			}
-			if(that.diceTwo.diceAnimationTimer.isExpired()){
+			if(sprite.diceAnimationTimer.isExpired()){
 				// 确定骰子数
-				that.diceTwo.painter.cellsIndex = that.diceTwoNum;
+				sprite.painter.cellsIndex = that.diceTwoNum;
+				that.diceStartFlag = false;
 			}
 		}
 	};
@@ -106,6 +122,7 @@ Game.prototype = {
 	startDice:function(){
 		var that = this;
 		pb.init("roll-dice").addEventListener("click",function(){
+			that.diceStartFlag = true;
 			that.diceOne.diceAnimationTimer.start();
 			that.diceTwo.diceAnimationTimer.start();
 			that.diceOneNum = parseInt(Math.random() * 5);
@@ -144,26 +161,26 @@ Game.prototype = {
 	},
 
 	createSprites:function(){
-		this.nameJsonData("dice-one");
-		this.nameJsonData("dice-two");
-		this.nameJsonData("windmillTwo");
+		// sprites list
 		this.diceOne = new Sprite("dice-one",new SpriteSheets(Config.imgSource[0],
-																this.jsonObj["dice-one"]),this.diceOneBehaivor);
+																this.findCellData("dice-one",Config.jsonObj["dice"])),
+																this.diceOneBehaivor);
 		this.diceTwo = new Sprite("dice-two",new SpriteSheets(Config.imgSource[0],
-																this.jsonObj["dice-two"]),
+																this.findCellData("dice-two",Config.jsonObj["dice"])),
 																this.diceTwoBehaivor);
 		this.windmillTwo = new Sprite("windmillTwo",new SpriteSheets(Config.imgSource[1],
-																this.jsonObj["windmillTwo"]),
+																this.findCellData("windmillTwo",Config.jsonObj["dynamic-embellish"])),
 																[this.windmillTwoBehavior]);
-		this.diceOne.diceAnimationTimer = new AnimationTimer(720,AnimationTimer.makeEaseInOutTransducer());
+		
+		this.diceOne.diceAnimationTimer = new AnimationTimer(1000,AnimationTimer.makeEaseInOutTransducer());
 		this.diceTwo.diceAnimationTimer = new AnimationTimer(900,AnimationTimer.makeEaseInTransducer(1.1));
 
 		// 放到canvas外面
 		this.diceOne.left = -96;
 		this.diceTwo.left = -96;
 		// push sprites
-		this.sprites.push(this.diceOne);
-		this.sprites.push(this.diceTwo);
+		// this.sprites.push(this.diceOne);
+		// this.sprites.push(this.diceTwo);
 	},
 	getSprites:function(name){
 		for(var i = 0;i < this.sprites.length;i++){
@@ -173,21 +190,14 @@ Game.prototype = {
 		}
 		return null;
 	},
-	nameJsonData:function(name){
-		var jsonList = Config.jsonSource,
-			len = jsonList.length,
-			jsonRes,
-			jsonResFrame;
-		this.jsonObj[name] = [];
-		for(var i = 0;i < len;i++){
-			jsonRes = JSON.parse(Config.jsonSource[i].responseText),
-			jsonResFrame = jsonRes.frames;
-			for(var j in jsonResFrame){
-				if(j.indexOf(name) !== -1){
-					this.jsonObj[name].push(jsonResFrame[j]);
-				}
+	findCellData:function(name,jsonObj){
+		var cellDatas = [];
+		for(var i in jsonObj){
+			if(i.indexOf(name) !== -1){
+				cellDatas.push(jsonObj[i]);
 			}
 		}
+		return cellDatas;
 	},
 	// 帧速率
 	fps:function(time){
