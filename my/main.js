@@ -179,10 +179,8 @@ Game.prototype = {
 		this.diceTwo.paint(context);
 		this.diceTwo.update(context,time);
 
-		// this.windmillTwo.paint(context);
-		// this.windmillTwo.update(context,time);
-		// this.windmillTwo.left = canvas.width - this.windmillTwo.width;
-		// this.windmillTwo.top = canvas.height - this.windmillTwo.height;
+		this.windmill.paint(context);
+		this.windmill.update(context,time);
 	},
 
 	createSprites:function(){
@@ -193,10 +191,12 @@ Game.prototype = {
 		this.diceTwo = new Sprite("diceTwo",new SpriteSheets(Config.imgSource[0],
 																this.findCellData("diceTwo",Config.jsonObj["dice"])),
 																this.diceTwoBehaivor);
-		// this.windmillTwo = new Sprite("windmillTwo",new SpriteSheets(Config.imgSource[1],
-		// 														this.findCellData("windmillTwo",Config.jsonObj["dynamic-embellish"])),
-		// 														[this.windmillTwoBehavior]);
-		
+		this.windmill = new Sprite("windmill",new SpriteSheets(Config.imgSource[1],
+																this.findCellData("windmill",Config.jsonObj["dynamic-embellish"])),
+																[this.windmillTwoBehavior]);
+		this.windmill.left = 15;
+		this.windmill.top = canvas.height - 160;
+
 		this.diceOne.diceAnimationTimer = new AnimationTimer(800,AnimationTimer.makeEaseInOutTransducer());
 		this.diceTwo.diceAnimationTimer = new AnimationTimer(1000,AnimationTimer.makeEaseInTransducer(1.1));
 
