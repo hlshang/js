@@ -12,5 +12,8 @@ var Config = {
 	// 进度条的半径，必须为高度的一半
 	progressRadius : 15,
 	// 重力加速度
-	GRAVITY_FORCE:9.81
+	GRAVITY_FORCE:9.81,
+	// 一块草地的宽度
+	grassWidth : 160,
+	grassHeight : 160
 }

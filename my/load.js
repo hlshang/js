@@ -50,7 +50,7 @@
 						if(imageId < imageObj.length){
 							loadImg();							
 						}
-						that.progress = parseFloat(imageId/sourceNums).toFixed(2);
+						that.progress = imageId/sourceNums;
 						that.showProgressBar(that.progress,imageObj[imageId - 1]);
 						if(imageId === imageObj.length){
 							loadMedia();
@@ -71,7 +71,7 @@
 				// 不支持video/audio，则跳过，不要音频文件也罢！
 				if(!media.play){
 					mediaId = mediaObj.length;
-					that.progress = parseFloat((imageId + mediaId)/sourceNums).toFixed(2);
+					that.progress = (imageId + mediaId)/sourceNums;
 					that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
 					loadJson();
 					return;
@@ -82,7 +82,7 @@
 					if(mediaId < mediaObj.length){
 						loadMedia();
 					}
-					that.progress = parseFloat((imageId + mediaId)/sourceNums).toFixed(2);
+					that.progress = (imageId + mediaId)/sourceNums;
 					that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
 					if(mediaId === mediaObj.length){
 						loadJson();
@@ -100,7 +100,7 @@
 							if(jsonId < jsonObj.length){
 								loadJson();
 							}
-							that.progress = parseFloat((imageId + mediaId + jsonId)/sourceNums).toFixed(2);
+							that.progress = (imageId + mediaId + jsonId)/sourceNums;
 							that.showProgressBar(that.progress,jsonObj[jsonId - 1]);
 							if(jsonId === jsonObj.length){
 								callback();
@@ -131,8 +131,9 @@
 				height = Config.progressBarH,
 				radius = Config.progressRadius,
 				cWidth = canvas.width,
-				cHeight = canvas.height;
-			
+				cHeight = canvas.height,
+				progress = parseInt(progress * 100);
+
 			context.clearRect(0,0,cWidth,cHeight);
 			context.beginPath();
 			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
@@ -147,16 +148,15 @@
 			
 			context.beginPath();
 			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
-			context.lineTo(cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height);
-			context.arc(cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
+			context.lineTo(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height);
+			context.arc(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
 			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
 			context.closePath();
 			context.fillStyle = "rgba(255,60,10,.8)";
 			context.fill();
 			
-			context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress,cHeight/2 - height,height,height)
-
-			this.showPrecentNums(progress * 100);
+			context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height,height,height)
+			this.showPrecentNums(progress);
 		},
 		showPrecentNums:function(precents){
 			pb.init("load-precent-nums").innerHTML = precents + "%";

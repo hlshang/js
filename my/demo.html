@@ -17,15 +17,13 @@
 	}
 	body{
 		font-family: "微软雅黑";
-		background-color: green
+		background: url(grass-bg.png) repeat left top;
 	}
 	.canvas-main{
 		position: relative;
-		width: 960px;
-		margin:10px auto 0;
-		border:1px solid #ccc;
+		width: 1080px;
+		margin:20px auto 0;
 		border-radius: 5px;
-		background-color: #f5f5f5
 	}
 	#load-precent-nums{
 		position: absolute;
@@ -36,14 +34,11 @@
 		-webkit-transform:translate(-50%,0);
 		transform:translate(-50%,0);
 	}
-	#myCanvas{
-		/*background-color: green*/
-	}
 	</style>
 </head>
 <body>
 	<div class="canvas-main">
-		<canvas id="myCanvas" width="960" height="560">
+		<canvas id="myCanvas" width="1080" height="540">
 			Your browser do not support canvas!
 		</canvas>
 		<div id="load-precent-nums"></div>
@@ -58,9 +53,9 @@
 					["dice.json"]
 				],
 		sourceObj = {
-			"images":["dice.png","dynamic-embellish.png"],
+			"images":["dice.png","dynamic-embellish.png","static-embellish.png"],
 			"audio":["song.mp3"],
-			"json":["dice.json?ok","dynamic-embellish.json?ok"]
+			"json":["dice.json","dynamic-embellish.json","static-embellish.json?ooo"]
 		};
 		document.addEventListener("DOMContentLoaded",function(){
 			canvas = pb.init("myCanvas");

@@ -47,10 +47,28 @@ SpriteSheets.prototype = {
 	},
 	paint:function(sprite,context){
 		var cells = this.cells[this.cellsIndex],
-			x = cells.frame.x,
-			y = cells.frame.y;
-		sprite.width = cells.frame.w,
-		sprite.height = cells.frame.h;
+			frame = cells.frame,
+			x = frame.x,
+			y = frame.y;
+		sprite.width = frame.w,
+		sprite.height = frame.h;
 		context.drawImage(this.spriteSheet,x,y,sprite.width,sprite.height,sprite.left,sprite.top,sprite.width,sprite.height);
+	}
+}
+// static
+function drawStaticImage(img,cell){
+	this.img = img;
+	this.cell = cell;
+	this.globalCompositeOperation = "lighter";
+}
+drawStaticImage.prototype = {
+	paint:function(img,context){
+		var cell = this.cell,
+			frame = cell.frame,
+			x = frame.x,
+			y = frame.y;
+		img.width = frame.w;
+		img.height = frame.h;
+		context.drawImage(this.img,x,y,img.width,img.height,img.left,img.top,img.width,img.height);
 	}
 }
