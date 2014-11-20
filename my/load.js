@@ -127,6 +127,7 @@
 			Config.jsonObj[jsonName] = responseText.frames;
 		},
 		showProgressBar:function(progress,sourceName){
+			console.log(canvas,sss);
 			var width = Config.progressBarW,
 				height = Config.progressBarH,
 				radius = Config.progressRadius,
@@ -135,6 +136,7 @@
 				progress = parseInt(progress * 100);
 
 			context.clearRect(0,0,cWidth,cHeight);
+
 			context.beginPath();
 			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
 			context.lineTo(cWidth/2 + width/2 - radius,cHeight/2 - height);
@@ -142,7 +144,7 @@
 			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
 			context.closePath();
 
-			context.strokeStyle = "rgba(255,60,0,1)";
+			context.strokeStyle = Config.progressBorderColor;
 			context.lineWidth = 2;
 			context.stroke();
 			
@@ -152,7 +154,7 @@
 			context.arc(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
 			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
 			context.closePath();
-			context.fillStyle = "rgba(255,60,10,.8)";
+			context.fillStyle = Config.progressColor;
 			context.fill();
 			
 			context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height,height,height)

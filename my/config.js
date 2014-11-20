@@ -11,6 +11,10 @@ var Config = {
 	progressBarH : 30,
 	// 进度条的半径，必须为高度的一半
 	progressRadius : 15,
+	// 进度条颜色
+	progressColor : "rgba(255,60,10,.8)",
+	// 进度条边框颜色
+	progressBorderColor : "rgba(255,60,0,1)",
 	// 重力加速度
 	GRAVITY_FORCE:9.81,
 	// 一块草地的宽度
