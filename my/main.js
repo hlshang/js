@@ -3,6 +3,8 @@ function Game(){
 	this.lastTime = 0;
 	this.INTERVAL_TIME = 90;
 	// this.lastFrameTime = 0;
+	// json cells 缓存
+	this.jsonCells = {},
 	// 最后一个骰子中设置
 	this.diceStartFlag = false;
 	// 骰子最终数
@@ -10,9 +12,9 @@ function Game(){
 	this.diceTwoNum = 0;
 	this.pauseGame = true;
 	// 假定屏幕高为10m
-	this.canvasPresumeHeight = 1;
+	this.canvasPresumeHeight = 10;
 	// pix/meter
-	this.pixPerMeter = canvas.height/10;
+	this.pixPerMeter = canvas.height/this.canvasPresumeHeight;
 	// 骰子的初始水平速度
 	this.xStartSpeed = 12;
 	// 骰子的初始垂直速度
@@ -281,11 +283,16 @@ Game.prototype = {
 	},
 	findCellData:function(name,jsonObj){
 		var cellDatas = [];
+		// jsonCells中存在，则直接返回
+		if(name in this.jsonCells){
+			return this.jsonCells[name];
+		}
 		for(var i in jsonObj){
 			if(i.indexOf(name) !== -1){
 				cellDatas.push(jsonObj[i]);
 			}
 		}
+		this.jsonCells[name] = cellDatas;
 		return cellDatas;
 	},
 	clearPause:function(){

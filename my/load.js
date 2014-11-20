@@ -127,7 +127,6 @@
 			Config.jsonObj[jsonName] = responseText.frames;
 		},
 		showProgressBar:function(progress,sourceName){
-			console.log(canvas,sss);
 			var width = Config.progressBarW,
 				height = Config.progressBarH,
 				radius = Config.progressRadius,
