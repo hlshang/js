@@ -50,7 +50,7 @@ SpriteSheets.prototype = {
 			frame = cells.frame,
 			x = frame.x,
 			y = frame.y;
-		sprite.width = frame.w,
+		sprite.width = frame.w;
 		sprite.height = frame.h;
 		context.drawImage(this.spriteSheet,x,y,sprite.width,sprite.height,sprite.left,sprite.top,sprite.width,sprite.height);
 	}

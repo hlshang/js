@@ -3,7 +3,13 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script src="config.js"></script>
+	<script src="common.js"></script>
+	<script src="animator.js"></script>
 	<script src="sprite.js"></script>
+	<script src="load.js"></script>
+	<script src="main.js"></script>
 	<style>
 	*{
 		padding: 0;
@@ -13,40 +19,63 @@
 		padding-top: 100px;
 		display: block;
 		width: 1065px;
-		margin:111px auto;
 	}
 	</style>
 </head>
 <body>
-	<canvas id="myCanvas" width="1080" height="700">
+	<canvas id="myCanvas" width="1080" height="333">
 		Your browser do not support canvas!
 	</canvas>
+	<div id="load-precent-nums"></div>
+	<a href="javascript:void(0)" id="roll-dice">摇一摇</a>
+	<img src="jump.png" alt="" id="jump-runner">
 	<script>
-	var canvas = document.getElementById("myCanvas"),
-		context = canvas.getContext("2d");
+	var canvas,context;
 
-	context.lineWidth = 1;
-	context.shadowBlur = 5;
-	context.shadowColor = "blue";
-	context.strokeStyle = "green";
+		var sourceList = [
+					["bg.jpg"],
+					["song.mp3"],
+					["dice.json"]
+				],
+		sourceObj = {
+			"images":["dice.png","dynamic-embellish.png","static-embellish.png"],
+			"audio":["song.mp3"],
+			"json":["dice.json","dynamic-embellish.json?o","static-embellish.json?ooo"]
+		};
+		document.addEventListener("DOMContentLoaded",function(){
+			canvas = pb.init("myCanvas");
+			context = canvas.getContext("2d"); 
+			loadSources.init(sourceObj,function(){
+				context.clearRect(0,0,canvas.width,canvas.height);
+				var game = new Game();
+				game.start();
+			});
+		},false)
+	// var canvas = document.getElementById("myCanvas"),
+	// 	context = canvas.getContext("2d");
 
-	context.translate(540,10);
-	context.rotate(45*Math.PI/180);
-	context.transform(1,-0.36,-0.36,1,0,0);
-	for(var i = 0;i < 6;i++){
-		context.fillStyle = "yellow";
-		context.fillRect(65*i,0,65,65);
-	}
-	for (var i = 0;i < 6;i++) {
-		context.strokeRect(0,65*i+65,65,65);
-	}
-	for(var i = 0;i < 6;i++){
-		context.strokeRect(65*i+65,65*6,65,65);
-	}
-	for(var i = 0;i < 6;i++){
-		context.strokeRect(65*6,65*i,65,65);
-	}
-	context.fill();
+	// context.lineWidth = 1;
+	// context.shadowBlur = 5;
+	// context.shadowColor = "blue";
+	// context.strokeStyle = "green";
+
+	// context.translate(540,10);
+	// context.rotate(45*Math.PI/180);
+	// context.transform(1,-0.36,-0.36,1,0,0);
+	// for(var i = 0;i < 6;i++){
+	// 	context.fillStyle = "yellow";
+	// 	context.fillRect(65*i,0,65,65);
+	// }
+	// for (var i = 0;i < 6;i++) {
+	// 	context.strokeRect(0,65*i+65,65,65);
+	// }
+	// for(var i = 0;i < 6;i++){
+	// 	context.strokeRect(65*i+65,65*6,65,65);
+	// }
+	// for(var i = 0;i < 6;i++){
+	// 	context.strokeRect(65*6,65*i,65,65);
+	// }
+	// context.fill();
 	</script>
 </body>
 </html>

@@ -130,6 +130,42 @@ function Game(){
 			}
 		}
 	};
+	this.runnerJumpBehavior = {
+		execute:function(sprite,context,time){
+			if(sprite.jumpTimer.isRunning()){
+				var framePerSecond = 1/that.commonFps;
+				sprite.velocityY = (1 - 9.81 * (sprite.jumpTimer.getElapsedTime()/1000)) * 111;
+				sprite.top -=  sprite.velocityY * framePerSecond;
+			}
+			if(sprite.jumpTimer.isExpired() && !sprite.falling){
+				sprite.falling = true;
+				sprite.jumpTimer.stop();
+				sprite.fallTimer.start();
+			}
+		}
+	};
+	this.runnerFallBehavior = {
+		execute:function(sprite,context,time){
+			if(sprite.fallTimer.isRunning()){
+				var framePerSecond = 1/that.commonFps;
+				sprite.velocityY = (9.81 * (sprite.fallTimer.getElapsedTime()/1000)) *111;
+				sprite.top +=  sprite.velocityY * framePerSecond;
+			}
+			if(sprite.fallTimer.isExpired()){
+				sprite.fallTimer.stop();
+			}
+		}
+	};
+	this.runnerMoveBehavior = {
+		execute:function(sprite,context,time){
+			if(sprite.moveTimer.isRunning()){
+				var framePerSecond = 1/that.commonFps;
+				sprite.velocityX = 10 * that.pixPerMeter;
+				sprite.left +=  1;
+			}
+		}
+	};
+	this.runnerBehavior = [this.runnerJumpBehavior,this.runnerFallBehavior,this.runnerMoveBehavior];
 	this.sprites = [];
 }
 Game.prototype = {
@@ -140,6 +176,9 @@ Game.prototype = {
 			that.diceStartFlag = true;
 			that.diceOne.diceAnimationTimer.start();
 			that.diceTwo.diceAnimationTimer.start();
+			that.runner.jumpTimer.start();
+			that.runner.moveTimer.start();
+			that.runner.falling = false;
 			that.diceOneNum = Math.floor(Math.random() * 6);
 			that.diceTwoNum = Math.floor(Math.random() * 6);
 		},false)
@@ -162,12 +201,18 @@ Game.prototype = {
 				})
 			},100)
 		}else{
-			this.drawSprites(time);
+			// this.drawSprites(time);
+			this.runnerJump(time);
 			this.commonFps = this.fps(time);
 			window.requestAnimationFrame(function(time){
 				that.animate.call(that,time);
 			});
 		}
+	},
+	runnerJump:function(time){
+		context.clearRect(0,0,canvas.width,canvas.height);
+		this.runner.paint(context);
+		this.runner.update(context,time);
 	},
 	drawSprites:function(time){
 		context.clearRect(0,0,canvas.width,canvas.height);
@@ -205,6 +250,17 @@ Game.prototype = {
 		// 放到canvas外面
 		this.diceOne.left = -96;
 		this.diceTwo.left = -96;
+
+		this.runner = new Sprite("runner",{
+			paint:function(sprite,context){
+				context.drawImage(document.getElementById("jump-runner"),0,0,128,64,sprite.left,sprite.top,128,64);
+			}
+		},this.runnerBehavior);
+		this.runner.top = 200;
+		this.runner.left = 200;
+		this.runner.jumpTimer = new AnimationTimer();
+		this.runner.fallTimer = new AnimationTimer();
+		this.runner.moveTimer = new AnimationTimer();
 	},
 	drawGround:function(){
 		this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
