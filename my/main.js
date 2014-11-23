@@ -5,11 +5,29 @@ function Game(){
 	// this.lastFrameTime = 0;
 	// json cells 缓存
 	this.jsonCells = {},
-	// 最后一个骰子中设置
-	this.diceStartFlag = false;
+	// 开始丢骰子
+	this.startShakeOneDice = false;
+	this.startShakeTwoDice = false;
+	// 开始跳跃
+	this.startJump = false;
+	// 开始移动
+	this.startMove = false;
+	// 骰子是否结束转动
+	this.oneEndRotate = false;
+	this.twoEndRotate = false;
+	// 人物是否在跑动
+	this.running = false;
+	// 人物是否在tiaod
+	this.jumping = false;
+	// 人物结束跑动
+	this.endRun = false;
 	// 骰子最终数
 	this.diceOneNum = 0;
 	this.diceTwoNum = 0;
+	// 骰子总数
+	this.diceTotal = 0;
+	// 置骰子跳跃进行时
+	this.allRunning = false;
 	this.pauseGame = true;
 	// 假定屏幕高为10m
 	this.canvasPresumeHeight = 10;
@@ -23,6 +41,8 @@ function Game(){
 
 	this.grasslandX = Math.ceil(canvas.width/Config.grassWidth);
 	this.grasslandY = Math.ceil(canvas.height/Config.grassHeight);
+
+	this.resumeArr = [];
 
 	this.diceOnePaintBehaivor = {
 		lastAdvance:0,
@@ -39,12 +59,13 @@ function Game(){
 			}
 		},
 		execute:function(sprite,context,time){
-			if(!that.diceStartFlag) return;
-
+			if(!that.startShakeOneDice) return;
+			// that.startShakeOneDice = true;
 			if(sprite.diceAnimationTimer.isExpired()){
+				that.startShakeOneDice = false;
+				sprite.diceAnimationTimer.stop();
 				// 确定骰子数
 				sprite.painter.cellsIndex = that.diceOneNum;
-				sprite.diceAnimationTimer.stop();
 				return false;
 			}
 			if(this.lastAdvanceTime === 0){
@@ -69,6 +90,10 @@ function Game(){
 				sprite.left += sprite.velocityX * framePerSecond;
 				sprite.top += sprite.velocityY * framePerSecond;
 			}
+			// if(sprite.diceAnimationTimer.isExpired()){
+			// 	sprite.diceAnimationTimer.stop();
+			// 	that.oneEndRotate = true;
+			// }
 		}
 	};
 	this.diceOneBehaivor = [this.diceOnePaintBehaivor,this.diceOneMoveBehaivor];
@@ -88,12 +113,14 @@ function Game(){
 			}
 		},
 		execute:function(sprite,context,time){
-			if(!that.diceStartFlag) return;
-
+			if(!that.startShakeTwoDice) return;
 			if(sprite.diceAnimationTimer.isExpired()){
 				sprite.painter.cellsIndex = that.diceTwoNum;
-				sprite.diceAnimationTimer.stop();
-				that.diceStartFlag = false;
+				that.startShakeTwoDice = false;
+				that.runner.jumpTimer.start();
+				that.runner.moveTimer.start();
+				that.startJump = true;
+				that.startMove = true;
 				return false;
 			}
 			if(this.lastAdvanceTime === 0){
@@ -114,10 +141,78 @@ function Game(){
 				sprite.left += sprite.velocityX * framePerSecond;
 				sprite.top += sprite.velocityY * framePerSecond;
 			}
+			if(sprite.diceAnimationTimer.isExpired()){
+				sprite.diceAnimationTimer.stop();
+			}
 		}
 	};
 	this.diceTwoBehaivor = [this.diceTwoPaintBehaivor,this.diceTwoMoveBehaivor];
 
+	this.runnerJumpFallBehavior = {
+		execute:function(sprite,context,time){
+			if(!that.startJump) return;
+			// if(that.diceEndRotate() && !that.jumping){
+			// 	that.diceLocReset();
+			// 	that.diceRotateReset();
+			// 	that.jumping = true;
+			// 	setTimeout(function(){
+			// 		sprite.jumpTimer.start();
+			// 	},500)
+			// }
+			if(sprite.jumpTimer.isRunning()){
+				if(!sprite.jumpTimer.isExpired()){
+					var framePerSecond = 1/that.commonFps;
+					sprite.velocityY = (2 - 9.81 * (sprite.jumpTimer.getElapsedTime()/1000)) * 60;
+					sprite.top -=  sprite.velocityY * framePerSecond;
+				}else{
+					sprite.jumpTimer.stop();
+					sprite.fallTimer.start();
+				}
+			}else if(sprite.fallTimer.isRunning()){
+				if(!sprite.fallTimer.isExpired()){
+					var framePerSecond = 1/that.commonFps;
+					sprite.velocityY = (9.81 * (sprite.fallTimer.getElapsedTime()/1000)) * 60;
+					sprite.top +=  sprite.velocityY * framePerSecond;
+				}else{
+					if(!that.startMove){
+						sprite.fallTimer.stop();
+						that.startJump = false;
+					}else{
+						sprite.jumpTimer.start();
+					}
+				}
+			}
+		}
+	};
+	
+	this.runnerMoveBehavior = {
+		execute:function(sprite,context,time){
+			if(!that.startMove) return;
+			that.diceLocReset();
+
+			// if(that.diceEndRotate() && !that.running){
+			// 	that.running = true;
+			// 	setTimeout(function(){
+			// 		sprite.moveTimer.start();
+			// 	},500)
+			// }
+			if(sprite.moveTimer.isRunning()){
+				var framePerSecond = 1/that.commonFps;
+				sprite.velocityX = 153 * framePerSecond;
+				sprite.left +=  sprite.velocityX;
+			}
+			if(sprite.moveTimer.isExpired()){
+				if(that.diceTotal){
+					that.diceTotal--;
+					sprite.moveTimer.start();
+				}else{
+					sprite.moveTimer.stop();
+					that.startMove = false;
+				}
+			}
+		}
+	};
+	this.runnerBehavior = [this.runnerJumpFallBehavior,this.runnerMoveBehavior];
 	this.windmillTwoBehavior = {
 		lastAdvanceTime:0,
 		execute:function(sprite,context,time){
@@ -130,64 +225,46 @@ function Game(){
 			}
 		}
 	};
-	this.runnerJumpBehavior = {
-		execute:function(sprite,context,time){
-			if(sprite.jumpTimer.isRunning()){
-				var framePerSecond = 1/that.commonFps;
-				sprite.velocityY = (1 - 9.81 * (sprite.jumpTimer.getElapsedTime()/1000)) * 111;
-				sprite.top -=  sprite.velocityY * framePerSecond;
-			}
-			if(sprite.jumpTimer.isExpired() && !sprite.falling){
-				sprite.falling = true;
-				sprite.jumpTimer.stop();
-				sprite.fallTimer.start();
-			}
-		}
-	};
-	this.runnerFallBehavior = {
-		execute:function(sprite,context,time){
-			if(sprite.fallTimer.isRunning()){
-				var framePerSecond = 1/that.commonFps;
-				sprite.velocityY = (9.81 * (sprite.fallTimer.getElapsedTime()/1000)) *111;
-				sprite.top +=  sprite.velocityY * framePerSecond;
-			}
-			if(sprite.fallTimer.isExpired()){
-				sprite.fallTimer.stop();
-			}
-		}
-	};
-	this.runnerMoveBehavior = {
-		execute:function(sprite,context,time){
-			if(sprite.moveTimer.isRunning()){
-				var framePerSecond = 1/that.commonFps;
-				sprite.velocityX = 10 * that.pixPerMeter;
-				sprite.left +=  1;
-			}
-		}
-	};
-	this.runnerBehavior = [this.runnerJumpBehavior,this.runnerFallBehavior,this.runnerMoveBehavior];
 	this.sprites = [];
 }
 Game.prototype = {
-	startDice:function(){
+	startShakeDice:function(){
 		var that = this;
 		pb.init("roll-dice").addEventListener("click",function(){
 			if(that.pauseGame) return;
-			that.diceStartFlag = true;
-			that.diceOne.diceAnimationTimer.start();
-			that.diceTwo.diceAnimationTimer.start();
-			that.runner.jumpTimer.start();
-			that.runner.moveTimer.start();
-			that.runner.falling = false;
+			that.diceRotateReset();
 			that.diceOneNum = Math.floor(Math.random() * 6);
 			that.diceTwoNum = Math.floor(Math.random() * 6);
+			that.diceTotals();
+			that.diceStartRotate()
 		},false)
+	},
+	diceStartRotate:function(){
+		this.startShakeOneDice = true;
+		this.startShakeTwoDice = true;
+		// 开始计时
+		this.diceOne.diceAnimationTimer.start();
+		this.diceTwo.diceAnimationTimer.start();
+	},
+	diceEndRotate:function(){
+		return this.oneEndRotate && this.twoEndRotate;
+	},
+	diceLocReset:function(){
+		this.diceOne.left = -96;
+		this.diceTwo.left = -96;
+		this.diceOne.top = 0;
+		this.diceTwo.top = 0;
+	},
+	diceRotateReset:function(){
+		this.oneEndRotate = false;
+		this.twoEndRotate = false;
 	},
 	start:function(){
 		var that = this;
-		this.createSprites();
 		this.clearPause();
-		this.startDice();
+		this.createSprites();
+		this.createResumeLoc();
+		this.startShakeDice();
 		window.requestAnimationFrame(function(time){
 			that.animate.call(that,time);
 		});
@@ -201,7 +278,8 @@ Game.prototype = {
 				})
 			},100)
 		}else{
-			// this.drawSprites(time);
+			this.drawSprites(time);
+			this.drawMap();
 			this.runnerJump(time);
 			this.commonFps = this.fps(time);
 			window.requestAnimationFrame(function(time){
@@ -210,13 +288,76 @@ Game.prototype = {
 		}
 	},
 	runnerJump:function(time){
-		context.clearRect(0,0,canvas.width,canvas.height);
 		this.runner.paint(context);
 		this.runner.update(context,time);
 	},
+	drawMap:function(){
+		context.save();
+		context.translate(540,0);
+		context.strokeStyle = "red";
+		context.rotate(45*Math.PI/180);
+		// context.transform(1,-0.36,-0.36,1,0,0);
+		for(var i = 0;i < 24;i++){
+			if(i < 6){
+				if(this.resumeArr.indexOf(i) !== -1){
+					context.fillStyle = "red";
+					context.fillRect(65 * (6 - i),65*24/4,65,65);
+				}else{
+					context.fillStyle = "green";
+					context.fillRect(65 * (6 - i),65*24/4,65,65);
+				}
+			}
+			context.fillStyle = "green";
+			
+			if(i >= 6 && i < 12){
+				if(this.resumeArr.indexOf(i) !== -1){
+					context.fillStyle = "blue";
+					context.fillRect(0,65*(12 - i),65,65);
+				}else{
+					context.fillStyle = "green";
+					context.fillRect(0,65*(12 - i),65,65);
+				}
+			}
+			context.fillStyle = "green";
+			if(i >= 12 && i < 18){
+				if(this.resumeArr.indexOf(i) !== -1){
+					context.fillStyle = "white";
+					context.fillRect(65 * (i - 12),0,65,65);
+				}else{
+					context.fillStyle = "green";
+					context.fillRect(65 * (i - 12),0,65,65);
+				}
+			}
+			context.fillStyle = "green";
+			if(i >= 18 && i < 24){
+				if(this.resumeArr.indexOf(i) !== -1){
+					context.fillStyle = "yellow";
+					context.fillRect(65 * 6,65*(i - 18),65,65);
+				}else{
+					context.fillStyle = "green";
+					context.fillRect(65 * 6,65*(i - 18),65,65);
+				}
+			}
+			context.fillStyle = "green";
+		}
+
+		// for(var i = 0;i < 6;i++){
+		// 	context.fillRect(65*i,0,65,65);
+		// }
+		// for (var i = 0;i < 6;i++) {
+		// 	context.fillRect(0,65*i+65,65,65);
+ 	// 	}
+		// for(var i = 0;i < 6;i++){
+		// 	context.fillRect(65*i+65,65*6,65,65);
+		// }
+		// for(var i = 0;i < 6;i++){
+		// 	context.fillRect(65*6,65*i,65,65);
+		// }
+
+		context.restore();
+	},
 	drawSprites:function(time){
 		context.clearRect(0,0,canvas.width,canvas.height);
-
 		this.drawEnclosure();
 		this.drawStaticEmbelish();
 
@@ -258,9 +399,9 @@ Game.prototype = {
 		},this.runnerBehavior);
 		this.runner.top = 200;
 		this.runner.left = 200;
-		this.runner.jumpTimer = new AnimationTimer();
-		this.runner.fallTimer = new AnimationTimer();
-		this.runner.moveTimer = new AnimationTimer();
+		this.runner.jumpTimer = new AnimationTimer(200);
+		this.runner.fallTimer = new AnimationTimer(200);
+		this.runner.moveTimer = new AnimationTimer(300);
 	},
 	drawGround:function(){
 		this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
@@ -370,5 +511,24 @@ Game.prototype = {
 		}
 		this.lastFrameTime = time;
 		return fps; 
+	},
+	diceTotals:function(){
+		this.diceTotal = this.diceOneNum + this.diceTwoNum + 2;
+	},
+	createResumeLoc:function(){
+		var	resumeCur;
+		for(var i = 0;i < 4;i++){
+			resumeCur = Math.floor(Math.random() * 24);
+			// 去拐角
+			if(resumeCur%6 === 0){
+				resumeCur++;
+			}
+			// 去重
+			if(this.resumeArr.indexOf(resumeCur) !== -1){
+				i--;
+				continue;
+			}
+			this.resumeArr.push(resumeCur);
+		}
 	}
 }

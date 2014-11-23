@@ -135,7 +135,7 @@
 				progress = parseInt(progress * 100);
 
 			context.clearRect(0,0,cWidth,cHeight);
-
+			context.save();
 			context.beginPath();
 			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
 			context.lineTo(cWidth/2 + width/2 - radius,cHeight/2 - height);
