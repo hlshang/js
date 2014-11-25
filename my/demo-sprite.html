@@ -3,13 +3,6 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<script type="text/javascript" src="jquery.js"></script>
-	<script src="config.js"></script>
-	<script src="common.js"></script>
-	<script src="animator.js"></script>
-	<script src="sprite.js"></script>
-	<script src="load.js"></script>
-	<script src="main.js"></script>
 	<style>
 	*{
 		padding: 0;
@@ -23,35 +16,38 @@
 	</style>
 </head>
 <body>
-	<canvas id="myCanvas" width="1080" height="333">
+	<canvas id="myCanvas" width="1280" height="3000">
 		Your browser do not support canvas!
 	</canvas>
-	<div id="load-precent-nums"></div>
-	<a href="javascript:void(0)" id="roll-dice">摇一摇</a>
-	<img src="jump.png" alt="" id="jump-runner">
 	<script>
-	var canvas,context;
+	var context = document.getElementById("myCanvas").getContext("2d");
 
-		var sourceList = [
-					["bg.jpg"],
-					["song.mp3"],
-					["dice.json"]
-				],
-		sourceObj = {
-			"images":["dice.png","dynamic-embellish.png","static-embellish.png"],
-			"audio":["song.mp3"],
-			"json":["dice.json","dynamic-embellish.json?o","static-embellish.json?ooo"]
-		};
-		document.addEventListener("DOMContentLoaded",function(){
-			canvas = pb.init("myCanvas");
-			context = canvas.getContext("2d"); 
-			loadSources.init(sourceObj,function(){
-				context.clearRect(0,0,canvas.width,canvas.height);
-				var game = new Game();
-				game.start();
-			});
-		},false)
-	
+		context.translate(200,500);
+		context.rotate(20*Math.PI/180);
+		context.transform(1,-0.36,-0.36,1,0,0);
+		for(var i = 0;i < 24;i++){
+			if(i < 6){
+					context.fillRect(65 * (6 - i),65*24/4,65,65);
+			}
+			
+			if(i >= 6 && i < 12){
+					context.fillRect(0,65*(12 - i),65,65);
+			}
+			if(i >= 12 && i < 18){
+					context.fillRect(65 * (i - 12),0,65,65);
+			}
+			if(i >= 18 && i < 24){
+					context.fillRect(65 * 6,65*(i - 18),65,65);
+			}
+		}
+		context.fillStyle = "green";
+		context.fill();
+		var ydeg = Math.atan(0.36) * 180/Math.PI,
+			xdeg = Math.atan(0.36) * 180/Math.PI;
+			Xb = 65/Math.cos(xdeg * Math.PI/180);
+		XX = Xb + 65 * Math.tan(xdeg * Math.PI/180);
+
+		// 0.36 = Math.tan (x * Math.PI/180);
 	</script>
 </body>
 </html>

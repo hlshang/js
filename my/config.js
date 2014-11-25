@@ -16,8 +16,11 @@ var Config = {
 	// 进度条边框颜色
 	progressBorderColor : "rgba(255,60,0,1)",
 	// 重力加速度
-	GRAVITY_FORCE:9.81,
-	// 一块草地的宽度
-	grassWidth : 160,
-	grassHeight : 160
+	GRAVITY_FORCE : 9.81,
+	// deg
+	deg : Math.PI/180,
+	slopeAngle : 20,
+	zoneWidth : 65,
+	zoneHeight : 65,
+
 }

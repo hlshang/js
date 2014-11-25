@@ -1,13 +1,38 @@
 function Game(){
-	var that = this;
+	var that = this,
+		canvasWidth = canvas.width,
+		canvasHeight = canvas.height;
 	this.lastTime = 0;
 	this.INTERVAL_TIME = 90;
 	// this.lastFrameTime = 0;
 	// json cells 缓存
-	this.jsonCells = {},
-	// 开始丢骰子
-	this.startShakeOneDice = false;
-	this.startShakeTwoDice = false;
+	this.jsonCells = {};
+	// 地图倾斜角度
+	this.slopeAngle = Config.slopeAngle * Config.deg;
+	// 行走地图水平长度
+	this.mapHorizontal = 65 * 6 * Math.cos(this.slopeAngle);
+	// 行走地图
+	// 人物水平每一步走多少像素
+	this.runnerHorizontalPace = Math.floor(this.mapHorizontal / 6);
+	// 骰子的时间
+	this.diceOneAniTime = 800;
+	this.diceTwoAniTime = 1000;
+	// 骰子每秒水平移动像素
+	this.diceOnePixPerSec = (canvasWidth / 2) / (this.diceOneAniTime / 1000);
+	this.diceTwoPixPerSec = (canvasWidth / 2) / (this.diceTwoAniTime / 1000);
+	// 每一步的时间
+	this.runnerMoveAniTime = 400;
+	// 跳跃和下降的时间，为移动时间的一半
+	this.runnerJumpAniTime = this.runnerAniTime / 2;
+	// 每两格中心点间的高度
+	this.runnerGridH = this.runnerHorizontalPace * Math.tan(this.slopeAngle);
+	// 每秒移动多少像素
+	this.runnerPixEverySec = Math.floor(this.runnerHorizontalPace / (this.runnerAniTime / 1000));
+	// 人物向上/下跳动的垂直速度
+	// 跳跃高度为1.5倍的两格中心点的高度
+	// 根据 vt + 1/2 * gt² = s (加速度方向为负)公式求出：
+	this.runnerVerticalUpSpeed = (this.runnerGridH * 1.5 + 1/2 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime/1000,2)) / this.runnerJumpAniTime/1000;
+	this.runnerVerticalDownSpeed = (this.runnerGridH * 0.5 + 1/2 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime/1000,2)) / this.runnerJumpAniTime/1000;
 	// 开始跳跃
 	this.startJump = false;
 	// 开始移动
@@ -17,30 +42,36 @@ function Game(){
 	this.twoEndRotate = false;
 	// 人物是否在跑动
 	this.running = false;
-	// 人物是否在tiaod
+	// 人物是否在跳动
 	this.jumping = false;
 	// 人物结束跑动
 	this.endRun = false;
+	// 开始丢骰子
+	this.startShakeOneDice = false;
+	this.startShakeTwoDice = false;
 	// 骰子最终数
 	this.diceOneNum = 0;
 	this.diceTwoNum = 0;
 	// 骰子总数
 	this.diceTotal = 0;
-	// 置骰子跳跃进行时
+	// 骰子的初始垂直速度
+	this.yStartSpeed = 1;
+	// 掷骰子跳跃进行时
 	this.allRunning = false;
 	this.pauseGame = true;
 	// 假定屏幕高为10m
 	this.canvasPresumeHeight = 10;
 	// pix/meter
-	this.pixPerMeter = canvas.height/this.canvasPresumeHeight;
-	// 骰子的初始水平速度
-	this.xStartSpeed = 12;
-	// 骰子的初始垂直速度
-	this.yStartSpeed = 1;
+	this.pixPerMeter = canvasHeight/this.canvasPresumeHeight;
+
+	// 人物跳动到哪个格子
+	this.currentPointer = 0;
+	// 掷完筛子后人物跳到哪个格子上
+	this.lastPointer = 0;
 	this.commonFps = 60;
 
-	this.grasslandX = Math.ceil(canvas.width/Config.grassWidth);
-	this.grasslandY = Math.ceil(canvas.height/Config.grassHeight);
+	this.grasslandX = Math.ceil(canvasWidth/Config.grassWidth);
+	this.grasslandY = Math.ceil(canvasHeight/Config.grassHeight);
 
 	this.resumeArr = [];
 
@@ -60,10 +91,9 @@ function Game(){
 		},
 		execute:function(sprite,context,time){
 			if(!that.startShakeOneDice) return;
-			// that.startShakeOneDice = true;
+
 			if(sprite.diceAnimationTimer.isExpired()){
 				that.startShakeOneDice = false;
-				sprite.diceAnimationTimer.stop();
 				// 确定骰子数
 				sprite.painter.cellsIndex = that.diceOneNum;
 				return false;
@@ -85,15 +115,14 @@ function Game(){
 				// 计算公式：
 				// X/Y方向的速度（m/s）* 每米移动的像素数（pix/m）* 每一帧经过的秒数（s/frame）
 				// 单位一消得到：pix/frame，即每一帧移动的像素数。
-				sprite.velocityX = that.xStartSpeed * that.pixPerMeter;
-				sprite.velocityY = (that.yStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime()/1000)) * that.pixPerMeter;
-				sprite.left += sprite.velocityX * framePerSecond;
-				sprite.top += sprite.velocityY * framePerSecond;
+				sprite.velocityX = that.diceOnePixPerSec * that.pixPerMeter;
+				sprite.velocityY = (that.yStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond;
+				sprite.left += sprite.velocityX;
+				sprite.top += sprite.velocityY;
 			}
-			// if(sprite.diceAnimationTimer.isExpired()){
-			// 	sprite.diceAnimationTimer.stop();
-			// 	that.oneEndRotate = true;
-			// }
+			if(sprite.diceAnimationTimer.isExpired()){
+				sprite.diceAnimationTimer.stop();
+			}
 		}
 	};
 	this.diceOneBehaivor = [this.diceOnePaintBehaivor,this.diceOneMoveBehaivor];
@@ -112,15 +141,24 @@ function Game(){
 				sprite.painter.cellsIndex = ++this.lastAdvance;
 			}
 		},
+		startJumpMove:function(){
+			that.runner.jumpTimer.start();
+			that.runner.moveTimer.start();
+			that.startJump = true;
+			that.startMove = true;
+		},
 		execute:function(sprite,context,time){
 			if(!that.startShakeTwoDice) return;
 			if(sprite.diceAnimationTimer.isExpired()){
-				sprite.painter.cellsIndex = that.diceTwoNum;
 				that.startShakeTwoDice = false;
-				that.runner.jumpTimer.start();
-				that.runner.moveTimer.start();
-				that.startJump = true;
-				that.startMove = true;
+				sprite.painter.cellsIndex = that.diceTwoNum;
+				// 这儿应该有一个显示骰子数的方法 todo
+				var timeOut = setTimeout(function(){
+					this.startJumpMove();
+					that.diceLocReset();
+					clearTimeout(timeOut);
+				},800)
+
 				return false;
 			}
 			if(this.lastAdvanceTime === 0){
@@ -136,10 +174,10 @@ function Game(){
 		execute:function(sprite,context,time){
 			if(sprite.diceAnimationTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
-				sprite.velocityX = that.xStartSpeed * that.pixPerMeter;
-				sprite.velocityY = (that.yStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime()/1000)) * that.pixPerMeter;
-				sprite.left += sprite.velocityX * framePerSecond;
-				sprite.top += sprite.velocityY * framePerSecond;
+				sprite.velocityX = that.diceTwoPixPerSec * framePerSecond;
+				sprite.velocityY = (that.yStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond;
+				sprite.left += sprite.velocityX;
+				sprite.top += sprite.velocityY;
 			}
 			if(sprite.diceAnimationTimer.isExpired()){
 				sprite.diceAnimationTimer.stop();
@@ -149,21 +187,28 @@ function Game(){
 	this.diceTwoBehaivor = [this.diceTwoPaintBehaivor,this.diceTwoMoveBehaivor];
 
 	this.runnerJumpFallBehavior = {
+		direction:"up",
+		runnerVerticalSpeed : 0,
+		jumpDirection:function(){
+			that.currentRunnerLoc();
+			if(that.currentPointer > 12 && that.currentPointer < 24){
+				this.direction = "down";
+				this.runnerVerticalSpeed = that.runnerVerticalDownSpeed;
+			}else{
+				this.direction = "up";
+				this.runnerVerticalSpeed = that.runnerVerticalUpSpeed;
+			}
+		},
 		execute:function(sprite,context,time){
 			if(!that.startJump) return;
-			// if(that.diceEndRotate() && !that.jumping){
-			// 	that.diceLocReset();
-			// 	that.diceRotateReset();
-			// 	that.jumping = true;
-			// 	setTimeout(function(){
-			// 		sprite.jumpTimer.start();
-			// 	},500)
-			// }
 			if(sprite.jumpTimer.isRunning()){
+				// 确认方向
+				this.jumpDirection();
+
 				if(!sprite.jumpTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (2 - 9.81 * (sprite.jumpTimer.getElapsedTime()/1000)) * 60;
-					sprite.top -=  sprite.velocityY * framePerSecond;
+					sprite.velocityY = (that.runnerVerticalSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond;
+					this.direction === "up" ? sprite.top -=  sprite.velocityY : sprite.top += sprite.velocityY;
 				}else{
 					sprite.jumpTimer.stop();
 					sprite.fallTimer.start();
@@ -171,14 +216,20 @@ function Game(){
 			}else if(sprite.fallTimer.isRunning()){
 				if(!sprite.fallTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (9.81 * (sprite.fallTimer.getElapsedTime()/1000)) * 60;
-					sprite.top +=  sprite.velocityY * framePerSecond;
+					sprite.velocityY = (Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond;
+					sprite.top +=  sprite.velocityY;
+					var distanceY = 1/2 * Config.GRAVITY_FORCE * Math.pow(sprite.fallTimer.getElapsedTime()/1000,2);
+					if(distanceY > that.runnerGridH/2 && this.direction === "up"){
+						// 下降高度大于二分之一的格子高度时，则自动停止此次跳跃，开始下一次。
+						sprite.fallTimer.stop();
+						sprite.jumpTimer.start();
+					}
 				}else{
-					if(!that.startMove){
+					if(that.startMove){
+						sprite.jumpTimer.start();
+					}else{
 						sprite.fallTimer.stop();
 						that.startJump = false;
-					}else{
-						sprite.jumpTimer.start();
 					}
 				}
 			}
@@ -188,31 +239,34 @@ function Game(){
 	this.runnerMoveBehavior = {
 		execute:function(sprite,context,time){
 			if(!that.startMove) return;
-			that.diceLocReset();
 
-			// if(that.diceEndRotate() && !that.running){
-			// 	that.running = true;
-			// 	setTimeout(function(){
-			// 		sprite.moveTimer.start();
-			// 	},500)
-			// }
 			if(sprite.moveTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
-				sprite.velocityX = 153 * framePerSecond;
-				sprite.left +=  sprite.velocityX;
+				sprite.velocityX = that.runnerPixEverySec * framePerSecond;
+				// 确定每一跳后的位置
+				that.currentRunnerLoc();
+				if(that.currentPointer > 6 && that.currentPointer < 18){
+					sprite.left +=  sprite.velocityX;
+				}else{
+					sprite.left -=  sprite.velocityX;
+				}
 			}
 			if(sprite.moveTimer.isExpired()){
-				if(that.diceTotal){
-					that.diceTotal--;
+				if(--that.diceTotal){
 					sprite.moveTimer.start();
 				}else{
 					sprite.moveTimer.stop();
 					that.startMove = false;
+					// 人物开始动作
+
+					// 显示相应的结果
+					that.showResult(that.currentPointer);
 				}
 			}
 		}
 	};
 	this.runnerBehavior = [this.runnerJumpFallBehavior,this.runnerMoveBehavior];
+
 	this.windmillTwoBehavior = {
 		lastAdvanceTime:0,
 		execute:function(sprite,context,time){
@@ -225,8 +279,10 @@ function Game(){
 			}
 		}
 	};
+
 	this.sprites = [];
 }
+
 Game.prototype = {
 	startShakeDice:function(){
 		var that = this;
@@ -236,6 +292,8 @@ Game.prototype = {
 			that.diceOneNum = Math.floor(Math.random() * 6);
 			that.diceTwoNum = Math.floor(Math.random() * 6);
 			that.diceTotals();
+			// 确定每次掷完筛子后人物的位置
+			that.lastRunnerLoc();
 			that.diceStartRotate()
 		},false)
 	},
@@ -245,9 +303,6 @@ Game.prototype = {
 		// 开始计时
 		this.diceOne.diceAnimationTimer.start();
 		this.diceTwo.diceAnimationTimer.start();
-	},
-	diceEndRotate:function(){
-		return this.oneEndRotate && this.twoEndRotate;
 	},
 	diceLocReset:function(){
 		this.diceOne.left = -96;
@@ -294,9 +349,9 @@ Game.prototype = {
 	drawMap:function(){
 		context.save();
 		context.translate(540,0);
-		context.strokeStyle = "red";
-		context.rotate(45*Math.PI/180);
-		// context.transform(1,-0.36,-0.36,1,0,0);
+		context.rotate(45 * Config.deg);
+		context.transform(1,-this.slopeAngle,-this.slopeAngle,1,0,0);
+
 		for(var i = 0;i < 24;i++){
 			if(i < 6){
 				if(this.resumeArr.indexOf(i) !== -1){
@@ -306,7 +361,7 @@ Game.prototype = {
 					context.fillStyle = "green";
 					context.fillRect(65 * (6 - i),65*24/4,65,65);
 				}
-			}
+			}		
 			context.fillStyle = "green";
 			
 			if(i >= 6 && i < 12){
@@ -346,7 +401,7 @@ Game.prototype = {
 		// }
 		// for (var i = 0;i < 6;i++) {
 		// 	context.fillRect(0,65*i+65,65,65);
- 	// 	}
+ 		// 	}
 		// for(var i = 0;i < 6;i++){
 		// 	context.fillRect(65*i+65,65*6,65,65);
 		// }
@@ -357,7 +412,7 @@ Game.prototype = {
 		context.restore();
 	},
 	drawSprites:function(time){
-		context.clearRect(0,0,canvas.width,canvas.height);
+		context.clearRect(0,0,canvasWidth,canvasHeight);
 		this.drawEnclosure();
 		this.drawStaticEmbelish();
 
@@ -383,10 +438,10 @@ Game.prototype = {
 																this.findCellData("windmill",Config.jsonObj["dynamic-embellish"])),
 																[this.windmillTwoBehavior]);
 		this.windmill.left = 15;
-		this.windmill.top = canvas.height - 160;
+		this.windmill.top = canvasHeight - 160;
 
-		this.diceOne.diceAnimationTimer = new AnimationTimer(800,AnimationTimer.makeEaseInOutTransducer());
-		this.diceTwo.diceAnimationTimer = new AnimationTimer(1000,AnimationTimer.makeEaseInTransducer(1.1));
+		this.diceOne.diceAnimationTimer = new AnimationTimer(this.diceOneAniTime,AnimationTimer.makeEaseInOutTransducer());
+		this.diceTwo.diceAnimationTimer = new AnimationTimer(this.diceTwoAniTime,AnimationTimer.makeEaseInTransducer(1.1));
 
 		// 放到canvas外面
 		this.diceOne.left = -96;
@@ -394,14 +449,15 @@ Game.prototype = {
 
 		this.runner = new Sprite("runner",{
 			paint:function(sprite,context){
-				context.drawImage(document.getElementById("jump-runner"),0,0,128,64,sprite.left,sprite.top,128,64);
+				context.drawImage(document.getElementById("jump-runner"),0,0,50,84,sprite.left,sprite.top,50,84);
 			}
 		},this.runnerBehavior);
-		this.runner.top = 200;
-		this.runner.left = 200;
-		this.runner.jumpTimer = new AnimationTimer(200);
-		this.runner.fallTimer = new AnimationTimer(200);
-		this.runner.moveTimer = new AnimationTimer(300);
+
+		this.runner.top = 20 + 300;
+		this.runner.left = 540 - 25;
+		this.runner.jumpTimer = new AnimationTimer(this.runnerJumpAniTime);
+		this.runner.fallTimer = new AnimationTimer(this.runnerJumpAniTime);
+		this.runner.moveTimer = new AnimationTimer(this.runnerMoveAniTime);
 	},
 	drawGround:function(){
 		this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
@@ -426,7 +482,7 @@ Game.prototype = {
 		}
 		for(var i = 0;i < 8;i++){
 			this.enclosureHorizontal.left = i * 132 + 11;
-			this.enclosureHorizontal.top = canvas.height - 30;
+			this.enclosureHorizontal.top = canvasHeight - 30;
 			this.enclosureHorizontal.paint(context);
 		}
 		// 垂直围栏
@@ -438,7 +494,7 @@ Game.prototype = {
 		}
 		for(var i = 0;i< 4 ;i++){
 			this.enclosureVertical.top = i * 170;
-			this.enclosureVertical.left = canvas.width - 15;
+			this.enclosureVertical.left = canvasWidth - 15;
 			this.enclosureVertical.paint(context);
 		}
 	},
@@ -448,18 +504,18 @@ Game.prototype = {
 		this.tree1.paint(context);
 		// 大树2
 		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-2"]));
-		this.tree2.left = canvas.width - 128;
-		this.tree2.top = canvas.height - 180;
+		this.tree2.left = canvasWidth - 128;
+		this.tree2.top = canvasHeight - 180;
 		this.tree2.paint(context);
 		// 帐篷
 		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tent"]));
-		this.tent.left = canvas.width - 160;
+		this.tent.left = canvasWidth - 160;
 		this.tent.paint(context);
 		// 柴火（两堆）
 		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["firewood"]));
 		this.firewood.top = 160;
 		for(var i = 0;i < 2;i++){
-			this.firewood.left = canvas.width - 32 * 2 * (i+1);
+			this.firewood.left = canvasWidth - 32 * 2 * (i+1);
 			this.firewood.paint(context);
 		}
 		// 木桶（两堆）
@@ -469,6 +525,32 @@ Game.prototype = {
 			this.cask.left = (i+1) * 60;
 			this.cask.paint(context);
 		}
+	},
+	showResult:function(index){
+		switch(index){
+			case this.resumeArr[0]:
+			break;
+			case this.resumeArr[1]:
+			break;
+			case this.resumeArr[2]:
+			break;
+			case this.resumeArr[3]:
+			break;
+			// 小游戏
+			case 2:
+			break;
+			// 小黑屋
+			case 6:
+			break;
+			case 12:
+			break;
+			case 18:
+			break;
+			default:break;
+		}
+	},
+	showResume:function(name,url){
+
 	},
 	getSprites:function(name){
 		for(var i = 0;i < this.sprites.length;i++){
@@ -501,19 +583,19 @@ Game.prototype = {
 			}
 		})
 	},
-	// 帧速率
-	fps:function(time){
-		var fps;
-		if(!this.lastFrameTime){
-			fps = 60;
-		}else{
-			fps = 1000/(time - this.lastFrameTime);
-		}
-		this.lastFrameTime = time;
-		return fps; 
-	},
 	diceTotals:function(){
 		this.diceTotal = this.diceOneNum + this.diceTwoNum + 2;
+		console.log(this.diceTotal)
+	},
+	currentRunnerLoc:function(){
+		this.currentPointer++;
+		if(this.currentPointer === 24){
+			// 回到起点
+			this.currentPointer = 0;
+		}
+	},
+	lastRunnerLoc:function(){
+		this.lastPointer = this.lastPointer !== 24 ? (this.lastPointer + this.diceTotal) ? 0;
 	},
 	createResumeLoc:function(){
 		var	resumeCur;
@@ -530,5 +612,16 @@ Game.prototype = {
 			}
 			this.resumeArr.push(resumeCur);
 		}
+	},
+	// 帧速率
+	fps:function(time){
+		var fps;
+		if(!this.lastFrameTime){
+			fps = 60;
+		}else{
+			fps = 1000/(time - this.lastFrameTime);
+		}
+		this.lastFrameTime = time;
+		return fps; 
 	}
 }
