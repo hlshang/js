@@ -217,8 +217,9 @@ function Game(){
 
 				if(!sprite.jumpTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (that.runnerVerticalSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
-					this.direction === "up" ? sprite.top -=  sprite.velocityY : sprite.top += sprite.velocityY ;
+					sprite.velocityY = (this.runnerVerticalSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
+					sprite.top -=  sprite.velocityY
+					// this.direction === "up" ? sprite.top -=  sprite.velocityY : sprite.top += sprite.velocityY ;
 				}else{
 					sprite.jumpTimer.stop();
 					sprite.fallTimer.start();
@@ -226,9 +227,10 @@ function Game(){
 			}else if(sprite.fallTimer.isRunning()){
 				if(!sprite.fallTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (that.runnerVerticalSpeed + Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
+					sprite.velocityY = (that.runnerVerticalDownSpeed + Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 					sprite.top +=  sprite.velocityY;
-					// var distanceY = 0.5 * Config.GRAVITY_FORCE * Math.pow(sprite.fallTimer.getElapsedTime() / 1000,2);
+					// var distanceY = this.runnerVerticalSpeed * sprite.fallTimer.getElapsedTime() / 1000 + 0.5 * Config.GRAVITY_FORCE * Math.pow(sprite.fallTimer.getElapsedTime() / 1000,2);
+					// console.log(distanceY)
 					// if(distanceY > that.runnerGridMeter/2 && this.direction === "up"){
 					// 	// 下降高度大于二分之一的格子高度时，则自动停止此次跳跃，开始下一次。
 					// 	sprite.fallTimer.stop();
