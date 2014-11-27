@@ -1,53 +1,27 @@
 function Game(){
 	var that = this;
+	// json cells 缓存
+	this.jsonCells = {};
 
 	this.canvasWidth = canvas.width;
 	this.canvasHeight = canvas.height;
-
-	this.lastTime = 0;
-	this.INTERVAL_TIME = 90;
-	// this.lastFrameTime = 0;
-	// json cells 缓存
-	this.jsonCells = {};
-	// 地图倾斜角度
-	this.slopeAngle = Config.slopeAngle * Config.deg;
-	// 行走地图水平长度
-	this.mapHorizontal = 65 * 6 * Math.cos(this.slopeAngle);
-	// 行走地图
-	// 人物水平每一步走多少像素
-	this.runnerHorizontalPace = Math.floor(this.mapHorizontal / 6);
+	// 假定屏幕高为10m
+	this.canvasPresumeHeight = 10;
+	this.canvasHalfPersumeHeight = this.canvasPresumeHeight / 2;
+	// pix/meter
+	this.pixPerMeter = this.canvasHeight / this.canvasPresumeHeight;
 	// 骰子的时间
-	this.diceOneAniTime = 800;
+	this.diceOneAniTime = 900;
 	this.diceTwoAniTime = 1000;
-	// 骰子每秒水平移动像素
+	// 骰子下落到屏幕一半（5m）所需的初始垂直速度（m/s）
+	this.diceOneYStartSpeed = (this.canvasHalfPersumeHeight - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.diceOneAniTime / 1000,2)) / (this.diceOneAniTime / 1000);
+	this.diceTwoYStartSpeed = (this.canvasHalfPersumeHeight - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.diceTwoAniTime / 1000,2)) / (this.diceTwoAniTime / 1000);
+	// 骰子水平每秒移动像素
 	this.diceOnePixPerSec = (this.canvasWidth / 2) / (this.diceOneAniTime / 1000) + 100;
 	this.diceTwoPixPerSec = (this.canvasWidth / 2) / (this.diceTwoAniTime / 1000);
-	// 每一步的时间
-	this.runnerMoveAniTime = 300;
-	// 跳跃和下降的时间，为移动时间的一半
-	this.runnerJumpAniTime = this.runnerMoveAniTime / 2;
-	// 每两格中心点间的高度
-	this.runnerGridH = this.runnerHorizontalPace * Math.tan(this.slopeAngle);
-	// 每秒移动多少像素
-	this.runnerPixEverySec = Math.floor(this.runnerHorizontalPace / (this.runnerMoveAniTime / 1000));
-	// 人物向上/下跳动的垂直速度
-	// 跳跃高度为1.5倍的两格中心点的高度
-	// 根据 vt + 1/2 * gt² = s (加速度方向为负)公式求出：
-	this.runnerVerticalUpSpeed = (this.runnerGridH * 1.5 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime/1000,2)) / (this.runnerJumpAniTime/1000);
-	this.runnerVerticalDownSpeed = (this.runnerGridH * 0.5 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime/1000,2)) / (this.runnerJumpAniTime/1000);
-	// 开始跳跃
-	this.startJump = false;
-	// 开始移动
-	this.startMove = false;
 	// 骰子是否结束转动
 	this.oneEndRotate = false;
 	this.twoEndRotate = false;
-	// 人物是否在跑动
-	this.running = false;
-	// 人物是否在跳动
-	this.jumping = false;
-	// 人物结束跑动
-	this.endRun = false;
 	// 开始丢骰子
 	this.startShakeOneDice = false;
 	this.startShakeTwoDice = false;
@@ -56,22 +30,58 @@ function Game(){
 	this.diceTwoNum = 0;
 	// 骰子总数
 	this.diceTotal = 0;
-	// 骰子的初始垂直速度
-	this.yStartSpeed = 1;
 	// 掷骰子跳跃进行时
 	this.allRunning = false;
-	this.pauseGame = true;
-	// 假定屏幕高为10m
-	this.canvasPresumeHeight = 10;
-	// pix/meter
-	this.pixPerMeter = this.canvasHeight/this.canvasPresumeHeight;
 
+	// 行走地图倾斜角度
+	this.slopeAngle = Config.slopeAngle * Config.deg;
+	// 行走地图的真实高度和宽度（比行走图多一格）
+	this.mapRealHorizontal = 65 * (6 + 0.5) * Math.cos(this.slopeAngle);
+	this.mapRealVertical = 65 * (6 + 0.5) * Math.sin(this.slopeAngle);
+	// 行走地图宽度和高度（1/2）
+	this.mapHorizontal = 65 * 6 * Math.cos(this.slopeAngle);
+	this.mapVertical = 65 * 6 * Math.sin(this.slopeAngle);
+	// 行走地图在画布中的位置（水平垂直居中）
+	this.walkMapLeft = this.canvasWidth / 2;
+	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
+	// 人物初始位置
+	this.runnweInitialLeft = this.canvasWidth / 2 - 50 / 2;
+	this.runnweInitialTop = this.walkMapTop + this.mapVertical * 2 - 84 + 0.5 * Math.sin(this.slopeAngle);
+	// 人物水平每一步走多少像素
+	this.runnerHorizontalPace = Math.floor(this.mapHorizontal / 6);
+	
+	// 每一步的时间
+	this.runnerMoveAniTime = 300;
+	// 跳跃和下降的时间，为移动时间的一半
+	this.runnerJumpAniTime = this.runnerMoveAniTime / 2;
+	// 每两格中心点间的高度(px)
+	this.runnerGridHPix = this.runnerHorizontalPace * Math.tan(this.slopeAngle);
+	// 每两格中心点间的高度(m)
+	this.runnerGridMeter = this.runnerGridHPix * this.canvasHalfPersumeHeight / (this.canvasHeight / 2);
+	// 每秒水平移动多少像素
+	this.runnerPixEverySec = Math.floor(this.runnerHorizontalPace / (this.runnerMoveAniTime / 1000));
+	// 人物向上/下跳动的垂直速度
+	// 跳跃高度为1.5倍的两格中心点的高度
+	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
+	this.runnerVerticalUpSpeed = (this.runnerGridMeter * 1.5 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime / 1000,2)) / (this.runnerJumpAniTime / 1000);
+	this.runnerVerticalDownSpeed = (this.runnerGridMeter * 0.5 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime / 1000,2)) / (this.runnerJumpAniTime / 1000);
+	// 开始跳跃
+	this.startJump = false;
+	// 开始移动
+	this.startMove = false;
+	// 人物是否在跑动
+	this.running = false;
+	// 人物是否在跳动
+	this.jumping = false;
+	// 人物结束跑动
+	this.endRun = false;
 	// 人物跳动到哪个格子
 	this.currentPointer = 0;
 	// 掷完筛子后人物跳到哪个格子上
 	this.lastPointer = 0;
+	
+	this.pauseGame = true;
 	this.commonFps = 60;
-
 	this.resumeArr = [];
 
 	this.diceOnePaintBehaivor = {
@@ -115,7 +125,7 @@ function Game(){
 				// X/Y方向的速度（m/s）* 每米移动的像素数（pix/m）* 每一帧经过的秒数（s/frame）
 				// 单位一消得到：pix/frame，即每一帧移动的像素数。
 				sprite.velocityX = that.diceOnePixPerSec * framePerSecond;
-				sprite.velocityY = (that.yStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond;
+				sprite.velocityY = (that.diceOneYStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 				sprite.left += sprite.velocityX;
 				sprite.top += sprite.velocityY;
 			}
@@ -176,7 +186,7 @@ function Game(){
 			if(sprite.diceAnimationTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
 				sprite.velocityX = that.diceTwoPixPerSec * framePerSecond;
-				sprite.velocityY = (that.yStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond;
+				sprite.velocityY = (that.diceTwoYStartSpeed + Config.GRAVITY_FORCE * (sprite.diceAnimationTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 				sprite.left += sprite.velocityX;
 				sprite.top += sprite.velocityY;
 			}
@@ -191,7 +201,7 @@ function Game(){
 		direction:"up",
 		runnerVerticalSpeed : 0,
 		jumpDirection:function(){
-			if(that.currentPointer > 12 && that.currentPointer < 24){
+			if(that.currentPointer > 12 && that.currentPointer < 25){
 				this.direction = "down";
 				this.runnerVerticalSpeed = that.runnerVerticalDownSpeed;
 			}else{
@@ -207,8 +217,7 @@ function Game(){
 
 				if(!sprite.jumpTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (this.runnerVerticalSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime()/1000)) * framePerSecond;
-					console.log((Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime()/1000)) * that.pixPerMeter * framePerSecond)
+					sprite.velocityY = (that.runnerVerticalSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 					this.direction === "up" ? sprite.top -=  sprite.velocityY : sprite.top += sprite.velocityY ;
 				}else{
 					sprite.jumpTimer.stop();
@@ -217,14 +226,14 @@ function Game(){
 			}else if(sprite.fallTimer.isRunning()){
 				if(!sprite.fallTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime()/1000)) * framePerSecond;
+					sprite.velocityY = (that.runnerVerticalSpeed + Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 					sprite.top +=  sprite.velocityY;
-					var distanceY = 1/2 * Config.GRAVITY_FORCE * Math.pow(sprite.fallTimer.getElapsedTime()/1000,2);
-					if(distanceY > that.runnerGridH/2 && this.direction === "up"){
-						// 下降高度大于二分之一的格子高度时，则自动停止此次跳跃，开始下一次。
-						sprite.fallTimer.stop();
-						sprite.jumpTimer.start();
-					}
+					// var distanceY = 0.5 * Config.GRAVITY_FORCE * Math.pow(sprite.fallTimer.getElapsedTime() / 1000,2);
+					// if(distanceY > that.runnerGridMeter/2 && this.direction === "up"){
+					// 	// 下降高度大于二分之一的格子高度时，则自动停止此次跳跃，开始下一次。
+					// 	sprite.fallTimer.stop();
+					// 	sprite.jumpTimer.start();
+					// }
 				}else{
 					if(that.startMove){
 						sprite.jumpTimer.start();
@@ -244,7 +253,7 @@ function Game(){
 			if(sprite.moveTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
 				sprite.velocityX = that.runnerPixEverySec * framePerSecond;
-				if(that.currentPointer > 6 && that.currentPointer < 18){
+				if(that.currentPointer > 6 && that.currentPointer < 19){
 					sprite.left +=  sprite.velocityX;
 				}else{
 					sprite.left -=  sprite.velocityX;
@@ -265,7 +274,7 @@ function Game(){
 			}
 		}
 	};
-	this.runnerBehavior = [this.runnerJumpFallBehavior,this.runnerMoveBehavior];
+	this.runnerBehavior = [this.runnerMoveBehavior,this.runnerJumpFallBehavior];
 
 	this.windmillTwoBehavior = {
 		lastAdvanceTime:0,
@@ -307,8 +316,8 @@ Game.prototype = {
 	diceLocReset:function(){
 		this.diceOne.left = -96;
 		this.diceTwo.left = -96;
-		this.diceOne.top = 0;
-		this.diceTwo.top = 0;
+		this.diceOne.top = -96;
+		this.diceTwo.top = -96;
 	},
 	diceRotateReset:function(){
 		this.oneEndRotate = false;
@@ -348,7 +357,7 @@ Game.prototype = {
 	},
 	drawMap:function(){
 		context.save();
-		context.translate(540,0);
+		context.translate(this.walkMapLeft,this.walkMapTop);
 		context.rotate(45 * Config.deg);
 		context.transform(1,-this.slopeAngle,-this.slopeAngle,1,0,0);
 
@@ -440,12 +449,11 @@ Game.prototype = {
 		this.windmill.left = 15;
 		this.windmill.top = this.canvasHeight - 160;
 
-		this.diceOne.diceAnimationTimer = new AnimationTimer(this.diceOneAniTime,AnimationTimer.makeEaseInOutTransducer());
-		this.diceTwo.diceAnimationTimer = new AnimationTimer(this.diceTwoAniTime,AnimationTimer.makeEaseInTransducer(1.1));
+		this.diceOne.diceAnimationTimer = new AnimationTimer(this.diceOneAniTime);
+		this.diceTwo.diceAnimationTimer = new AnimationTimer(this.diceTwoAniTime);
 
 		// 放到canvas外面
-		this.diceOne.left = -96;
-		this.diceTwo.left = -96;
+		this.diceLocReset();
 
 		this.runner = new Sprite("runner",{
 			paint:function(sprite,context){
@@ -453,8 +461,8 @@ Game.prototype = {
 			}
 		},this.runnerBehavior);
 
-		this.runner.top = 20 + 300;
-		this.runner.left = 540 - 25;
+		this.runner.top = this.runnweInitialTop;
+		this.runner.left = this.runnweInitialLeft;
 		this.runner.jumpTimer = new AnimationTimer(this.runnerJumpAniTime);
 		this.runner.fallTimer = new AnimationTimer(this.runnerJumpAniTime);
 		this.runner.moveTimer = new AnimationTimer(this.runnerMoveAniTime);
@@ -529,17 +537,19 @@ Game.prototype = {
 	showResult:function(index){
 		switch(index){
 			case this.resumeArr[0]:
+			this.showResume("one","/resume-json/one.json",this.resumeOne);
 			break;
 			case this.resumeArr[1]:
+			this.showResume("two","/resume-json/two.json",this.resumeTwo);
 			break;
 			case this.resumeArr[2]:
+			this.showResume("three","/resume-json/three.json",this.resumeThree);
 			break;
 			case this.resumeArr[3]:
+			this.showResume("four","/resume-json/four.json",this.resumeFour);
 			break;
-			// 小游戏
 			case 2:
 			break;
-			// 小黑屋
 			case 6:
 			break;
 			case 12:
@@ -549,9 +559,25 @@ Game.prototype = {
 			default:break;
 		}
 	},
-	showResume:function(name,url){
-
+	showResume:function(name,url,callback){
+		// name 只是个标识
+		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
+		xmlHttp.onreadystatechange = function(){
+			if(xmlHttp.readyState === 4){
+				if(xmlHttp.status === 200){
+					callback(xmlHttp);
+				}else{
+				}
+			}
+		}
+		xmlHttp.open("GET",url,true);
+		xmlHttp.setRequestHeader("Content-Type","application/json");
+		xmlHttp.send(null);
 	},
+	resumeOne:function(res){},
+	resumeTwo:function(res){},
+	resumeThree:function(res){},
+	resumeFour:function(res){},
 	getSprites:function(name){
 		for(var i = 0;i < this.sprites.length;i++){
 			if(name === this.sprites[i].name){
@@ -590,23 +616,28 @@ Game.prototype = {
 	currentRunnerLoc:function(){
 		this.currentPointer++;
 		if(this.currentPointer === 24){
-			// 回到起点
-			this.currentPointer = 0;
+			// 因会有少许误差
+			// 转完一圈回到起点时，修正位置。
+			this.runner.left = this.runnweInitialLeft;
+			this.runner.top = this.runnweInitialTop;
+		}
+		if(this.currentPointer === 25){
+			this.currentPointer = 1;
 		}
 	},
 	lastRunnerLoc:function(){
-		this.lastPointer = this.lastPointer !== 24 ? (this.lastPointer + this.diceTotal) : 0;
+		this.lastPointer = this.lastPointer !== 25 ? (this.lastPointer + this.diceTotal) : 1;
 	},
 	createResumeLoc:function(){
 		var	resumeCur;
 		for(var i = 0;i < 4;i++){
 			resumeCur = Math.floor(Math.random() * 24);
 			// 去拐角
-			if(resumeCur%6 === 0){
+			if(resumeCur % 6 === 0){
 				resumeCur++;
 			}
-			// 去重
-			if(this.resumeArr.indexOf(resumeCur) !== -1){
+			// 去重和2
+			if(this.resumeArr.indexOf(resumeCur) !== -1 || resumeCur === 2){
 				i--;
 				continue;
 			}
@@ -619,7 +650,7 @@ Game.prototype = {
 		if(!this.lastFrameTime){
 			fps = 60;
 		}else{
-			fps = 1000/(time - this.lastFrameTime);
+			fps = 1000 / (time - this.lastFrameTime);
 		}
 		this.lastFrameTime = time;
 		return fps; 

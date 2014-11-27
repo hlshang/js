@@ -9,45 +9,38 @@
 		margin:0;
 	}
 	#myCanvas{
-		padding-top: 100px;
 		display: block;
-		width: 1065px;
+		border:1px solid red; 
 	}
 	</style>
 </head>
 <body>
-	<canvas id="myCanvas" width="1280" height="3000">
+	<canvas id="myCanvas" width="1080" height="540">
 		Your browser do not support canvas!
 	</canvas>
 	<script>
 	var context = document.getElementById("myCanvas").getContext("2d");
-
-		context.translate(200,500);
-		context.rotate(20*Math.PI/180);
-		context.transform(1,-0.36,-0.36,1,0,0);
-		for(var i = 0;i < 24;i++){
-			if(i < 6){
-					context.fillRect(65 * (6 - i),65*24/4,65,65);
-			}
-			
-			if(i >= 6 && i < 12){
-					context.fillRect(0,65*(12 - i),65,65);
-			}
-			if(i >= 12 && i < 18){
-					context.fillRect(65 * (i - 12),0,65,65);
-			}
-			if(i >= 18 && i < 24){
-					context.fillRect(65 * 6,65*(i - 18),65,65);
-			}
+	var img = new Image();
+	img.src = "g.png";
+	context.translate(540,0);
+	context.rotate(45*Math.PI/180);
+	context.transform(1,-0.36,-0.36	,1,0,0);
+	for(var i = 0;i < 24;i++){
+		if(i < 6){
+				context.drawImage(img,65 * (6 - i),65*24/4,65,65);
 		}
-		context.fillStyle = "green";
-		context.fill();
-		var ydeg = Math.atan(0.36) * 180/Math.PI,
-			xdeg = Math.atan(0.36) * 180/Math.PI;
-			Xb = 65/Math.cos(xdeg * Math.PI/180);
-		XX = Xb + 65 * Math.tan(xdeg * Math.PI/180);
-
-		// 0.36 = Math.tan (x * Math.PI/180);
+		if(i >= 6 && i < 12){
+				context.drawImage(img,0,65*(12 - i),65,65);
+		}
+		if(i >= 12 && i < 18){
+				context.drawImage(img,65 * (i - 12),0,65,65);
+		}
+		if(i >= 18 && i < 24){
+			context.drawImage(img,65 * 6,65*(i - 18),65,65);
+		}
+	}
+	// context.fillStyle = "green";
+	// context.fill();
 	</script>
 </body>
 </html>

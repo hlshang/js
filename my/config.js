@@ -21,6 +21,5 @@ var Config = {
 	deg : Math.PI/180,
 	slopeAngle : 20,
 	zoneWidth : 65,
-	zoneHeight : 65,
-
+	zoneHeight : 65
 }
