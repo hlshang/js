@@ -32,21 +32,25 @@ function Game(){
 	this.diceTotal = 0;
 	// 掷骰子跳跃进行时
 	this.allRunning = false;
-
 	// 行走地图倾斜角度
 	this.slopeAngle = Config.slopeAngle * Config.deg;
+	// 矩阵倾斜角度
+	this.matrixSlope = 45 * Config.deg - Config.slopeAngle * Config.deg;
+
+	this.mapRealEdgeLength = 65 * (6 + 0.5) / Math.cos(this.matrixSlope);
+	this.mapEdgeLength = 65 * 6 / Math.cos(this.matrixSlope);
 	// 行走地图的真实高度和宽度（比行走图多一格）
-	this.mapRealHorizontal = 65 * (6 + 0.5) * Math.cos(this.slopeAngle);
-	this.mapRealVertical = 65 * (6 + 0.5) * Math.sin(this.slopeAngle);
+	this.mapRealHorizontal = this.mapRealEdgeLength * Math.cos(this.slopeAngle);
+	this.mapRealVertical = this.mapEdgeLength * Math.sin(this.slopeAngle);
 	// 行走地图宽度和高度（1/2）
-	this.mapHorizontal = 65 * 6 * Math.cos(this.slopeAngle);
-	this.mapVertical = 65 * 6 * Math.sin(this.slopeAngle);
+	this.mapHorizontal = this.mapEdgeLength * Math.cos(this.slopeAngle);
+	this.mapVertical = this.mapEdgeLength * Math.sin(this.slopeAngle);
 	// 行走地图在画布中的位置（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
 	// 人物初始位置
 	this.runnweInitialLeft = this.canvasWidth / 2 - 50 / 2;
-	this.runnweInitialTop = this.walkMapTop + this.mapVertical * 2 - 84 + 0.5 * Math.sin(this.slopeAngle);
+	this.runnweInitialTop = this.walkMapTop + this.mapVertical * 2 - 42 + 0.5 * Math.sin(this.slopeAngle);
 	// 人物水平每一步走多少像素
 	this.runnerHorizontalPace = Math.floor(this.mapHorizontal / 6);
 	
@@ -361,7 +365,7 @@ Game.prototype = {
 		context.save();
 		context.translate(this.walkMapLeft,this.walkMapTop);
 		context.rotate(45 * Config.deg);
-		context.transform(1,-this.slopeAngle,-this.slopeAngle,1,0,0);
+		context.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
 
 		for(var i = 0;i < 24;i++){
 			if(i < 6){
