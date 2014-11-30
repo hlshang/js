@@ -581,16 +581,16 @@ Game.prototype = {
 	showResult:function(index){
 		switch(index){
 			case this.resumeArr[0]:
-			this.showResume("one","resume-json/one.json",this.resumeOne);
+			this.showResume("one","/resume-json/one.json",this.resumeOne);
 			break;
 			case this.resumeArr[1]:
-			this.showResume("two","resume-json/two.json",this.resumeTwo);
+			this.showResume("two","/resume-json/two.json",this.resumeTwo);
 			break;
 			case this.resumeArr[2]:
-			this.showResume("three","resume-json/three.json",this.resumeThree);
+			this.showResume("three","/resume-json/three.json",this.resumeThree);
 			break;
 			case this.resumeArr[3]:
-			this.showResume("four","resume-json/four.json",this.resumeFour);
+			this.showResume("four","/resume-json/four.json",this.resumeFour);
 			break;
 			case 2:
 			break;

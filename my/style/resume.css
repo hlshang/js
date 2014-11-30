@@ -1,0 +1,23 @@
+*{
+	padding: 0;
+	margin: 0
+}
+body{
+	font-family: "微软雅黑";
+	background: url(../images/grass-bg.png) repeat left top;
+}
+.canvas-main{
+	position: relative;
+	width: 1080px;
+	margin:0 auto;
+	border-radius: 5px;
+}
+#load-precent-nums{
+	position: absolute;
+	left:50%;
+	top:50%;
+	font-size: 14px;
+	font-weight: bold;
+	-webkit-transform:translate(-50%,0);
+	transform:translate(-50%,0);
+}

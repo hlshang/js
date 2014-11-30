@@ -22,9 +22,9 @@
 	var context = document.getElementById("myCanvas").getContext("2d");
 	var img = new Image();
 	img.src = "g.png";
-	context.translate(540,0);
+	context.translate(540,100);
 	// context.rotate(45*Math.PI/180);
-	context.transform(1,-0.5,-0.5,1,0,0);
+	context.transform(1,-0.3,-0.3,1,0,0);
 	for(var i = 0;i < 24;i++){
 		if(i < 6){
 				context.drawImage(img,65 * (6 - i),65*24/4,65,65);

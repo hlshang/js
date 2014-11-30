@@ -1,6 +1,6 @@
 (function(){
 	var resumeImg = new Image();
-		resumeImg.src = "resume.png";
+		resumeImg.src = "images/resume.png";
 	var	sourceNums = 0,
 		sourceArr = [];
 
