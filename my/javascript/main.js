@@ -52,27 +52,27 @@ function Game(){
 	this.walkMapLeft = this.canvasWidth / 2;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
 	// 人物初始位置
-	this.runnweInitialLeft = this.canvasWidth / 2 - 50 / 2;
-	this.runnweInitialTop = this.walkMapTop + this.mapVertical * 2 - 42 + 0.5 * Math.sin(this.slopeAngle);
+	this.runnweInitialLeft = this.canvasWidth / 2 - 100;
+	this.runnweInitialTop = this.walkMapTop + this.mapVertical * 2 - 180 + 0.5 * Math.sin(this.slopeAngle);
 	// 人物水平每一步走多少像素
-	this.runnerHorizontalPace = Math.floor(this.mapHorizontal / 6);
+	this.jumperHorizontalPace = Math.floor(this.mapHorizontal / 6);
 	// 每一步的时间
-	this.runnerMoveAniTime = 300;
+	this.jumperMoveAniTime = 300;
 	// 跳跃和下降的时间，为移动时间的一半
-	this.runnerJumpAniTime = this.runnerMoveAniTime / 2;
+	this.jumperJumpAniTime = this.jumperMoveAniTime / 2;
 	// 每两格中心点间的高度(px)
-	this.runnerGridHPix = Math.floor(this.runnerHorizontalPace * Math.tan(this.slopeAngle));
+	this.jumperGridHPix = Math.floor(this.jumperHorizontalPace * Math.tan(this.slopeAngle));
 	// 每两格中心点间的高度(m)
-	this.runnerGridMeter = this.runnerGridHPix * this.canvasHalfPersumeHeight / (this.canvasHeight / 2);
+	this.jumperGridMeter = this.jumperGridHPix * this.canvasHalfPersumeHeight / (this.canvasHeight / 2);
 	// 每秒水平移动多少像素
-	this.runnerPixEverySec = Math.floor(this.runnerHorizontalPace / (this.runnerMoveAniTime / 1000));
+	this.jumperPixEverySec = Math.floor(this.jumperHorizontalPace / (this.jumperMoveAniTime / 1000));
 	// 人物向上/下跳动的垂直速度
 	// 跳跃高度为1.5倍的两格中心点的高度
 	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
-	this.runnerVerticalUpSpeed = (this.runnerGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime / 1000,2)) / (this.runnerJumpAniTime / 1000);
-	this.runnerVerticalDownSpeed = (this.runnerGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime / 1000,2)) / (this.runnerJumpAniTime / 1000);
-	this.runnerJumpUpSpeed = (this.runnerGridMeter * 2.3 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime / 1000,2)) / (this.runnerJumpAniTime / 1000);
-	this.runnerJumpDownSpeed = (this.runnerGridMeter * 1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.runnerJumpAniTime / 1000,2)) / (this.runnerJumpAniTime / 1000);
+	this.jumperVerticalUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperVerticalDownSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperJumpUpSpeed = (this.jumperGridMeter * 2.3 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 开始跳跃
 	this.startJump = false;
@@ -163,8 +163,8 @@ function Game(){
 		},
 		startJumpMove:function(){
 			that.currentRunnerLoc();
-			that.runner.jumpTimer.start();
-			that.runner.moveTimer.start();
+			that.jumper.jumpTimer.start();
+			that.jumper.moveTimer.start();
 			that.startJump = true;
 			that.startMoveAll = true;
 		},
@@ -208,7 +208,7 @@ function Game(){
 	};
 	this.diceTwoBehaivor = [this.diceTwoPaintBehaivor,this.diceTwoMoveBehaivor];
 
-	this.runnerJumpFallBehavior = {
+	this.jumperJumpFallBehavior = {
 		originTop:0,
 		distanceGap:0,
 		distanceGapB:0,
@@ -217,12 +217,12 @@ function Game(){
 		jumpDirection:function(){
 			if(that.currentPointer > 12 && that.currentPointer < 25){
 				this.direction = "down";
-				this.runnerVerticalUpSpeed = that.runnerVerticalDownSpeed;
-				this.runnerVerticalDownSpeed = that.runnerJumpUpSpeed;
+				this.jumperVerticalUpSpeed = that.jumperVerticalDownSpeed;
+				this.jumperVerticalDownSpeed = that.jumperJumpUpSpeed;
 			}else{
 				this.direction = "up";
-				this.runnerVerticalUpSpeed = that.runnerVerticalUpSpeed;
-				this.runnerVerticalDownSpeed = that.runnerJumpDownSpeed;
+				this.jumperVerticalUpSpeed = that.jumperVerticalUpSpeed;
+				this.jumperVerticalDownSpeed = that.jumperJumpDownSpeed;
 			}
 		},
 		execute:function(sprite,context,time){
@@ -236,7 +236,7 @@ function Game(){
 
 				if(!sprite.jumpTimer.isExpired()){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (this.runnerVerticalUpSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
+					sprite.velocityY = (this.jumperVerticalUpSpeed - Config.GRAVITY_FORCE * (sprite.jumpTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 					sprite.top -=  sprite.velocityY
 				}else{
 					sprite.jumpTimer.stop();
@@ -245,10 +245,10 @@ function Game(){
 			}else if(sprite.fallTimer.isRunning()){
 				if(!sprite.fallTimer.isExpired() && !that.startMovePer){
 					var framePerSecond = 1/that.commonFps;
-					sprite.velocityY = (this.runnerVerticalDownSpeed + Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
+					sprite.velocityY = (this.jumperVerticalDownSpeed + Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 					sprite.top +=  sprite.velocityY;
 					// 修正垂直距离差
-					// this.distanceGap = that.runnerGridHPix * 1.05 - Math.abs(sprite.top - this.originTop);
+					// this.distanceGap = that.jumperGridHPix * 1.05 - Math.abs(sprite.top - this.originTop);
 					// if(this.distanceGap > 0){
 					// 	this.originTop = 0;
 					// 	if(that.currentPointer > 12 && that.currentPointer < 25){
@@ -271,7 +271,7 @@ function Game(){
 		}
 	};
 	
-	this.runnerMoveBehavior = {
+	this.jumperMoveBehavior = {
 		distanceGap:0,
 		originLeft:0,
 		execute:function(sprite,context,time){
@@ -281,7 +281,7 @@ function Game(){
 			}
 			if(sprite.moveTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
-				sprite.velocityX = that.runnerPixEverySec * framePerSecond;
+				sprite.velocityX = that.jumperPixEverySec * framePerSecond;
 
 				if(that.currentPointer > 6 && that.currentPointer < 19){
 					sprite.left +=  sprite.velocityX;
@@ -289,7 +289,7 @@ function Game(){
 					sprite.left -=  sprite.velocityX;
 				}
 				// 修正平移距离差
-				this.distanceGap= Math.abs(sprite.left - this.originLeft) - that.runnerHorizontalPace;
+				this.distanceGap= Math.abs(sprite.left - this.originLeft) - that.jumperHorizontalPace;
 				if(this.distanceGap > 0){
 					this.originLeft = 0;
 					if(that.currentPointer > 6 && that.currentPointer < 19){
@@ -302,8 +302,8 @@ function Game(){
 			
 			if(sprite.moveTimer.isExpired()){
 				if(that.currentPointer === 24){
-					that.runner.top = that.runnweInitialTop;
-					that.runner.left = that.runnweInitialLeft;
+					that.jumper.top = that.runnweInitialTop;
+					that.jumper.left = that.runnweInitialLeft;
 				}
 				that.startMovePer = true;
 				if(--that.diceTotal){
@@ -320,20 +320,7 @@ function Game(){
 			}
 		}
 	};
-	this.runnerBehavior = [this.runnerJumpFallBehavior,this.runnerMoveBehavior];
-
-	this.windmillTwoBehavior = {
-		lastAdvanceTime:0,
-		execute:function(sprite,context,time){
-			if(this.lastAdvanceTime === 0){
-				this.lastAdvanceTime = time;
-			}
-			if(time - this.lastAdvanceTime > 150){
-				sprite.painter.advance();
-				this.lastAdvanceTime = time;
-			}
-		}
-	};
+	this.jumperBehavior = [this.jumperJumpFallBehavior,this.jumperMoveBehavior];
 
 	this.sprites = [];
 }
@@ -390,18 +377,30 @@ Game.prototype = {
 		}else{
 			this.drawSprites(time);
 			this.drawMap();
-			this.runnerJump(time);
+			this.jumperJump(time);
 			this.commonFps = this.fps(time);
 			window.requestAnimationFrame(function(time){
 				that.animate.call(that,time);
 			});
 		}
 	},
-	runnerJump:function(time){
-		this.runner.paint(context);
-		this.runner.update(context,time);
+	jumperJump:function(time){
+		this.jumper.paint(context);
+		this.jumper.update(context,time);
 	},
 	drawMap:function(){
+		this.mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"]));
+		this.mapBlockTop = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top.png"]));
+		this.mapBlockBottom = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-bottom.png"]));
+		this.mapBlockRight = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-right.png"]));
+
+		this.mapBlockBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-blue.png"]));
+		this.mapBlockRed = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-red.png"]));
+		this.mapBlockGrey = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-grey.png"]));
+		this.mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"]));
+		this.mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"]));
+		this.mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"]));
+
 		context.save();
 		context.translate(this.walkMapLeft,this.walkMapTop);
 		context.rotate(45 * Config.deg);
@@ -410,58 +409,50 @@ Game.prototype = {
 		for(var i = 0;i < 24;i++){
 			if(i < 6){
 				if(this.resumeArr.indexOf(i) !== -1){
-					context.fillRect(65 * (6 - i),65*24/4,65,65);
+					this.mapBlockBlue.left = 60 * (6 - i);
+					this.mapBlockBlue.top = 60*24/4;
+					this.mapBlockBlue.paint(context)
 				}else{
-					context.fillRect(65 * (6 - i),65*24/4,65,65);
+					this.mapBlockBottom.left = 60 * (6 - i);
+					this.mapBlockBottom.top = 60*24/4;
+					this.mapBlockBottom.paint(context)
 				}
 			}		
-			context.fillStyle = "green";
 			
 			if(i >= 6 && i < 12){
 				if(this.resumeArr.indexOf(i) !== -1){
-					context.fillStyle = "blue";
-					context.fillRect(0,65*(12 - i),65,65);
+					this.mapBlockRed.left = 0;
+					this.mapBlockRed.top = 60*(12 - i);
+					this.mapBlockRed.paint(context)
 				}else{
-					context.fillStyle = "green";
-					context.fillRect(0,65*(12 - i),65,65);
+					this.mapBlockRight.left = 0;
+					this.mapBlockRight.top = 60*(12 - i);
+					this.mapBlockRight.paint(context)
 				}
 			}
-			context.fillStyle = "green";
 			if(i >= 12 && i < 18){
 				if(this.resumeArr.indexOf(i) !== -1){
-					context.fillStyle = "white";
-					context.fillRect(65 * (i - 12),0,65,65);
+					this.mapBlockWhite.left = 60 * (i - 12);
+					this.mapBlockWhite.top = 0;
+					this.mapBlockWhite.paint(context)
 				}else{
-					context.fillStyle = "green";
-					context.fillRect(65 * (i - 12),0,65,65);
+					this.mapBlockBottom.left = 60 * (i - 12);
+					this.mapBlockBottom.top = 0;
+					this.mapBlockBottom.paint(context)
 				}
 			}
-			context.fillStyle = "green";
 			if(i >= 18 && i < 24){
 				if(this.resumeArr.indexOf(i) !== -1){
-					context.fillStyle = "yellow";
-					context.fillRect(65 * 6,65*(i - 18),65,65);
+					this.mapBlockWBlue.left = 60 * 6;
+					this.mapBlockWBlue.top = 60*(i - 18);
+					this.mapBlockWBlue.paint(context)
 				}else{
-					context.fillStyle = "green";
-					context.fillRect(65 * 6,65*(i - 18),65,65);
+					this.mapBlockRight.left = 60 * 6;
+					this.mapBlockRight.top = 60*(i - 18);
+					this.mapBlockRight.paint(context)
 				}
 			}
-			context.fillStyle = "green";
 		}
-
-		// for(var i = 0;i < 6;i++){
-		// 	context.fillRect(65*i,0,65,65);
-		// }
-		// for (var i = 0;i < 6;i++) {
-		// 	context.fillRect(0,65*i+65,65,65);
- 		// 	}
-		// for(var i = 0;i < 6;i++){
-		// 	context.fillRect(65*i+65,65*6,65,65);
-		// }
-		// for(var i = 0;i < 6;i++){
-		// 	context.fillRect(65*6,65*i,65,65);
-		// }
-
 		context.restore();
 	},
 	drawSprites:function(time){
@@ -474,9 +465,6 @@ Game.prototype = {
 
 		this.diceTwo.paint(context);
 		this.diceTwo.update(context,time);
-
-		this.windmill.paint(context);
-		this.windmill.update(context,time);
 	},
 
 	createSprites:function(){
@@ -487,11 +475,6 @@ Game.prototype = {
 		this.diceTwo = new Sprite("diceTwo",new SpriteSheets(Config.imgSource[0],
 																this.findCellData("diceTwo",Config.jsonObj["main"])),
 																this.diceTwoBehaivor);
-		this.windmill = new Sprite("windmill",new SpriteSheets(Config.imgSource[1],
-																this.findCellData("windmill",Config.jsonObj["dynamic-embellish"])),
-																[this.windmillTwoBehavior]);
-		this.windmill.left = 15;
-		this.windmill.top = this.canvasHeight - 160;
 
 		this.diceOne.diceAnimationTimer = new AnimationTimer(this.diceOneAniTime);
 		this.diceTwo.diceAnimationTimer = new AnimationTimer(this.diceTwoAniTime);
@@ -499,21 +482,19 @@ Game.prototype = {
 		// 放到canvas外面
 		this.diceLocReset();
 
-		this.runner = new Sprite("runner",{
-			paint:function(sprite,context){
-				context.drawImage(document.getElementById("jump-runner"),0,0,50,84,sprite.left,sprite.top,50,84);
-			}
-		},this.runnerBehavior);
-
-		this.runner.top = this.runnweInitialTop;
-		this.runner.left = this.runnweInitialLeft;
-		this.runner.jumpTimer = new AnimationTimer(this.runnerJumpAniTime);
-		this.runner.fallTimer = new AnimationTimer(this.runnerJumpAniTime);
-		this.runner.moveTimer = new AnimationTimer(this.runnerMoveAniTime);
+		this.jumper = new Sprite("jumper",new SpriteSheets(Config.imgSource[3],
+																this.findCellData("boy",Config.jsonObj["jumpers"])),this.jumperBehavior);
+		this.jumper.width = 100;
+		this.jumper.height = 100;
+		this.jumper.top = this.runnweInitialTop;
+		this.jumper.left = this.runnweInitialLeft;
+		this.jumper.jumpTimer = new AnimationTimer(this.jumperJumpAniTime);
+		this.jumper.fallTimer = new AnimationTimer(this.jumperJumpAniTime);
+		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
 	},
 	drawGround:function(){
 		this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
-																this.findCellData("grassland",Config.jsonObj["static-embellish"])))
+																this.findCellData("grassland.png",Config.jsonObj["static-embellish"])))
 		for(var i = 0;i < this.grasslandY;i++){
 			for(var j = 0;j < this.grasslandX;j++){
 				this.grassland.left = j * Config.grassWidth;
@@ -526,7 +507,7 @@ Game.prototype = {
 	drawEnclosure:function(){
 		// 水平围栏
 		this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[2],
-																				Config.jsonObj["static-embellish"]["enclosure-horizontal"]));
+																				Config.jsonObj["static-embellish"]["enclosure-horizontal.png"]));
 		for(var i = 0;i < 8;i++){
 			this.enclosureHorizontal.left = i * 132 + 11;
 			this.enclosureHorizontal.paint(context);
@@ -539,7 +520,7 @@ Game.prototype = {
 		}
 		// 垂直围栏
 		this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[2],
-																				Config.jsonObj["static-embellish"]["enclosure-vertical"]));
+																				Config.jsonObj["static-embellish"]["enclosure-vertical.png"]));
 		for(var i = 0;i< 4 ;i++){
 			this.enclosureVertical.top = i * 170; 
 			this.enclosureVertical.paint(context);
@@ -552,31 +533,38 @@ Game.prototype = {
 	},
 	drawStaticEmbelish:function(){
 		// 大树1
-		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-1"]));
+		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-1.png"]));
 		this.tree1.paint(context);
 		// 大树2
-		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-2"]));
-		this.tree2.left = this.canvasWidth - 128;
-		this.tree2.top = this.canvasHeight - 180;
-		this.tree2.paint(context);
+		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-2.png"]));
+		this.tree2.top = this.canvasHeight - 120;
+		for(var i = 0;i < 2;i++){
+			this.tree2.left = this.canvasWidth - 95 * (i+1);
+			this.tree2.paint(context);
+		}
 		// 帐篷
-		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tent"]));
+		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tent.png"]));
 		this.tent.left = this.canvasWidth - 160;
 		this.tent.paint(context);
 		// 柴火（两堆）
-		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["firewood"]));
+		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["firewood.png"]));
 		this.firewood.top = 160;
 		for(var i = 0;i < 2;i++){
 			this.firewood.left = this.canvasWidth - 32 * 2 * (i+1);
 			this.firewood.paint(context);
 		}
 		// 木桶（两堆）
-		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["cask"]));
+		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["cask.png"]));
 		this.cask.top = 120;
 		for(var i = 0;i < 2;i++){
 			this.cask.left = (i+1) * 60;
 			this.cask.paint(context);
 		}
+		// chair
+		this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["chair.PNG"]));
+		this.chair.left = 50;
+		this.chair.top = 400;
+		this.chair.paint(context);
 	},
 	showResult:function(index){
 		switch(index){
