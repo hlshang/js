@@ -1,5 +1,10 @@
 // 公用的变量
 var Config = {
+	sourceList:{
+		"images":["images/main.png","images/dynamic-embellish.png","images/static-embellish.png","images/jumpers.png","images/runners.png"],
+		"audio":["sounds/song.mp3"],
+		"json":["resume-json/main.json?oksk","resume-json/dynamic-embellish.json?o","resume-json/static-embellish.json?oooss","resume-json/jumpers.json","resume-json/runners.json"]
+	},
 	// 三种资源
 	imgSource : [],
 	mediaSource : [],

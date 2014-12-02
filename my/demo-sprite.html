@@ -18,29 +18,18 @@
 	<canvas id="myCanvas" width="1080" height="540">
 		Your browser do not support canvas!
 	</canvas>
+	<div class="one" data-one="ok">one</div>
+	<div class="one">two</div>
+	<div class="one">three</div>
 	<script>
-	var context = document.getElementById("myCanvas").getContext("2d");
-	var img = new Image();
-	img.src = "g.png";
-	context.translate(540,100);
-	// context.rotate(45*Math.PI/180);
-	context.transform(1,-0.3,-0.3,1,0,0);
-	for(var i = 0;i < 24;i++){
-		if(i < 6){
-				context.drawImage(img,65 * (6 - i),65*24/4,65,65);
-		}
-		if(i >= 6 && i < 12){
-				context.drawImage(img,0,65*(12 - i),65,65);
-		}
-		if(i >= 12 && i < 18){
-				context.drawImage(img,65 * (i - 12),0,65,65);
-		}
-		if(i >= 18 && i < 24){
-			context.drawImage(img,65 * 6,65*(i - 18),65,65);
-		}
+	for(var i = 0;i < document.querySelectorAll(".one").length;i++){
+		(function(i){
+			document.querySelectorAll(".one")[i].addEventListener("click",function(e){
+				console.log(this.dataset.one)
+			},false)
+		})(i)
 	}
-	// context.fillStyle = "green";
-	// context.fill();
+	
 	</script>
 </body>
 </html>

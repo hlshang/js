@@ -17,26 +17,27 @@
 		<canvas id="myCanvas" width="1080" height="540">
 			Your browser do not support canvas!
 		</canvas>
-		<div id="load-precent-nums"></div>
 	</div>
-	<span id="roll-dice">摇一摇</span>
+	<div class="game-cover">
+		<div class="game-cover-img"></div>
+		<div id="load-precent-nums"></div>
+		<a href="javascript:void(0)" class="start-game-btn"></a>
+	</div>
+	<div class="select-role-wrap hide">
+		<div class="role-list boy" data-role="boy"></div>
+		<div class="role-list girl" data-role="girl"></div>
+		<div class="role-list runner" data-role="runner"></div>
+	</div>
+	<div class="game-cutdown"></div>
+	<span id="roll-dice">ok</span>
 	<script>
 		var canvas,context;
-
-		var sourceList = [
-					["images/bg.jpg"],
-					["song.mp3"],
-					["dice.json"]
-				],
-		sourceObj = {
-			"images":["images/main.png","images/dynamic-embellish.png","images/static-embellish.png","images/jumpers.png"],
-			"audio":["sounds/song.mp3"],
-			"json":["resume-json/main.json?okk","resume-json/dynamic-embellish.json?o","resume-json/static-embellish.json?oooss","resume-json/jumpers.json"]
-		};
 		document.addEventListener("DOMContentLoaded",function(){
-			canvas = pb.init("myCanvas");
-			context = canvas.getContext("2d"); 
-			loadSources.init(sourceObj,function(){
+				canvas = pb.init("myCanvas");
+				context = canvas.getContext("2d"); 
+			
+			loadSources.init(Config.sourceList,function(){
+				// init
 				context.clearRect(0,0,canvas.width,canvas.height);
 				var game = new Game();
 				game.start();
