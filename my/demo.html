@@ -18,23 +18,26 @@
 			Your browser do not support canvas!
 		</canvas>
 	</div>
-	<div class="game-cover">
-		<div class="game-cover-img"></div>
-		<div id="load-precent-nums"></div>
-		<a href="javascript:void(0)" class="start-game-btn"></a>
+	<div class="game-cover-wrap">
+		<div class="game-cover">
+			<div class="game-cover-img"></div>
+			<div id="load-precent-nums"></div>
+			<a href="javascript:void(0)" class="start-game-btn"></a>
+		</div>
+		<div class="select-role-wrap">
+			<div class="role-list boy" data-role="boy"></div>
+			<div class="role-list girl" data-role="girl"></div>
+			<div class="role-list runner" data-role="runner"></div>
+		</div>
+		<div class="game-cutdown"></div>
 	</div>
-	<div class="select-role-wrap hide">
-		<div class="role-list boy" data-role="boy"></div>
-		<div class="role-list girl" data-role="girl"></div>
-		<div class="role-list runner" data-role="runner"></div>
-	</div>
-	<div class="game-cutdown"></div>
+	
 	<span id="roll-dice">ok</span>
 	<script>
 		var canvas,context;
 		document.addEventListener("DOMContentLoaded",function(){
-				canvas = pb.init("myCanvas");
-				context = canvas.getContext("2d"); 
+			canvas = pb.init("myCanvas");
+			context = canvas.getContext("2d"); 
 			
 			loadSources.init(Config.sourceList,function(){
 				// init

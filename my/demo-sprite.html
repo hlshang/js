@@ -12,24 +12,52 @@
 		display: block;
 		border:1px solid red; 
 	}
+	.one{
+		position: relative;
+		/*top:200px;*/
+		width: 100px;
+		height: 100px;
+		background-color: blue;
+	}
 	</style>
 </head>
 <body>
-	<canvas id="myCanvas" width="1080" height="540">
+	<!-- <canvas id="myCanvas" width="1080" height="540">
 		Your browser do not support canvas!
-	</canvas>
-	<div class="one" data-one="ok">one</div>
-	<div class="one">two</div>
-	<div class="one">three</div>
+	</canvas> -->
+	<div class="one" data-one="ok" style="top:200px">one</div>
+	<!-- <div class="one">two</div> -->
+	<!-- <div class="one">three</div> -->
 	<script>
-	for(var i = 0;i < document.querySelectorAll(".one").length;i++){
-		(function(i){
-			document.querySelectorAll(".one")[i].addEventListener("click",function(e){
-				console.log(this.dataset.one)
-			},false)
-		})(i)
-	}
-	
+		var one = document.querySelector(".one");
+		var t;
+		// for(var i in one.style){
+		// 	console.log(one.style)
+		// }
+		function ani(obj,topN,aniTime,fn){
+			var oldTop = obj.style.top ? parseInt(obj.style.top) : 0,
+				time = 16,
+				step,
+				curTop = 0,
+				t,
+				topN = parseInt(topN),
+				precent,i = 1;
+			t = setInterval(function(){
+				var newTop = obj.style.top ? parseInt(obj.style.top) : 0,
+					step = (Math.abs(topN - oldTop) / (aniTime/time)),
+					precent = step*(i++) / Math.abs(topN - oldTop),
+					qq = 200 - 190 * ((precent - Math.sin(precent*2*Math.PI) / (2*Math.PI)) / precent);
+				obj.style.top = qq + "px";
+				if(precent >= 1){
+					clearInterval(t);
+					fn.call(obj);
+					return;
+				}
+			},time)
+		}
+		ani(one,"10px",400,function(){
+			console.log("ok")
+		})
 	</script>
 </body>
 </html>

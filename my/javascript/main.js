@@ -4,7 +4,9 @@ function Game(){
 	this.jsonCells = {};
 
 	// 角色 boy or girl or runner 默认为boy
-	this.role = "runner";
+	this.role = "boy";
+	// 角色分类 两种 jumper and runner
+	this.currentRole = "jumper";
 	// 跳跃者是否开始动作 不跳跃时有动作
 	this.roleActionStart = true;
 	// 倒计时 默认为3s
@@ -450,6 +452,42 @@ function Game(){
 }
 
 Game.prototype = {
+	start:function(){
+		var that = this;
+		that.showSelectRole();
+		// 选择角色
+		that.selectRole(function(){
+			that.coverAni(document.querySelector(".select-role-wrap"),-that.canvasHeight,800,gameEasing.easeIn,function(){
+				that.cutDownStart();
+			})
+		});
+		that.clearPause();
+
+		that.createSprites();
+
+		that.createResumeLoc();
+		that.startShakeDice();
+		
+		window.requestAnimationFrame(function(time){
+			that.animate.call(that,time);
+		});
+	},
+	animate:function(time){
+		var that = this;
+		if(this.pauseGame){
+			setTimeout(function(){
+				window.requestAnimationFrame(function(time){
+					that.animate.call(that,time);
+				})
+			},100)
+		}else{
+			this.commonFps = this.fps(time);
+			this.drawSprites(time);
+			window.requestAnimationFrame(function(time){
+				that.animate.call(that,time);
+			});
+		}
+	},
 	startShakeDice:function(){
 		var that = this;
 		pb.init("roll-dice").addEventListener("click",function(){
@@ -499,47 +537,28 @@ Game.prototype = {
 	cutDownStart:function(){
 		this.cutDown(5,this.clearPause);
 	},
-	start:function(){
-		var that = this;
-			that.showSelectRole();
-			// 选择角色
-			that.selectRole(that.cutDownStart);
-			that.clearPause();
-
-			that.createSprites();
-			this.drawRoles();
-
-			that.createResumeLoc();
-			that.startShakeDice();
-			window.requestAnimationFrame(function(time){
-				that.animate.call(that,time);
-			});
+	drawSprites:function(time){
+		context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
+		// embelish
+		this.drawEmbelish();
+		// walkMap
+		this.drawWalkMap();
+		// dice
+		this.drawDice(time);
+		// roles
+		this.drawRoles(time);
 	},
-	animate:function(time){
-		var that = this;
-		if(this.pauseGame){
-			setTimeout(function(){
-				window.requestAnimationFrame(function(time){
-					that.animate.call(that,time);
-				})
-			},100)
-		}else{
-			this.drawSprites(time);
-			this.drawMap();
-			this.jumperJump(time);
-			this.commonFps = this.fps(time);
-			window.requestAnimationFrame(function(time){
-				that.animate.call(that,time);
-			});
-		}
+	createSprites:function(){
+		// walkMap
+		this.createWalkMap();
+		// embelish
+		this.createEmbelish();
+		// dice
+		this.createDice();
+		// roles
+		this.createRoles();
 	},
-	jumperJump:function(time){
-		this.jumper.paint(context);
-		this.jumper.update(context,time);
-		this.runner.paint(context);
-		this.runner.update(context,time)
-	},
-	drawMap:function(){
+	createWalkMap:function(){
 		this.mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"]));
 		this.mapBlockTop = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top.png"]));
 		this.mapBlockBottom = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-bottom.png"]));
@@ -551,12 +570,69 @@ Game.prototype = {
 		this.mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"]));
 		this.mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"]));
 		this.mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"]));
+	},
+	createDice:function(){
+		this.diceOne = new Sprite("diceThree",new SpriteSheets(Config.imgSource[0],
+																this.findCellData("diceThree",Config.jsonObj["main"])),
+																this.diceOneBehaivor);
+		this.diceTwo = new Sprite("diceTwo",new SpriteSheets(Config.imgSource[0],
+																this.findCellData("diceTwo",Config.jsonObj["main"])),
+																this.diceTwoBehaivor);
 
+		this.diceOne.diceAnimationTimer = new AnimationTimer(this.diceOneAniTime);
+		this.diceTwo.diceAnimationTimer = new AnimationTimer(this.diceTwoAniTime);
+
+		// dice放到canvas外面
+		this.diceLocReset();
+	},
+	createRoles:function(){
+		// jumpers
+		this.jumper = new Sprite("jumper",new SpriteSheets(Config.imgSource[3],
+																this.findCellData(this.role,Config.jsonObj["jumpers"])),this.jumperBehavior);
+		this.jumper.top = this.rolesInitialTop;
+		this.jumper.left = this.rolesInitialLeft;
+		this.jumper.jumpTimer = new AnimationTimer(this.jumperJumpAniTime);
+		this.jumper.fallTimer = new AnimationTimer(this.jumperJumpAniTime);
+		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
+
+		// runners
+		this.runner = new Sprite("runner",new SpriteSheets(Config.imgSource[4],
+																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
+		this.runner.left = this.rolesInitialLeft;
+		this.runner.top = this.rolesInitialTop;
+		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
+	},
+	createEmbelish:function(){
+		// 水平围栏
+		this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[2],
+																				Config.jsonObj["static-embellish"]["enclosure-horizontal.png"]));
+		// 垂直围栏
+		this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[2],
+																				Config.jsonObj["static-embellish"]["enclosure-vertical.png"]));
+		// 大树1
+		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-1.png"]));
+		// 大树2
+		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-2.png"]));
+		this.tree2.top = this.canvasHeight - 120;
+		// 帐篷
+		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tent.png"]));
+		this.tent.left = this.canvasWidth - 160;
+		// 柴火（两堆）
+		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["firewood.png"]));
+		this.firewood.top = 160;
+		// 木桶（两堆）
+		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["cask.png"]));
+		this.cask.top = 120;
+		// chair
+		this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["chair.PNG"]));
+		this.chair.left = 50;
+		this.chair.top = 400;
+	},
+	drawWalkMap:function(){
 		context.save();
 		context.translate(this.walkMapLeft,this.walkMapTop);
 		context.rotate(45 * Config.deg);
 		context.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
-
 
 		for(var i = 0;i < 24;i++){
 			if(i < 6){
@@ -606,43 +682,66 @@ Game.prototype = {
 		}
 		context.restore();
 	},
-	drawSprites:function(time){
-		context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
-		this.drawEnclosure();
-		this.drawStaticEmbelish();
-
+	drawDice:function(time){
 		this.diceOne.paint(context);
 		this.diceOne.update(context,time);
 
 		this.diceTwo.paint(context);
 		this.diceTwo.update(context,time);
 	},
-
-	createSprites:function(){
-		// sprites list
-		this.diceOne = new Sprite("diceThree",new SpriteSheets(Config.imgSource[0],
-																this.findCellData("diceThree",Config.jsonObj["main"])),
-																this.diceOneBehaivor);
-		this.diceTwo = new Sprite("diceTwo",new SpriteSheets(Config.imgSource[0],
-																this.findCellData("diceTwo",Config.jsonObj["main"])),
-																this.diceTwoBehaivor);
-
-		this.diceOne.diceAnimationTimer = new AnimationTimer(this.diceOneAniTime);
-		this.diceTwo.diceAnimationTimer = new AnimationTimer(this.diceTwoAniTime);
-
-		// 放到canvas外面
-		this.diceLocReset();
+	drawRoles:function(time){
+		this.currentRole === "jumper" ? this.drawJumper(time) : this.drawRunner(time);
 	},
-	drawGround:function(){
-		this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
-																this.findCellData("grassland.png",Config.jsonObj["static-embellish"])))
-		for(var i = 0;i < this.grasslandY;i++){
-			for(var j = 0;j < this.grasslandX;j++){
-				this.grassland.left = j * Config.grassWidth;
-				this.grassland.top = i * Config.grassHeight;
-				this.grassland.paint(context);
-			}
+	drawJumper:function(time){
+		this.jumper.paint(context);
+		this.jumper.update(context,time);
+	},
+	drawRunner:function(time){
+		this.runner.paint(context);
+		this.runner.update(context,time)
+	},
+	drawEmbelish:function(){
+		// 围栏
+		for(var i = 0;i < 8;i++){
+			this.enclosureHorizontal.left = i * 132 + 11;
+			this.enclosureHorizontal.paint(context);
 		}
+		this.enclosureHorizontal.top = this.canvasHeight - 30;
+		for(var i = 0;i < 8;i++){
+			this.enclosureHorizontal.left = i * 132 + 11;
+			this.enclosureHorizontal.paint(context);
+		}
+		for(var i = 0;i< 4 ;i++){
+			this.enclosureVertical.top = i * 170; 
+			this.enclosureVertical.paint(context);
+		}
+		this.enclosureVertical.left = this.canvasWidth - 15;
+		for(var i = 0;i< 4 ;i++){
+			this.enclosureVertical.top = i * 170;
+			this.enclosureVertical.paint(context);
+		}
+
+		// 各种静态装饰物
+		// 树1和树2
+		this.tree1.paint(context);
+		for(var i = 0;i < 2;i++){
+			this.tree2.left = this.canvasWidth - 95 * (i+1);
+			this.tree2.paint(context);
+		}
+		// 帐篷
+		this.tent.paint(context);
+		// 柴火
+		for(var i = 0;i < 2;i++){
+			this.firewood.left = this.canvasWidth - 32 * 2 * (i+1);
+			this.firewood.paint(context);
+		}
+		// 木桶
+		for(var i = 0;i < 2;i++){
+			this.cask.left = (i+1) * 60;
+			this.cask.paint(context);
+		}
+		// 椅子
+		this.chair.paint(context);
 	},
 	selectRole:function(callback){
 		var $roleObj = document.querySelectorAll(".role-list"),
@@ -653,97 +752,24 @@ Game.prototype = {
 				$roleObj[i].addEventListener("click",function(e){
 					that.role = this.dataset.data("role");
 					$roleObj[i].className += "";
+					that.currentRole = that.role === "runner" ? "runner" : "jumper"; 
 					callback();
 				},false)
 			})(i)
 		}
 	},
 	showSelectRole:function(){
+		var that = this,
+			$gameCover = document.querySelector(".game-cover"),
+			$selectRole = document.querySelector(".select-role-wrap");
 		document.querySelector(".start-game-btn").addEventListener("click",function(e){
 			e.preventDefault();
-			document.querySelector(".game-cover").className += "";
-			document.querySelector(".select-role-wrap").className.replace(" hide","");
+			that.coverAni($gameCover,-that.canvasHeight,800,gameEasing.easeOut,function(){
+				that.coverAni($selectRole,-that.canvasHeight,800,gameEasing.easeInOut,function(){
+					console.log("please select role!!")
+				})
+			})
 		},false)
-	},
-	drawRoles:function(){
-		// jumpers
-		this.jumper = new Sprite("jumper",new SpriteSheets(Config.imgSource[3],
-																this.findCellData(this.role,Config.jsonObj["jumpers"])),this.jumperBehavior);
-		this.jumper.top = this.rolesInitialTop;
-		this.jumper.left = this.rolesInitialLeft;
-		this.jumper.jumpTimer = new AnimationTimer(this.jumperJumpAniTime);
-		this.jumper.fallTimer = new AnimationTimer(this.jumperJumpAniTime);
-		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
-		// runners
-		this.runner = new Sprite("runner",new SpriteSheets(Config.imgSource[4],
-																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
-		// console.log(this.findCellData(this.role,Config.jsonObj["runners"]))
-		this.runner.left = this.rolesInitialLeft;
-		this.runner.top = this.rolesInitialTop;
-		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
-	},
-	// 围栏
-	drawEnclosure:function(){
-		// 水平围栏
-		this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[2],
-																				Config.jsonObj["static-embellish"]["enclosure-horizontal.png"]));
-		for(var i = 0;i < 8;i++){
-			this.enclosureHorizontal.left = i * 132 + 11;
-			this.enclosureHorizontal.paint(context);
-
-		}
-		this.enclosureHorizontal.top = this.canvasHeight - 30;
-		for(var i = 0;i < 8;i++){
-			this.enclosureHorizontal.left = i * 132 + 11;
-			this.enclosureHorizontal.paint(context);
-		}
-		// 垂直围栏
-		this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[2],
-																				Config.jsonObj["static-embellish"]["enclosure-vertical.png"]));
-		for(var i = 0;i< 4 ;i++){
-			this.enclosureVertical.top = i * 170; 
-			this.enclosureVertical.paint(context);
-		}
-		this.enclosureVertical.left = this.canvasWidth - 15;
-		for(var i = 0;i< 4 ;i++){
-			this.enclosureVertical.top = i * 170;
-			this.enclosureVertical.paint(context);
-		}
-	},
-	drawStaticEmbelish:function(){
-		// 大树1
-		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-1.png"]));
-		this.tree1.paint(context);
-		// 大树2
-		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-2.png"]));
-		this.tree2.top = this.canvasHeight - 120;
-		for(var i = 0;i < 2;i++){
-			this.tree2.left = this.canvasWidth - 95 * (i+1);
-			this.tree2.paint(context);
-		}
-		// 帐篷
-		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tent.png"]));
-		this.tent.left = this.canvasWidth - 160;
-		this.tent.paint(context);
-		// 柴火（两堆）
-		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["firewood.png"]));
-		this.firewood.top = 160;
-		for(var i = 0;i < 2;i++){
-			this.firewood.left = this.canvasWidth - 32 * 2 * (i+1);
-			this.firewood.paint(context);
-		}
-		// 木桶（两堆）
-		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["cask.png"]));
-		this.cask.top = 120;
-		for(var i = 0;i < 2;i++){
-			this.cask.left = (i+1) * 60;
-			this.cask.paint(context);
-		}
-		// chair
-		this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["chair.PNG"]));
-		this.chair.left = 50;
-		this.chair.top = 400;
-		this.chair.paint(context);
 	},
 	showResult:function(index){
 		switch(index){
@@ -859,5 +885,57 @@ Game.prototype = {
 		}
 		this.lastFrameTime = time;
 		return fps; 
+	},
+	// 上下滑动
+	coverAni:function(obj,lastTop,aniTime,aniWay,fn){
+		var oldTop = obj.style.top ? parseInt(obj.style.top) : 0,
+			changeTime = 16,
+			lastTop = parseInt(lastTop),
+			topGap = Math.abs(lastTop - oldTop),
+			step = topGap / (aniTime/changeTime),
+			precent,
+			i = 1,
+			coverInterVal;
+
+		coverInterVal = setInterval(function(){
+			var originTop = obj.style.top ? parseInt(obj.style.top) : 0,
+				precent = step * i / topGap,
+				currentTop = oldTop - topGap * (aniWay(precent) / precent);
+			obj.style.top = currentTop + "px";
+			i++;
+			if(precent >= 1){
+				clearInterval(coverInterVal);
+				fn.call(obj);
+				return;
+			}
+		},changeTime)
+	}
+	// drawGround:function(){
+	// 	this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
+	// 															this.findCellData("grassland.png",Config.jsonObj["static-embellish"])))
+	// 	for(var i = 0;i < this.grasslandY;i++){
+	// 		for(var j = 0;j < this.grasslandX;j++){
+	// 			this.grassland.left = j * Config.grassWidth;
+	// 			this.grassland.top = i * Config.grassHeight;
+	// 			this.grassland.paint(context);
+	// 		}
+	// 	}
+	// },
+}
+var gameEasing = {
+	liner:function(p){
+		return p;
+	},
+	swing:function(p){
+		return 0.5 - Math.cos( p*Math.PI ) / 2;
+	},
+	easeInOut:function(p){
+		return p - Math.sin(p * 2 * Math.PI) / (2 * Math.PI);
+	},
+	easeOut:function(p){
+		return 1 - Math.pow(1 - p,2);
+	},
+	easeIn:function(p){
+		return Math.pow(p,2);
 	}
 }
