@@ -9,7 +9,7 @@ body{
 .canvas-main{
 	position: relative;
 	width: 1080px;
-	margin:0 auto;
+	margin:20px auto 0;
 	border-radius: 5px;
 }
 #load-precent-nums{

@@ -4,7 +4,7 @@ function Game(){
 	this.jsonCells = {};
 
 	// 角色 boy or girl or runner 默认为boy
-	this.role = "boy";
+	this.role = "girl";
 	// 角色分类 两种 jumper and runner
 	this.currentRole = "jumper";
 	// 跳跃者是否开始动作 不跳跃时有动作
@@ -587,7 +587,7 @@ Game.prototype = {
 	},
 	createRoles:function(){
 		// jumpers
-		this.jumper = new Sprite("jumper",new SpriteSheets(Config.imgSource[3],
+		this.jumper = new Sprite("jumper",new SpriteSheets(Config.imgSource[2],
 																this.findCellData(this.role,Config.jsonObj["jumpers"])),this.jumperBehavior);
 		this.jumper.top = this.rolesInitialTop;
 		this.jumper.left = this.rolesInitialLeft;
@@ -596,7 +596,7 @@ Game.prototype = {
 		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
 
 		// runners
-		this.runner = new Sprite("runner",new SpriteSheets(Config.imgSource[4],
+		this.runner = new Sprite("runner",new SpriteSheets(Config.imgSource[3],
 																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
 		this.runner.left = this.rolesInitialLeft;
 		this.runner.top = this.rolesInitialTop;
@@ -604,27 +604,27 @@ Game.prototype = {
 	},
 	createEmbelish:function(){
 		// 水平围栏
-		this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[2],
-																				Config.jsonObj["static-embellish"]["enclosure-horizontal.png"]));
+		this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[1],
+																				Config.jsonObj["embellish"]["enclosure-horizontal.png"]));
 		// 垂直围栏
-		this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[2],
-																				Config.jsonObj["static-embellish"]["enclosure-vertical.png"]));
+		this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[1],
+																				Config.jsonObj["embellish"]["enclosure-vertical.png"]));
 		// 大树1
-		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-1.png"]));
+		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-1.png"]));
 		// 大树2
-		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tree-2.png"]));
+		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-2.png"]));
 		this.tree2.top = this.canvasHeight - 120;
 		// 帐篷
-		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["tent.png"]));
+		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tent.png"]));
 		this.tent.left = this.canvasWidth - 160;
 		// 柴火（两堆）
-		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["firewood.png"]));
+		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["firewood.png"]));
 		this.firewood.top = 160;
 		// 木桶（两堆）
-		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["cask.png"]));
+		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["cask.png"]));
 		this.cask.top = 120;
 		// chair
-		this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[2],Config.jsonObj["static-embellish"]["chair.PNG"]));
+		this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["chair.PNG"]));
 		this.chair.left = 50;
 		this.chair.top = 400;
 	},
@@ -702,6 +702,7 @@ Game.prototype = {
 	},
 	drawEmbelish:function(){
 		// 围栏
+		this.enclosureHorizontal.top = 0;
 		for(var i = 0;i < 8;i++){
 			this.enclosureHorizontal.left = i * 132 + 11;
 			this.enclosureHorizontal.paint(context);
@@ -711,6 +712,7 @@ Game.prototype = {
 			this.enclosureHorizontal.left = i * 132 + 11;
 			this.enclosureHorizontal.paint(context);
 		}
+		this.enclosureVertical.left = 0;
 		for(var i = 0;i< 4 ;i++){
 			this.enclosureVertical.top = i * 170; 
 			this.enclosureVertical.paint(context);
@@ -911,8 +913,8 @@ Game.prototype = {
 		},changeTime)
 	}
 	// drawGround:function(){
-	// 	this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[2],
-	// 															this.findCellData("grassland.png",Config.jsonObj["static-embellish"])))
+	// 	this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[1],
+	// 															this.findCellData("grassland.png",Config.jsonObj["embellish"])))
 	// 	for(var i = 0;i < this.grasslandY;i++){
 	// 		for(var j = 0;j < this.grasslandX;j++){
 	// 			this.grassland.left = j * Config.grassWidth;
