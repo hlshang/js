@@ -482,18 +482,21 @@ Game.prototype = {
 		// 选择角色
 		that.selectRole(function(){
 			that.coverAni(document.querySelector(".select-role-wrap"),-that.canvasHeight,800,gameEasing.easeIn,function(){
-				that.cutDownStart();
+				that.cutDown(5,function(){
+					that.startGame();
+				});
 			})
 		});
 		that.clearPause();
 	},
 	startGame:function(){
+		var that = this;
 		// start sound
 		this.playSound(this.startSound);
 
-		that.createSprites();
-		that.createResumeLoc();
-		that.startShakeDice();
+		this.createSprites();
+		this.createResumeLoc();
+		this.startShakeDice();
 
 		window.requestAnimationFrame(function(time){
 			that.animate.call(that,time);
@@ -561,9 +564,6 @@ Game.prototype = {
 				},i * 1000)
 			})(i)
 		}
-	},
-	cutDownStart:function(){
-		this.cutDown(5,this.startGame);
 	},
 	drawSprites:function(time){
 		context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
@@ -780,7 +780,7 @@ Game.prototype = {
 		for(var i = 0;i < len;i++){
 			(function(i){
 				$roleObj[i].addEventListener("click",function(e){
-					that.role = this.dataset.data("role");
+					that.role = this.dataset.role;
 					$roleObj[i].className += "";
 					that.currentRole = that.role === "runner" ? "runner" : "jumper"; 
 					callback();
