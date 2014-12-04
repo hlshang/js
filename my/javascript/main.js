@@ -104,6 +104,18 @@ function Game(){
 	// 掷完筛子后人物跳到哪个格子上
 	this.lastPointer = 0;
 	
+	// 音效
+	//开始音效
+	this.startSound = Config.mediaSource[0];
+	// 骰子音效
+	this.diceSound = Config.mediaSource[1];
+	// 跳跃音效
+	this.jumperSound = Config.mediaSource[2]
+	// 跑步者音效
+	this.runnerSound = Config.mediaSource[3];
+	// resume sound
+	this.resumeSound = Config.mediaSource[4];
+
 	this.pauseGame = true;
 	this.commonFps = 60;
 	this.resumeArr = [];
@@ -176,10 +188,16 @@ function Game(){
 		},
 		startJumpMove:function(){
 			that.currentRunnerLoc();
-			that.jumper.jumpTimer.start();
-			that.jumper.moveTimer.start();
+			if(that.currentRole === "runner"){
+				that.runner.runTimer.start();
+			}else{
+				that.jumper.jumpTimer.start();
+				that.jumper.moveTimer.start();
+			}
 			that.startJump = true;
 			that.startMoveAll = true;
+			// play jumper sound
+			that.playSound(that.jumperSound);
 		},
 		execute:function(sprite,context,time){
 			var self = this;
@@ -325,6 +343,9 @@ function Game(){
 				if(--that.diceTotal){
 					// 确定每一跳后的位置
 					that.currentRunnerLoc();
+					// jumper sound
+					that.playSound(that.jumperSound);
+
 					sprite.moveTimer.start();
 				}else{
 					sprite.moveTimer.stop();
@@ -435,6 +456,9 @@ function Game(){
 				if(--that.diceTotal){
 					// 确定每一步后的位置
 					that.currentRunnerLoc();
+					// runner sound
+					that.playSound(that.runnerSound);
+
 					sprite.runTimer.start();
 				}else{
 					sprite.runTimer.stop();
@@ -462,12 +486,15 @@ Game.prototype = {
 			})
 		});
 		that.clearPause();
+	},
+	startGame:function(){
+		// start sound
+		this.playSound(this.startSound);
 
 		that.createSprites();
-
 		that.createResumeLoc();
 		that.startShakeDice();
-		
+
 		window.requestAnimationFrame(function(time){
 			that.animate.call(that,time);
 		});
@@ -520,22 +547,23 @@ Game.prototype = {
 	},
 	cutDown:function(time,callback){
 		var cutInterVal,
-			cur = time;
-		for(var i = 0;i < time;i++){
+			cur = time,
+			$gameCutDown = document.querySelector(".game-cutdown");
+		for(var i = 0;i <= time;i++){
 			(function(i){
 				cutInterVal = setTimeout(function(){
-					document.querySelector(".game-cutdown").className = "game-cutdown-" + cur;
+					$gameCutDown.innerHTML = cur;
 					cur--;
+					if(i === time){
+						clearTimeout(cutInterVal);
+						callback();
+					}
 				},i * 1000)
-				if(i === time - 1){
-					clearTimeout(cutInterVal);
-					callback();
-				}
 			})(i)
 		}
 	},
 	cutDownStart:function(){
-		this.cutDown(5,this.clearPause);
+		this.cutDown(5,this.startGame);
 	},
 	drawSprites:function(time){
 		context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
@@ -762,14 +790,11 @@ Game.prototype = {
 	},
 	showSelectRole:function(){
 		var that = this,
-			$gameCover = document.querySelector(".game-cover"),
-			$selectRole = document.querySelector(".select-role-wrap");
+			$gameCover = document.querySelector(".game-cover");
 		document.querySelector(".start-game-btn").addEventListener("click",function(e){
 			e.preventDefault();
 			that.coverAni($gameCover,-that.canvasHeight,800,gameEasing.easeOut,function(){
-				that.coverAni($selectRole,-that.canvasHeight,800,gameEasing.easeInOut,function(){
-					console.log("please select role!!")
-				})
+				console.log("please select role!!")
 			})
 		},false)
 	},
@@ -799,6 +824,8 @@ Game.prototype = {
 		}
 	},
 	showResume:function(name,url,callback){
+		var $resumeDetail = document.querySelector(".game-resume-detail");
+		$resumeDetail.className = "game-resume-detail animated zoomIn";
 		// name 只是个标识
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){
@@ -817,6 +844,12 @@ Game.prototype = {
 	resumeTwo:function(res){},
 	resumeThree:function(res){},
 	resumeFour:function(res){},
+	closeResume:function(){
+		var $resumeClose = document.querySelector(".game-resume-close");
+		$resumeClose.addEventListener("click",function(){
+			this.parentNode.className = "game-resume-detail animated zoomOut";
+		},false)
+	},
 	getSprites:function(name){
 		for(var i = 0;i < this.sprites.length;i++){
 			if(name === this.sprites[i].name){
@@ -824,6 +857,17 @@ Game.prototype = {
 			}
 		}
 		return null;
+	},
+	soundIsPlaying:function(sound){
+		return !sound.ended && sound.currentTime > 0;
+	},
+	playSound:function(sound){
+		if(!this.soundIsPlaying(sound)){
+			sound.play();
+		}else{
+			sound.load();
+			sound.play();
+		}
 	},
 	findCellData:function(name,jsonObj){
 		var cellDatas = [];
@@ -902,7 +946,7 @@ Game.prototype = {
 		coverInterVal = setInterval(function(){
 			var originTop = obj.style.top ? parseInt(obj.style.top) : 0,
 				precent = step * i / topGap,
-				currentTop = oldTop - topGap * (aniWay(precent) / precent);
+				currentTop = oldTop - (step * i) * (aniWay(precent) / precent);
 			obj.style.top = currentTop + "px";
 			i++;
 			if(precent >= 1){

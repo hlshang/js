@@ -12,52 +12,183 @@
 		display: block;
 		border:1px solid red; 
 	}
-	.one{
+	.game-cover-wrap{
+		width: 1080px;
+		height: 540px;
+		margin:20px auto 0;
+		border:1px solid blue;
 		position: relative;
-		/*top:200px;*/
-		width: 100px;
-		height: 100px;
-		background-color: blue;
+	}
+	.game-cover{
+		position: absolute;
+		z-index:10;
+		top:0;
+		left:0;
+		width: 100%;
+		height: 100%;
+		background-color: yellow
+	}
+	.select-role-wrap{
+		position: absolute;
+		z-index: 9;
+		top:0;
+		left:0;
+		width: 100%;
+		height: 100%;
+		background-color: orange
+	}
+	.game-cutdown{
+		font-size: 160px;
+		font-family: SimSun;
+		font-weight: bold;
+		color:orange;
+	}
+	.game-resume-detail{
+		width: 500px;
+		height: 360px;
+		background: url(images-tmp/resume-container.png) no-repeat left
+	}
+	.animated{
+	  -webkit-animation-duration: .5s;
+	          animation-duration:.5s;
+	  -webkit-animation-fill-mode: both;
+	          animation-fill-mode: both;
+	}
+
+	@-webkit-keyframes zoomIn {
+	  0% {
+	    opacity: 0;
+	    -webkit-transform: scale3d(.1, .1, .1);
+	            transform: scale3d(.1, .1, .1);
+	  }
+
+	  50% {
+	    opacity: 1;
+	  }
+	}
+
+	@keyframes zoomIn {
+	  0% {
+	    opacity: 0;
+	    -webkit-transform: scale3d(.1, .1, .1);
+	            transform: scale3d(.1, .1, .1);
+	  }
+
+	  50% {
+	    opacity: 1;
+	  }
+	}
+
+	.zoomIn {
+	  -webkit-animation-name: zoomIn;
+	          animation-name: zoomIn;
+	}
+	.hide{
+		display: none
 	}
 	</style>
+
 </head>
 <body>
-	<!-- <canvas id="myCanvas" width="1080" height="540">
-		Your browser do not support canvas!
-	</canvas> -->
-	<div class="one" data-one="ok" style="top:200px">one</div>
-	<!-- <div class="one">two</div> -->
-	<!-- <div class="one">three</div> -->
+	<!-- <div class="game-cover-wrap">
+		<div class="game-cover">
+			<div class="game-cover-img"></div>
+			<div id="load-precent-nums"></div>
+			<a href="javascript:void(0)" class="start-game-btn"></a>
+		</div>
+		<div class="select-role-wrap">
+			<div class="role-list boy" data-role="boy"></div>
+			<div class="role-list girl" data-role="girl"></div>
+			<div class="role-list runner" data-role="runner"></div>
+		</div>
+	</div> -->
+		<div class="game-cutdown">0</div>
+	<!-- <div class="game-resume-detail" style="display:none"></div> -->
+	<div class="hide" id="okk">ooooo</div>
 	<script>
-		var one = document.querySelector(".one");
+	// setTimeout(function(){
+	// 	setTimeout(function(){
+	// 		document.querySelector(".game-cutdown").style.opacity = 0;
+	// 		document.querySelector(".game-cutdown").innerHTML = "1"
+	// 	},2000)
+	// },0)
+	console.log(document.getElementById("okks"))
+		var gameCover = document.querySelector(".game-cover"),
+			selectRole = document.querySelector(".select-role-wrap");
 		var t;
-		// for(var i in one.style){
-		// 	console.log(one.style)
-		// }
-		function ani(obj,topN,aniTime,fn){
+		var gameEasing = {
+			liner:function(p){
+				return p;
+			},
+			swing:function(p){
+				return 0.5 - Math.cos( p*Math.PI ) / 2;
+			},
+			easeInOut:function(p){
+				return p - Math.sin(p * 2 * Math.PI) / (2 * Math.PI);
+			},
+			easeOut:function(p){
+				return 1 - Math.pow(1 - p,2);
+			},
+			easeIn:function(p){
+				return Math.pow(p,2);
+			}
+		}
+		function coverAni(obj,lastTop,aniTime,aniWay,fn){
 			var oldTop = obj.style.top ? parseInt(obj.style.top) : 0,
-				time = 16,
-				step,
-				curTop = 0,
-				t,
-				topN = parseInt(topN),
-				precent,i = 1;
-			t = setInterval(function(){
-				var newTop = obj.style.top ? parseInt(obj.style.top) : 0,
-					step = (Math.abs(topN - oldTop) / (aniTime/time)),
-					precent = step*(i++) / Math.abs(topN - oldTop),
-					qq = 200 - 190 * ((precent - Math.sin(precent*2*Math.PI) / (2*Math.PI)) / precent);
-				obj.style.top = qq + "px";
+				changeTime = 16,
+				lastTop = parseInt(lastTop),
+				topGap = Math.abs(lastTop - oldTop),
+				step = topGap / (aniTime/changeTime),
+				precent,
+				i = 1,
+				coverInterVal;
+
+			coverInterVal = setInterval(function(){
+				var originTop = obj.style.top ? parseInt(obj.style.top) : 0,
+					precent = step * i / topGap,
+					currentTop = oldTop - (step * i) * (aniWay(precent) / precent);
+				obj.style.top = currentTop + "px";
+				i++;
 				if(precent >= 1){
-					clearInterval(t);
+					clearInterval(coverInterVal);
 					fn.call(obj);
 					return;
 				}
-			},time)
+			},changeTime)
 		}
-		ani(one,"10px",400,function(){
-			console.log("ok")
-		})
+		function cutDown(time,callback){
+			var cutInterVal,
+				cur = time;
+			for(var i = 0;i <= time;i++){
+				(function(i){
+					cutInterVal = setTimeout(function(){
+						// document.querySelector(".game-cutdown").className = "game-cutdown game-cutdown-" + cur;
+						document.querySelector(".game-cutdown").innerHTML = cur;
+						cur--;
+						if(i === time){
+							clearTimeout(cutInterVal);
+							callback();
+						}
+					},i * 1000)
+				})(i)
+			}
+		}
+		cutDown(4,function(){})
+		document.addEventListener("click",function(){
+			document.querySelector(".game-resume-detail").style.display = "block";
+			document.querySelector(".game-resume-detail").className += " animated zoomIn";
+		},false)
+		// console.log(document.querySelector(".game-resume-detail").style.display = "block")
+		// document.addEventListener("click",function(){
+		// 	coverAni(gameCover,"-560px",400,gameEasing.easeInOut,function(){
+		// 		cutDown(3,function(){
+		// 					// document.querySelector(".game-cutdown").innerHTML = "start";
+		// 			setTimeout(function(){
+		// 				console.log("start game")
+		// 			},200)
+		// 		})
+		// 	})
+		// },false)
 	</script>
 </body>
 </html>
