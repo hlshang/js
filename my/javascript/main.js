@@ -103,7 +103,14 @@ function Game(){
 	this.currentPointer = 0;
 	// 掷完筛子后人物跳到哪个格子上
 	this.lastPointer = 0;
-	
+	// selector
+	this.selectRoleWrap = document.querySelector(".select-role-wrap");
+	this.gameCutDown = document.querySelector(".game-cutdown");
+	this.roleListAll = document.querySelectorAll(".role-list");
+	this.gameCover = document.querySelector(".game-cover");
+	this.startGameBtn = document.querySelector(".start-game-btn");
+	this.gameResumeDetail = document.querySelector(".game-resume-detail");
+	this.gameResumeClose = document.querySelector(".game-resume-close");
 	// 音效
 	//开始音效
 	this.startSound = Config.mediaSource[0];
@@ -115,6 +122,8 @@ function Game(){
 	this.runnerSound = Config.mediaSource[3];
 	// resume sound
 	this.resumeSound = Config.mediaSource[4];
+	// cutDown sound
+	this.cutSound = Config.mediaSource[5];
 
 	this.pauseGame = true;
 	this.commonFps = 60;
@@ -478,22 +487,22 @@ function Game(){
 Game.prototype = {
 	start:function(){
 		var that = this;
-		that.showSelectRole();
+		this.showSelectRole();
 		// 选择角色
-		that.selectRole(function(){
-			that.coverAni(document.querySelector(".select-role-wrap"),-that.canvasHeight,800,gameEasing.easeIn,function(){
+		this.selectRole(function(){
+			that.coverAni(that.selectRoleWrap,-that.canvasHeight,800,gameEasing.easeIn,function(){
 				that.cutDown(5,function(){
 					that.startGame();
 				});
 			})
 		});
-		that.clearPause();
 	},
 	startGame:function(){
 		var that = this;
 		// start sound
 		this.playSound(this.startSound);
 
+		this.clearPause();
 		this.createSprites();
 		this.createResumeLoc();
 		this.startShakeDice();
@@ -551,10 +560,12 @@ Game.prototype = {
 	cutDown:function(time,callback){
 		var cutInterVal,
 			cur = time,
-			$gameCutDown = document.querySelector(".game-cutdown");
+			$gameCutDown = this.gameCutDown,
+			that = this;
 		for(var i = 0;i <= time;i++){
 			(function(i){
 				cutInterVal = setTimeout(function(){
+					that.playSound(that.cutSound);
 					$gameCutDown.innerHTML = cur;
 					cur--;
 					if(i === time){
@@ -774,7 +785,7 @@ Game.prototype = {
 		this.chair.paint(context);
 	},
 	selectRole:function(callback){
-		var $roleObj = document.querySelectorAll(".role-list"),
+		var $roleObj = this.roleListAll,
 			len = $roleObj.length,
 			that = this;
 		for(var i = 0;i < len;i++){
@@ -789,11 +800,10 @@ Game.prototype = {
 		}
 	},
 	showSelectRole:function(){
-		var that = this,
-			$gameCover = document.querySelector(".game-cover");
-		document.querySelector(".start-game-btn").addEventListener("click",function(e){
+		var that = this;
+		this.startGameBtn.addEventListener("click",function(e){
 			e.preventDefault();
-			that.coverAni($gameCover,-that.canvasHeight,800,gameEasing.easeOut,function(){
+			that.coverAni(that.gameCover,-that.canvasHeight,800,gameEasing.easeOut,function(){
 				console.log("please select role!!")
 			})
 		},false)
@@ -824,8 +834,7 @@ Game.prototype = {
 		}
 	},
 	showResume:function(name,url,callback){
-		var $resumeDetail = document.querySelector(".game-resume-detail");
-		$resumeDetail.className = "game-resume-detail animated zoomIn";
+		this.gameResumeDetail.className = "game-resume-detail animated zoomIn";
 		// name 只是个标识
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){
@@ -845,8 +854,7 @@ Game.prototype = {
 	resumeThree:function(res){},
 	resumeFour:function(res){},
 	closeResume:function(){
-		var $resumeClose = document.querySelector(".game-resume-close");
-		$resumeClose.addEventListener("click",function(){
+		this.gameResumeClose.addEventListener("click",function(){
 			this.parentNode.className = "game-resume-detail animated zoomOut";
 		},false)
 	},

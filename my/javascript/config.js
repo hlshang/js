@@ -2,7 +2,7 @@
 var Config = {
 	sourceList:{
 		"images":["images/main.png","images/embellish.png","images/jumpers.png","images/runners.png"],
-		"audio":["sounds/start.mp3","sounds/dice.mp3","sounds/jumper.mp3","sounds/runner.mp3","sounds/resume.mp3"],
+		"audio":["sounds/start.mp3","sounds/dice.mp3","sounds/jumper.mp3","sounds/runner.mp3","sounds/resume.mp3","sounds/cutDown.mp3"],
 		"json":["resume-json/main.json","resume-json/embellish.json","resume-json/jumpers.json","resume-json/runners.json"]
 	},
 	// 三种资源

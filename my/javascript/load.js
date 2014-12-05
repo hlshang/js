@@ -39,6 +39,21 @@
 				mediaId = 0,
 				jsonId = 0,
 				jsonFailId = 0;
+			var mediaHandler = function(){
+				Config.mediaSource.push(this);
+				mediaId++;
+				if(mediaId < mediaObj.length){
+					loadMedia();
+				}
+				that.progress = (imageId + mediaId)/sourceNums;
+				that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
+
+				this.removeEventListener("canplay",mediaHandler,false);
+				
+				if(mediaId === mediaObj.length){
+					loadJson();
+				}
+			};
 			var loadImg = function(){
 				var	image = new Image();
 				image.src = imageObj[imageId];
@@ -76,18 +91,7 @@
 					loadJson();
 					return;
 				}
-				media.addEventListener("canplay",function(){
-					Config.mediaSource.push(media);
-					mediaId++;
-					if(mediaId < mediaObj.length){
-						loadMedia();
-					}
-					that.progress = (imageId + mediaId)/sourceNums;
-					that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
-					if(mediaId === mediaObj.length){
-						loadJson();
-					}
-				},false)
+				media.addEventListener("canplay",mediaHandler,false)
 			}
 
 			function loadJson(){
