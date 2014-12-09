@@ -491,7 +491,8 @@ Game.prototype = {
 		// 选择角色
 		this.selectRole(function(){
 			that.coverAni(that.selectRoleWrap,-that.canvasHeight,800,gameEasing.easeIn,function(){
-				that.cutDown(5,function(){
+				that.cutDown(3,function(){
+					that.gameCutDown.innerHTML = "Start Game!";
 					that.startGame();
 				});
 			})
@@ -506,6 +507,7 @@ Game.prototype = {
 		this.createSprites();
 		this.createResumeLoc();
 		this.startShakeDice();
+		this.closeResume();
 
 		window.requestAnimationFrame(function(time){
 			that.animate.call(that,time);
@@ -531,6 +533,7 @@ Game.prototype = {
 		var that = this;
 		pb.init("roll-dice").addEventListener("click",function(){
 			if(that.pauseGame) return;
+			that.playSound(that.diceSound);
 			that.diceRotateReset();
 			that.diceOneNum = Math.floor(Math.random() * 6);
 			that.diceTwoNum = Math.floor(Math.random() * 6);
@@ -565,13 +568,14 @@ Game.prototype = {
 		for(var i = 0;i <= time;i++){
 			(function(i){
 				cutInterVal = setTimeout(function(){
-					that.playSound(that.cutSound);
-					$gameCutDown.innerHTML = cur;
-					cur--;
 					if(i === time){
 						clearTimeout(cutInterVal);
 						callback();
+						return false;
 					}
+					that.playSound(that.cutSound);
+					$gameCutDown.innerHTML = cur;
+					cur--;
 				},i * 1000)
 			})(i)
 		}

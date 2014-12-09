@@ -62,20 +62,24 @@ body{
 .game-cutdown{
 	position: absolute;
 	left:50%;
-	top:100px;
+	top:50%;
 	font-size: 160px;
 	font-family: SimSun;
 	font-weight: bold;
+	-webkit-transform:translate(-50%,-50%);
+	-moz-transform:translate(-50%,-50%);
+	transform:translate(-50%,-50%);
 	color:orange;
 }
 .game-resume-detail{
-	opacity: 0;
+	/*opacity: 0;*/
 	width: 500px;
 	height: 360px;
 	position: absolute;
 	left:50%;
-	top:200px;
-	margin-left:-180px;
+	top:50%;
+	margin-left:-250px;
+	margin-top: -180px;
 	color:#fafafa;
 	background: url(../images-tmp/resume-container.png) no-repeat left
 }
