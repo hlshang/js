@@ -7,6 +7,8 @@ function Game(){
 	this.role = "girl";
 	// 角色分类 两种 jumper and runner
 	this.currentRole = "jumper";
+	this.roleWidth = 0;
+	this.roleHeight = 0;
 	// 跳跃者是否开始动作 不跳跃时有动作
 	this.roleActionStart = true;
 	// 倒计时 默认为3s
@@ -59,9 +61,7 @@ function Game(){
 	// 行走地图在画布中的位置（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
-	// 人物初始位置
-	this.rolesInitialLeft = this.canvasWidth / 2 - 20;
-	this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - 108 + 0.5 * Math.sin(this.slopeAngle);
+	
 	// 一格的长度
 	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6);
 	// 一格的高度
@@ -504,6 +504,7 @@ Game.prototype = {
 		// start sound
 		this.playSound(this.startSound);
 
+		this.confirmRoleWH();
 		this.clearPause();
 		this.createSprites();
 		this.createResumeLoc();
@@ -812,6 +813,18 @@ Game.prototype = {
 				console.log("please select role!!")
 			})
 		},false)
+	},
+	confirmRoleWH:function(){
+		if(this.role === "runner"){
+			this.roleWidth = 30;
+			this.roleHeight = 50;
+		}else {
+			this.roleWidth = 150;
+			this.roleHeight = 100;
+		}
+		// 人物初始位置
+		this.rolesInitialLeft = this.canvasWidth / 2 - this.roleWidth / 2;
+		this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - this.roleHeight - this.verticalPacePix;
 	},
 	showResult:function(index){
 		switch(index){
