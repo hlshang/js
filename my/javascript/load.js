@@ -1,6 +1,6 @@
 (function(){
 	var resumeImg = new Image();
-		resumeImg.src = "images/resume.png";
+		resumeImg.src = "images/resume-1.png";
 	var	sourceNums = 0,
 		sourceArr = [];
 
@@ -137,31 +137,33 @@
 				cWidth = canvas.width,
 				cHeight = canvas.height,
 				progress = parseInt(progress * 100);
+			document.getElementById("load-precent").style.width = 500 * progress/100 + "px";
+			document.getElementById("load-precent-nums").innerHTML = progress + "%";
+			// this.showPrecentNums(progress);
 
-			context.clearRect(0,0,cWidth,cHeight);
-			context.save();
-			context.beginPath();
-			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
-			context.lineTo(cWidth/2 + width/2 - radius,cHeight/2 - height);
-			context.arc(cWidth/2 + width/2 - radius,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
-			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
-			context.closePath();
+			// context.clearRect(0,0,cWidth,cHeight);
+			// context.save();
+			// context.beginPath();
+			// context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
+			// context.lineTo(cWidth/2 + width/2 - radius,cHeight/2 - height);
+			// context.arc(cWidth/2 + width/2 - radius,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
+			// context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
+			// context.closePath();
 
-			context.strokeStyle = Config.progressBorderColor;
-			context.lineWidth = 2;
-			context.stroke();
+			// context.strokeStyle = Config.progressBorderColor;
+			// context.lineWidth = 2;
+			// context.stroke();
 			
-			context.beginPath();
-			context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
-			context.lineTo(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height);
-			context.arc(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
-			context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
-			context.closePath();
-			context.fillStyle = Config.progressColor;
-			context.fill();
+			// context.beginPath();
+			// context.arc(cWidth/2 - width/2 + radius,cHeight/2 - height/2,radius,0.5*Math.PI,1.5*Math.PI);
+			// context.lineTo(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height);
+			// context.arc(cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height/2,radius,1.5*Math.PI,0.5*Math.PI);
+			// context.lineTo(cWidth/2 - width/2 + radius,cHeight/2 - height/2 + radius);
+			// context.closePath();
+			// context.fillStyle = Config.progressColor;
+			// context.fill();
 			
-			context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height,height,height)
-			this.showPrecentNums(progress);
+			// context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height,height,height)
 		},
 		showPrecentNums:function(precents){
 			pb.init("load-precent-nums").innerHTML = precents + "%";

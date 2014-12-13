@@ -60,8 +60,8 @@ function Game(){
 	this.walkMapLeft = this.canvasWidth / 2;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
 	// 人物初始位置
-	this.rolesInitialLeft = this.canvasWidth / 2 - 100;
-	this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - 180 + 0.5 * Math.sin(this.slopeAngle);
+	this.rolesInitialLeft = this.canvasWidth / 2 - 20;
+	this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - 108 + 0.5 * Math.sin(this.slopeAngle);
 	// 一格的长度
 	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6);
 	// 一格的高度
@@ -125,7 +125,8 @@ function Game(){
 	// cutDown sound
 	this.cutSound = Config.mediaSource[5];
 
-	this.pauseGame = true;
+	this.coverSlideTime = 400;
+	this.pauseGame = false;
 	this.commonFps = 60;
 	this.resumeArr = [];
 
@@ -490,9 +491,9 @@ Game.prototype = {
 		this.showSelectRole();
 		// 选择角色
 		this.selectRole(function(){
-			that.coverAni(that.selectRoleWrap,-that.canvasHeight,800,gameEasing.easeIn,function(){
+			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
 				that.cutDown(3,function(){
-					that.gameCutDown.innerHTML = "Start Game!";
+					document.body.removeChild(that.gameCutDown);
 					that.startGame();
 				});
 			})
@@ -574,7 +575,7 @@ Game.prototype = {
 						return false;
 					}
 					that.playSound(that.cutSound);
-					$gameCutDown.innerHTML = cur;
+					$gameCutDown.className = "game-cutdown game-cutdown-" + cur;
 					cur--;
 				},i * 1000)
 			})(i)
@@ -807,7 +808,7 @@ Game.prototype = {
 		var that = this;
 		this.startGameBtn.addEventListener("click",function(e){
 			e.preventDefault();
-			that.coverAni(that.gameCover,-that.canvasHeight,800,gameEasing.easeOut,function(){
+			that.coverAni(that.gameCover,-560,that.coverSlideTime,gameEasing.easeOut,function(){
 				console.log("please select role!!")
 			})
 		},false)

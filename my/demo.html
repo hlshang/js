@@ -19,10 +19,17 @@
 		</canvas>
 	</div>
 	<div class="game-cover-wrap">
+		
 		<div class="game-cover">
-			<div class="game-cover-img"></div>
-			<div id="load-precent-nums"></div>
-			<a href="javascript:void(0)" class="start-game-btn">开始</a>
+			<div class="game-cover-img">
+				<p class="game-resume one flipInY animated-slow infinite"></p>
+				<p class="game-resume two tada animated-slow infinite"></p>
+			</div>
+			<div class="load-precent-wrap">
+				<div id="load-precent"></div>
+				<div id="load-precent-nums"></div>
+			</div>
+			<div class="start-game-btn hide">开始查看简历</div>
 		</div>
 		<div class="select-role-wrap">
 			<div class="role-list boy" data-role="boy"></div>
@@ -31,7 +38,7 @@
 		</div>
 	</div>
 	<div class="game-cutdown"></div>
-	<div class="game-resume-detail zoomOut">
+	<div class="game-resume-detail zoomOut animated">
 		<span class="game-resume-close">x</span>
 	</div>
 	<span id="roll-dice">ok</span>
@@ -42,7 +49,9 @@
 			context = canvas.getContext("2d"); 
 			
 			loadSources.init(Config.sourceList,function(){
-				// init
+				// document.getElementById("load-precent-nums").className = "hide";
+				document.querySelector(".game-cover").removeChild(document.querySelector(".load-precent-wrap"));
+				document.querySelector(".start-game-btn").className = "start-game-btn";
 				context.clearRect(0,0,canvas.width,canvas.height);
 				var game = new Game();
 				game.start();
