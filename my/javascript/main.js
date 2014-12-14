@@ -83,10 +83,11 @@ function Game(){
 	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
-	this.runnerAniTime = 400;
+	this.runnerAniTime = 300;
 	// 跑步者水平速度（每秒水平移动多少像素）
 	this.runnerHPixEverySec = Math.floor(this.horizontalPacePix / (this.runnerAniTime / 1000));
 	this.runnerVPixEverySec = this.runnerHPixEverySec * Math.tan(this.slopeAngle);
+	// console.log
 	// 开始跳跃
 	this.startJump = false;
 	// 开始移动
@@ -387,7 +388,7 @@ function Game(){
 
 	this.runnerRunActionBehavior = {
 		lastAdvanceTime:0,
-		changeFrequencyTime:150,
+		changeFrequencyTime:80,
 		updateAdvance:function(sprite){
 			if(that.currentPointer >= 0 && that.currentPointer < 6){
 				if(sprite.painter.cellsIndex >= 7){
@@ -395,66 +396,54 @@ function Game(){
 				}
 			}
 			if(that.currentPointer >= 6 && that.currentPointer < 12){
-				if(sprite.painter.cellsIndex >= 14 || sprite.painter.cellsIndex < 7){
-					sprite.painter.cellsIndex = 7;
+				if(sprite.painter.cellsIndex >= 14){
+					sprite.painter.cellsIndex = 8;
 				}
 			}
 			if(that.currentPointer >= 12 && that.currentPointer < 18){
-				if(sprite.painter.cellsIndex >= 21 || sprite.painter.cellsIndex < 14){
-					sprite.painter.cellsIndex = 14;
+				if(sprite.painter.cellsIndex >= 21){
+					sprite.painter.cellsIndex = 16;
 				}
 			}
 			if(that.currentPointer >= 18 && that.currentPointer < 24){
-				if(sprite.painter.cellsIndex >= 28 || sprite.painter.cellsIndex < 21){
-					sprite.painter.cellsIndex = 21;
+				if(sprite.painter.cellsIndex >= 28){
+					sprite.painter.cellsIndex = 24;
 				}
 			}
 		},
 		execute:function(sprite,context,time){
+			if(!that.startMoveAll) return;
+			that.roleActionStart = false;
+
 			if(this.lastAdvanceTime === 0){
 				this.lastAdvanceTime = time;
 			}
 			if(time - this.lastAdvanceTime > this.changeFrequencyTime){
-				// sprite.painter.advance();
+				sprite.painter.advance();
 				this.updateAdvance(sprite);
 				this.lastAdvanceTime = time;
 			}
 		}
 	};
-	this.runnerLingerActionBehavior = {
-		lastAdvanceTime:0,
-		changeFrequencyTime:100,
-		execute:function(sprite,context,time){
-			// if(!that.roleActionStart) return;
-
-			// if(this.lastAdvanceTime === 0){
-			// 	this.lastAdvanceTime = time;
-			// }
-			// if(time - this.lastAdvanceTime > this.changeFrequencyTime){
-			// 	sprite.painter.advance();
-			// 	this.lastAdvanceTime = time;
-			// }
-		}
-	};
 	this.runnerMoveBehavior = {
 		execute:function(sprite,context,time){
-			if(that.roleActionStart) return;
+			if(!that.startMoveAll) return;
+
+			that.roleActionStart = false;
 
 			if(sprite.runTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
-				sprite.velocityX = that.runnerVPixEverySec * framePerSecond;
-				sprite.velocityY = that.runnerHPixEverySec * framePerSecond;
-				if(that.currentPointer < 6){
-					sprite.left -= sprite.velocityX;
-					sprite.top -= sprite.velocityY
-				}else if(that.currentPointer >= 6 && that.currentPointer < 12){
-					sprite.left += sprite.velocityX;
-					sprite.top -= sprite.velocityY;
-				}else if(that.currentPointer >= 12 && that.currentPointer < 18){
-					sprite.left += sprite.velocityX;
-					sprite.top += sprite.velocityY;
+				sprite.velocityX = that.runnerHPixEverySec * framePerSecond;
+				sprite.velocityY = that.runnerVPixEverySec * framePerSecond;
+				if(that.currentPointer > 6 && that.currentPointer < 19){
+					sprite.left +=  sprite.velocityX;
 				}else{
-					sprite.left -= sprite.velocityX;
+					sprite.left -=  sprite.velocityX;
+				}
+
+				if(that.currentPointer > 0 && that.currentPointer < 13){
+					sprite.top -= sprite.velocityY;
+				}else{
 					sprite.top += sprite.velocityY;
 				}
 			}
@@ -472,6 +461,7 @@ function Game(){
 					sprite.runTimer.start();
 				}else{
 					sprite.runTimer.stop();
+					that.startMoveAll = false;
 					that.runnerActionStart = true;
 					// 人物开始动作
 					// 显示相应的结果
@@ -480,7 +470,7 @@ function Game(){
 			}
 		}
 	};
-	this.runnerBehavior = [this.runnerRunActionBehavior,this.runnerLingerActionBehavior,this.runnerMoveBehavior];
+	this.runnerBehavior = [this.runnerRunActionBehavior,this.runnerMoveBehavior];
 
 	this.sprites = [];
 }
@@ -492,7 +482,7 @@ Game.prototype = {
 		// 选择角色
 		this.selectRole(function(){
 			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
-				that.cutDown(3,function(){
+				that.cutDown(1,function(){
 					document.body.removeChild(that.gameCutDown);
 					that.startGame();
 				});
