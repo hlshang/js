@@ -17,9 +17,20 @@
 		<canvas id="myCanvas" width="1080" height="540">
 			Your browser do not support canvas!
 		</canvas>
+		<div class="roll-num-show"></div>
+		<div class="roll-dice-wrap">
+			<div class="roll-count-select-wrap">
+				<div class="roll-count-select"></div>
+				<span class="roll-count-num one">0</span>
+				<span class="roll-count-num two">3</span>
+				<span class="roll-count-num three">6</span>
+				<span class="roll-count-num four">9</span>
+				<span class="roll-count-num five">12</span>
+			</div>
+			<div id="roll-dice-btn" class="roll-dice-btn"></div>
+		</div>
 	</div>
 	<div class="game-cover-wrap">
-		
 		<div class="game-cover">
 			<div class="game-cover-img">
 				<p class="game-resume one flipInY animated-slow infinite"></p>
@@ -41,7 +52,6 @@
 	<div class="game-resume-detail zoomOut animated">
 		<span class="game-resume-close">x</span>
 	</div>
-	<div id="roll-dice">ok</div>
 	<script>
 		var canvas,context;
 		document.addEventListener("DOMContentLoaded",function(){

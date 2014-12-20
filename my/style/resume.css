@@ -161,9 +161,84 @@ body{
 	margin-left:-250px;
 	margin-top: -180px;
 	color:#fafafa;
-	background: url(../images-tmp/resume-container.png) no-repeat left
+	background: url(../images/resume-container.png) no-repeat left
 }
-
+.game-resume-close{
+  position: absolute;
+  right: 20px;
+  top:10px;
+  font-size: 40px;
+  font-family: arial;
+  cursor: pointer;
+}
+.roll-dice-wrap{
+  position: absolute;
+  left:50%;
+  top:50%;
+  width: 200px;
+  margin-left: -100px;
+  z-index: 1000;
+  display: none;
+}
+.roll-dice-btn{
+  margin:0 auto;
+  width: 70px;
+  height: 70px;
+  background: url(../images/start-dice.png) no-repeat left top;
+   background-size: 60px;
+}
+.roll-dice-btn:hover{
+  background: url(../images/start-dice-hover.png) no-repeat left top;
+  background-size: 60px;
+  cursor: pointer;
+}
+.roll-count-select-wrap{
+  margin:0 auto 5px;
+  width: 200px;
+  height: 10px;
+  border:1px solid #f87c4c;
+  border-radius: 5px;
+}
+.roll-count-select{
+  width: 123px;
+  height: 100%;
+  background-color: #ec7206;
+  border-radius: 5px;
+}
+.roll-count-num{
+  position: absolute;
+  top:-15px;
+  font-size: 12px;
+  font-weight: bold;
+  color:#503b04;
+}
+.roll-count-num.one{
+  left: 0
+}
+.roll-count-num.two{
+  left: 50px;
+}
+.roll-count-num.three{
+  left: 100px;
+}
+.roll-count-num.four{
+  left: 150px;
+}
+.roll-count-num.five{
+  left: 200px;
+}
+.roll-num-show{
+  width: 170px;
+  position: absolute;
+  left: 50%;
+  top:20%;
+  margin-left:-85px; 
+  font-size: 150px;
+  font-family: arial;
+  font-weight: bold;
+  color:#ec7206;
+  text-align: center;
+}
 .animated{
   -webkit-animation-duration: .4s;
           animation-duration: .4s;

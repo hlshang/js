@@ -32,6 +32,8 @@ function Game(){
 	// 骰子是否结束转动
 	this.oneEndRotate = false;
 	this.twoEndRotate = false;
+	this.mousedown = false;
+	this.mouseup = false;
 	// 开始丢骰子
 	this.startShakeOneDice = false;
 	this.startShakeTwoDice = false;
@@ -112,6 +114,10 @@ function Game(){
 	this.startGameBtn = document.querySelector(".start-game-btn");
 	this.gameResumeDetail = document.querySelector(".game-resume-detail");
 	this.gameResumeClose = document.querySelector(".game-resume-close");
+	this.rollDiceWrap = document.querySelector(".roll-dice-wrap");
+	this.rollBtn = document.getElementById("roll-dice-btn");
+	this.rollCountSelect = document.querySelector(".roll-count-select");
+	this.rollNumShow = document.querySelector(".roll-num-show");
 	// 音效
 	//开始音效
 	this.startSound = Config.mediaSource[0];
@@ -216,7 +222,9 @@ function Game(){
 			if(sprite.diceAnimationTimer.isExpired()){
 				that.startShakeTwoDice = false;
 				sprite.painter.cellsIndex = that.diceTwoNum;
-				// 这儿应该有一个显示骰子数的方法 todo
+				// 显示骰子数
+				that.diceNumShow(that.diceTotal);
+
 				var timeOut = setTimeout( function(){
 					self.startJumpMove();
 					that.diceLocReset();
@@ -496,6 +504,7 @@ Game.prototype = {
 
 		this.confirmRoleWH();
 		this.clearPause();
+		this.rollDiceShow(true);
 		this.createSprites();
 		this.createResumeLoc();
 		this.startShakeDice();
@@ -522,18 +531,100 @@ Game.prototype = {
 		}
 	},
 	startShakeDice:function(){
-		var that = this;
-		pb.init("roll-dice").addEventListener("click",function(){
-			if(that.pauseGame) return;
+		var that = this,
+			rollCountInter,
+			rollCountW,
+			rollCountDirect = "right";
+		this.rollBtn.addEventListener("mousedown",function(){
+			if(that.mousedown) return;
+			that.mousedown = true;
+			rollCountInter = setInterval(function(){
+				rollCountW = that.rollCountSelect.style.width ? that.rollCountSelect.style.width : 0;
+				rollCountW = parseInt(rollCountW);
+				if(rollCountDirect === "left"){
+					that.rollCountSelect.style.width = rollCountW - 10 + "px";
+				}else{
+					that.rollCountSelect.style.width = rollCountW + 10 + "px";
+				}
+				if(rollCountW >= 190){
+					rollCountDirect = "left";
+				}else if(rollCountW <= 0){
+					rollCountDirect = "right";
+				}
+			},16)
+		},false)
+		this.rollBtn.addEventListener("mouseup",function(){
+			if(that.mouseup) return;
+			that.mouseup = true;
+			clearInterval(rollCountInter);
 			that.playSound(that.diceSound);
+			that.convertRoll(rollCountW);
 			that.diceRotateReset();
-			that.diceOneNum = Math.floor(Math.random() * 6);
-			that.diceTwoNum = Math.floor(Math.random() * 6);
-			that.diceTotals();
+			that.diceDetailNum(that.diceTotal);
+			that.rollDiceShow();
+			// that.diceTotals();
 			// 确定每次掷完筛子后人物的位置
 			that.lastRunnerLoc();
 			that.diceStartRotate()
 		},false)
+		// pb.init("roll-dice-btn").addEventListener("click",function(){
+		// 	if(that.pauseGame) return;
+		// 	that.playSound(that.diceSound);
+		// 	that.diceRotateReset();
+		// 	that.diceOneNum = Math.floor(Math.random() * 6);
+		// 	that.diceTwoNum = Math.floor(Math.random() * 6);
+		// 	that.diceTotals();
+		// 	// 确定每次掷完筛子后人物的位置
+		// 	that.lastRunnerLoc();
+		// 	that.diceStartRotate()
+		// },false)
+	},
+	rollDiceShow:function(show){
+		var that = this;
+		setTimeout(function(){
+			if(show){
+				that.rollDiceWrap.style.display = "block";
+			}else{
+				that.mousedown = false;
+				that.mouseup = false;
+				that.rollCountSelect.style.width = 0;
+				that.rollDiceWrap.style.display = "none";
+			}
+		},200)
+	},
+	diceNumShow:function(num){
+		var that = this;
+		setTimeout(function(){
+			that.rollNumShow.innerHTML = num;
+		},500)
+		setTimeout(function(){
+			that.rollNumShow.innerHTML = "";
+		},1500)
+	},
+	diceDetailNum:function(diceAll){
+		var diceTotalReal = diceAll - 2;
+		if(diceTotalReal > 5){
+			this.diceOneNum = this.intervalRandom(diceTotalReal - 5,5)
+		}else{
+			this.diceOneNum = this.intervalRandom(0,diceTotalReal);
+		}
+		this.diceTwoNum = diceTotalReal - this.diceOneNum;
+	},
+	convertRoll:function(w){
+		if(w <= 50){
+			this.diceTotal = this.intervalRandom(2,3);
+		}else if(w > 50 && w <= 100){
+			this.diceTotal = this.intervalRandom(3,6);
+		}else if(w > 100 && w <= 150){
+			this.diceTotal = this.intervalRandom(6,9);
+		}else if(w > 150 && w <= 200){
+			this.diceTotal = this.intervalRandom(9,12);
+		}
+	},
+	intervalRandom:function(n,m){
+		// 获取n到m之间的随机数
+		var r = m - n + 1;
+		return Math.floor(Math.random() * r + n);
 	},
 	diceStartRotate:function(){
 		this.startShakeOneDice = true;
@@ -605,6 +696,8 @@ Game.prototype = {
 		this.mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"]));
 		this.mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"]));
 		this.mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"]));
+		this.mapBlockBlack = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-black.png"]));
+		this.mapTopCorner = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top-corner.png"]));
 	},
 	createDice:function(){
 		this.diceOne = new Sprite("diceThree",new SpriteSheets(Config.imgSource[0],
@@ -670,9 +763,30 @@ Game.prototype = {
 		context.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
 
 		for(var i = 0;i < 24;i++){
-			if(i < 6){
+			if(i === 0){
+				this.mapBlockGreen.top = 60*24/4;
+				this.mapBlockGreen.left = 60 * 6;
+				this.mapBlockGreen.paint(context);
+			}
+			if(i === 2){
+				this.mapBlockGrey.top = 60*24/4;
+				this.mapBlockGrey.left = 60 * 4;
+				this.mapBlockGrey.paint(context);
+			}
+			if(i === 6){
+				this.mapBlockBlack.left = 0;
+				this.mapBlockBlack.top = 60 * 6;
+				this.mapBlockBlack.paint(context)
+			}
+			if(i === 12){
+				this.mapTopCorner.top = 0;
+				this.mapTopCorner.left = 0;
+				this.mapTopCorner.paint(context);
+			}
+			if(i < 6 && i !== 0 && i !== 2){
 				this.mapBlockBlue.top = 60*24/4;
 				this.mapBlockBottom.top = 60*24/4;
+
 				if(this.resumeArr.indexOf(i) !== -1){
 					this.mapBlockBlue.left = 60 * (6 - i);
 					this.mapBlockBlue.paint(context)
@@ -681,7 +795,7 @@ Game.prototype = {
 					this.mapBlockBottom.paint(context)
 				}
 			}		
-			if(i >= 6 && i < 12){
+			if(i > 6 && i < 12){
 				this.mapBlockRed.left = 0;
 				this.mapBlockRight.left = 0;
 				if(this.resumeArr.indexOf(i) !== -1){
@@ -692,7 +806,7 @@ Game.prototype = {
 					this.mapBlockRight.paint(context)
 				}
 			}
-			if(i >= 12 && i < 18){
+			if(i > 12 && i < 18){
 				this.mapBlockWhite.top = 0;
 				this.mapBlockBottom.top = 0;
 				if(this.resumeArr.indexOf(i) !== -1){
@@ -819,26 +933,32 @@ Game.prototype = {
 	showResult:function(index){
 		switch(index){
 			case this.resumeArr[0]:
-			this.showResume("one","/resume-json/one.json",this.resumeOne);
+			this.showResume("one","resume-json/one.json",this.resumeOne);
 			break;
 			case this.resumeArr[1]:
-			this.showResume("two","/resume-json/two.json",this.resumeTwo);
+			this.showResume("two","resume-json/two.json",this.resumeTwo);
 			break;
 			case this.resumeArr[2]:
-			this.showResume("three","/resume-json/three.json",this.resumeThree);
+			this.showResume("three","resume-json/three.json",this.resumeThree);
 			break;
 			case this.resumeArr[3]:
-			this.showResume("four","/resume-json/four.json",this.resumeFour);
+			this.showResume("four","resume-json/four.json",this.resumeFour);
 			break;
 			case 2:
+			this.rollDiceShow(true);
 			break;
 			case 6:
+			this.rollDiceShow(true);
 			break;
 			case 12:
+			this.rollDiceShow(true);
 			break;
 			case 18:
+			this.rollDiceShow(true);
 			break;
-			default:break;
+			default:
+			this.rollDiceShow(true);
+			break;
 		}
 	},
 	showResume:function(name,url,callback){
@@ -862,7 +982,9 @@ Game.prototype = {
 	resumeThree:function(res){},
 	resumeFour:function(res){},
 	closeResume:function(){
+		var that = this;
 		this.gameResumeClose.addEventListener("click",function(){
+			that.rollDiceShow(true);
 			this.parentNode.className = "game-resume-detail animated zoomOut";
 		},false)
 	},
@@ -908,10 +1030,10 @@ Game.prototype = {
 			}
 		})
 	},
-	diceTotals:function(){
-		this.diceTotal = this.diceOneNum + this.diceTwoNum + 2;
-		console.log(this.diceTotal)
-	},
+	// diceTotals:function(){
+	// 	this.diceTotal = this.diceOneNum + this.diceTwoNum + 2;
+	// 	console.log(this.diceTotal)
+	// },
 	currentRunnerLoc:function(){
 		this.currentPointer++;
 		if(this.currentPointer === 25){
