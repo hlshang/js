@@ -62,7 +62,7 @@ function Game(){
 	// 行走地图宽度和高度（1/2）
 	this.mapHorizontal = (65 * 6 * Math.tan(this.matrixSlope) + 65 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
 	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
-
+	console.log(this.mapHorizontal)
 	// 行走地图在画布中的位置（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
@@ -219,8 +219,8 @@ function Game(){
 					that.entranceBlackRoom = false;
 					return true;
 				}
-				return false;
 			}
+			return false;
 		},
 		startJumpMove:function(){
 			that.currentRunnerLoc();
@@ -244,9 +244,9 @@ function Game(){
 				// 显示骰子数
 				that.diceNumShow(that.diceTotal);
 
+				console.log(this.isInBlackRoom())
 				// 在小黑屋里面 直接返回
-				if(this.isInBlackRoom) return;
-
+				if(this.isInBlackRoom()) return;
 				var timeOut = setTimeout( function(){
 					self.startJumpMove();
 					that.diceLocReset();
@@ -968,7 +968,8 @@ Game.prototype = {
 		}
 		for(var j = 0;j < len;j++){
 			(function(j){
-				that.pokerListBack.[j].addEventListener("click",function(){
+				that.pokerListBack[j].addEventListener("click",function(){
+					console.log()
 					if(that.pokerSelect) return;
 					that.pokerSelect = true;
 					var currentPoker = Math.floor(Math.random() * 3);
@@ -995,6 +996,8 @@ Game.prototype = {
 			}
 		},500)
 		setTimeout(function(){
+			that.rollDiceShow(true);
+
 			that.pokerSelect = false;
 			that.miniGameWrap.className = "mini-game-wrap zoomOut animated";
 		},3500)
@@ -1014,7 +1017,6 @@ Game.prototype = {
 			this.showResume("four","resume-json/four.json",this.resumeFour);
 			break;
 			case 2:
-			this.rollDiceShow(true);
 			this.showMiniGame();
 			break;
 			case 6:
