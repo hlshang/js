@@ -13,6 +13,10 @@ function Game(){
 	this.roleActionStart = true;
 	// 倒计时 默认为3s
 	this.cutDownTime = 3;
+	// 当前是否进入了小黑屋
+	this.entranceBlackRoom = false;
+	// 逃离小黑屋需投掷的骰子次数
+	this.fleeBlackRoom = 3;
 	this.canvasWidth = canvas.width;
 	this.canvasHeight = canvas.height;
 	// 假定屏幕高为10m
@@ -50,15 +54,14 @@ function Game(){
 	this.matrixSlope = 45 * Config.deg - Config.slopeAngle * Config.deg;
 
 	// 行走地图的真实高度和宽度（比行走图多一格）
-	this.mapRealEdgeLength = 65 * (6 + 0.5) / Math.cos(this.matrixSlope);
-	this.mapRealHorizontal = this.mapRealEdgeLength * Math.cos(this.slopeAngle);
-	this.mapRealVertical = this.mapRealEdgeLength * Math.sin(this.slopeAngle);
+	this.mapRealHorizontal = (65 * 6.5 * Math.tan(this.matrixSlope) + 65 * 6.5 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.slopeAngle);
 
-	this.mapEdgeLength = 65 * 6 / Math.cos(this.matrixSlope);
+	// this.mapEdgeLength = 65 * 6 / Math.cos(this.matrixSlope);
 	
 	// 行走地图宽度和高度（1/2）
-	this.mapHorizontal = this.mapEdgeLength * Math.cos(this.slopeAngle);
-	this.mapVertical = this.mapEdgeLength * Math.sin(this.slopeAngle);
+	this.mapHorizontal = (65 * 6 * Math.tan(this.matrixSlope) + 65 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
 
 	// 行走地图在画布中的位置（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2;
@@ -106,6 +109,8 @@ function Game(){
 	this.currentPointer = 0;
 	// 掷完筛子后人物跳到哪个格子上
 	this.lastPointer = 0;
+	// 是否已经选择了扑克
+	this.pokerSelect = false;
 	// selector
 	this.selectRoleWrap = document.querySelector(".select-role-wrap");
 	this.gameCutDown = document.querySelector(".game-cutdown");
@@ -118,6 +123,9 @@ function Game(){
 	this.rollBtn = document.getElementById("roll-dice-btn");
 	this.rollCountSelect = document.querySelector(".roll-count-select");
 	this.rollNumShow = document.querySelector(".roll-num-show");
+	this.miniGameWrap = document.querySelector(".mini-game-wrap");
+	this.pokerListBack = document.querySelectorAll(".poker-list-back");
+	this.pokerList = document.querySelectorAll(".poker-list");
 	// 音效
 	//开始音效
 	this.startSound = Config.mediaSource[0];
@@ -203,18 +211,29 @@ function Game(){
 				sprite.painter.cellsIndex = ++this.lastAdvance;
 			}
 		},
+		isInBlackRoom:function(){
+			if(that.entranceBlackRoom){
+				that.fleeBlackRoom--;
+				// 投掷三次或者点数相同
+				if(!that.fleeBlackRoom || that.diceOneNum === that.diceTwoNum){
+					that.entranceBlackRoom = false;
+					return true;
+				}
+				return false;
+			}
+		},
 		startJumpMove:function(){
 			that.currentRunnerLoc();
 			if(that.currentRole === "runner"){
 				that.runner.runTimer.start();
 			}else{
+				that.startJump = true;
 				that.jumper.jumpTimer.start();
 				that.jumper.moveTimer.start();
 			}
-			that.startJump = true;
 			that.startMoveAll = true;
 			// play jumper sound
-			that.playSound(that.jumperSound);
+			// that.playSound(that.jumperSound);
 		},
 		execute:function(sprite,context,time){
 			var self = this;
@@ -224,6 +243,9 @@ function Game(){
 				sprite.painter.cellsIndex = that.diceTwoNum;
 				// 显示骰子数
 				that.diceNumShow(that.diceTotal);
+
+				// 在小黑屋里面 直接返回
+				if(this.isInBlackRoom) return;
 
 				var timeOut = setTimeout( function(){
 					self.startJumpMove();
@@ -930,6 +952,53 @@ Game.prototype = {
 		this.rolesInitialLeft = this.canvasWidth / 2 - this.roleWidth / 2;
 		this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - this.roleHeight - this.verticalPacePix;
 	},
+	showBlackRoom:function(){
+		this.entranceBlackRoom = true;
+		setTimeout(function(){
+			// 显示提示（）
+		},1500)
+	},
+	showMiniGame:function(){
+		this.miniGameWrap.className = "mini-game-wrap zoomIn animated";
+		var len = this.pokerList.length,
+			pokerList = ["two","three","four","five"],
+			that = this;
+		for(var i = 0;i < len;i++){
+			this.pokerList[i].className += " " + pokerList[Math.floor(Math.random() * 4)];
+		}
+		for(var j = 0;j < len;j++){
+			(function(j){
+				that.pokerListBack.[j].addEventListener("click",function(){
+					if(that.pokerSelect) return;
+					that.pokerSelect = true;
+					var currentPoker = Math.floor(Math.random() * 3);
+					that.pokerList[currentPoker].className = "poker-list one";
+					this.className += " rollOver180";
+					that.pokerList[j].className += " rollOver0";
+					if(j === currentPoker){
+						// 显示提示
+						that.showShortCut("success");
+					}else{
+						that.showShortCut("fail");
+					}
+				},false);
+			})(j)
+		}
+	},
+	showShortCut:function(msg){
+		var that = this;
+		setTimeout(function(){
+			if(msg === "success"){
+
+			}else{
+
+			}
+		},500)
+		setTimeout(function(){
+			that.pokerSelect = false;
+			that.miniGameWrap.className = "mini-game-wrap zoomOut animated";
+		},3500)
+	},
 	showResult:function(index){
 		switch(index){
 			case this.resumeArr[0]:
@@ -946,15 +1015,11 @@ Game.prototype = {
 			break;
 			case 2:
 			this.rollDiceShow(true);
+			this.showMiniGame();
 			break;
 			case 6:
 			this.rollDiceShow(true);
-			break;
-			case 12:
-			this.rollDiceShow(true);
-			break;
-			case 18:
-			this.rollDiceShow(true);
+			this.showBlackRoom();
 			break;
 			default:
 			this.rollDiceShow(true);
@@ -962,7 +1027,7 @@ Game.prototype = {
 		}
 	},
 	showResume:function(name,url,callback){
-		this.gameResumeDetail.className = "game-resume-detail animated zoomIn";
+		this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 		// name 只是个标识
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){

@@ -14,7 +14,7 @@
 </head>
 <body>
 	<div class="canvas-main">
-		<canvas id="myCanvas" width="1080" height="540">
+		<canvas id="myCanvas" width="1080" height="540" class="hide">
 			Your browser do not support canvas!
 		</canvas>
 		<div class="roll-num-show"></div>
@@ -29,6 +29,20 @@
 			</div>
 			<div id="roll-dice-btn" class="roll-dice-btn"></div>
 		</div>
+		<div class="mini-game-wrap zoomOut animated">
+			<div class="poker-list-wrap">
+				<div class="poker-list-back one"></div>
+				<div class="poker-list"></div>
+			</div>
+			<div class="poker-list-wrap">
+				<div class="poker-list-back two"></div>
+				<div class="poker-list"></div>
+			</div>
+			<div class="poker-list-wrap">
+				<div class="poker-list-back three"></div>
+				<div class="poker-list"></div>
+			</div>
+		</div>
 	</div>
 	<div class="game-cover-wrap">
 		<div class="game-cover">
@@ -40,7 +54,7 @@
 				<div id="load-precent"></div>
 				<div id="load-precent-nums"></div>
 			</div>
-			<div class="start-game-btn hide">å¼€å§‹æŸ¥çœ‹ç®€åŽ†</div>
+			<div class="start-game-btn hide">¿ªÊ¼²é¿´¼òÀú</div>
 		</div>
 		<div class="select-role-wrap">
 			<div class="role-list boy" data-role="boy"></div>
@@ -67,7 +81,6 @@
 				game.start();
 			});
 		},false)
-		
 	</script>
 </body>
 </html>
