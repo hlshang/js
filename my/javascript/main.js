@@ -54,15 +54,12 @@ function Game(){
 	this.matrixSlope = 45 * Config.deg - Config.slopeAngle * Config.deg;
 
 	// 行走地图的真实高度和宽度（比行走图多一格）
-	this.mapRealHorizontal = (65 * 6.5 * Math.tan(this.matrixSlope) + 65 * 6.5 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapRealHorizontal = (60 * 6.5 * Math.tan(this.matrixSlope) + 60 * 6.5 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
 	this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.slopeAngle);
-
-	// this.mapEdgeLength = 65 * 6 / Math.cos(this.matrixSlope);
 	
 	// 行走地图宽度和高度（1/2）
-	this.mapHorizontal = (65 * 6 * Math.tan(this.matrixSlope) + 65 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
 	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
-	console.log(this.mapHorizontal)
 	// 行走地图在画布中的位置（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
@@ -70,7 +67,7 @@ function Game(){
 	// 一格的长度
 	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6);
 	// 一格的高度
-	this.verticalPacePix = Math.floor(this.horizontalPacePix * Math.tan(this.slopeAngle));
+	this.verticalPacePix = Math.floor(this.mapVertical / 6);
 	// 每一步的时间
 	this.jumperMoveAniTime = 300;
 	// 跳跃和下降的时间，为移动时间的一半
@@ -92,7 +89,6 @@ function Game(){
 	// 跑步者水平速度（每秒水平移动多少像素）
 	this.runnerHPixEverySec = Math.floor(this.horizontalPacePix / (this.runnerAniTime / 1000));
 	this.runnerVPixEverySec = this.runnerHPixEverySec * Math.tan(this.slopeAngle);
-	// console.log
 	// 开始跳跃
 	this.startJump = false;
 	// 开始移动
@@ -111,13 +107,17 @@ function Game(){
 	this.lastPointer = 0;
 	// 是否已经选择了扑克
 	this.pokerSelect = false;
+	// 是否正在快捷键查看简历
+	this.shortCutView = false;
 	// selector
 	this.selectRoleWrap = document.querySelector(".select-role-wrap");
 	this.gameCutDown = document.querySelector(".game-cutdown");
 	this.roleListAll = document.querySelectorAll(".role-list");
+	this.gameCoverWrap = document.querySelector(".game-cover-wrap");
 	this.gameCover = document.querySelector(".game-cover");
 	this.startGameBtn = document.querySelector(".start-game-btn");
 	this.gameResumeDetail = document.querySelector(".game-resume-detail");
+	this.gameResumeWrap = document.querySelector(".game-resume-wrap");
 	this.gameResumeClose = document.querySelector(".game-resume-close");
 	this.rollDiceWrap = document.querySelector(".roll-dice-wrap");
 	this.rollBtn = document.getElementById("roll-dice-btn");
@@ -126,6 +126,8 @@ function Game(){
 	this.miniGameWrap = document.querySelector(".mini-game-wrap");
 	this.pokerListBack = document.querySelectorAll(".poker-list-back");
 	this.pokerList = document.querySelectorAll(".poker-list");
+	this.pokerTipsWrap = document.querySelector(".poker-tips-wrap");
+	this.gameBlackRoom = document.querySelector(".game-black-room");
 	// 音效
 	//开始音效
 	this.startSound = Config.mediaSource[0];
@@ -217,8 +219,9 @@ function Game(){
 				// 投掷三次或者点数相同
 				if(!that.fleeBlackRoom || that.diceOneNum === that.diceTwoNum){
 					that.entranceBlackRoom = false;
-					return true;
+					return false;
 				}
+				return true;
 			}
 			return false;
 		},
@@ -243,10 +246,12 @@ function Game(){
 				sprite.painter.cellsIndex = that.diceTwoNum;
 				// 显示骰子数
 				that.diceNumShow(that.diceTotal);
-
-				console.log(this.isInBlackRoom())
 				// 在小黑屋里面 直接返回
-				if(this.isInBlackRoom()) return;
+				if(this.isInBlackRoom()){
+					that.diceLocReset();
+					that.rollDiceShow(true);
+					return;
+				};
 				var timeOut = setTimeout( function(){
 					self.startJumpMove();
 					that.diceLocReset();
@@ -512,7 +517,8 @@ Game.prototype = {
 		// 选择角色
 		this.selectRole(function(){
 			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
-				that.cutDown(1,function(){
+				document.body.removeChild(that.gameCoverWrap);
+				that.cutDown(3,function(){
 					document.body.removeChild(that.gameCutDown);
 					that.startGame();
 				});
@@ -936,7 +942,8 @@ Game.prototype = {
 		this.startGameBtn.addEventListener("click",function(e){
 			e.preventDefault();
 			that.coverAni(that.gameCover,-560,that.coverSlideTime,gameEasing.easeOut,function(){
-				console.log("please select role!!")
+				that.gameCoverWrap.removeChild(that.gameCover);
+				console.log("please select role!!");
 			})
 		},false)
 	},
@@ -953,10 +960,17 @@ Game.prototype = {
 		this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - this.roleHeight - this.verticalPacePix;
 	},
 	showBlackRoom:function(){
+		var that = this;
 		this.entranceBlackRoom = true;
 		setTimeout(function(){
-			// 显示提示（）
-		},1500)
+			// 显示提示
+			that.gameBlackRoom.className = "game-black-room zoomIn animated";
+			that.gameBlackRoom.innerHTML = "你真不幸，被关小黑屋啦！想逃离的话，有两种途径：<br />（1）连续掷三次后，自动解除锁定。<br />（2）掷的骰子数相同则自动解除。"
+		},500)
+		setTimeout(function(){
+			that.gameBlackRoom.className = "game-black-room hide";
+			that.rollDiceShow(true);
+		},4500)
 	},
 	showMiniGame:function(){
 		this.miniGameWrap.className = "mini-game-wrap zoomIn animated";
@@ -969,7 +983,6 @@ Game.prototype = {
 		for(var j = 0;j < len;j++){
 			(function(j){
 				that.pokerListBack[j].addEventListener("click",function(){
-					console.log()
 					if(that.pokerSelect) return;
 					that.pokerSelect = true;
 					var currentPoker = Math.floor(Math.random() * 3);
@@ -989,38 +1002,60 @@ Game.prototype = {
 	showShortCut:function(msg){
 		var that = this;
 		setTimeout(function(){
+			that.pokerTipsWrap.className = "poker-tips-wrap zoomIn animated";
 			if(msg === "success"){
-
+				that.showResume("shortCutKey","resume-json/shortCut-key.json",function(res){
+					that.shortCutShowResume();
+					that.pokerTipsWrap.innerHTML = res.info;
+				});
 			}else{
-
+				that.pokerTipsWrap.innerHTML = "你猜错啦！！！下次再来吧！！！";
 			}
 		},500)
 		setTimeout(function(){
 			that.rollDiceShow(true);
 
 			that.pokerSelect = false;
-			that.miniGameWrap.className = "mini-game-wrap zoomOut animated";
+			// reset
+			that.miniGameWrap.className = "mini-game-wrap hide";
+			that.pokerTipsWrap.className = "poker-tips-wrap hide";
+			for(var i = 0;i < 3;i++){
+				that.pokerListBack[i].className = "poker-list-back";
+				that.pokerList[i].className = "poker-list";
+			}
 		},3500)
 	},
 	showResult:function(index){
+		var that = this;
 		switch(index){
 			case this.resumeArr[0]:
-			this.showResume("one","resume-json/one.json",this.resumeOne);
+			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			this.showResume("one","resume-json/one.json?1",function(res){
+				that.resumeOne.call(that,res);
+			});
 			break;
 			case this.resumeArr[1]:
-			this.showResume("two","resume-json/two.json",this.resumeTwo);
+			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			this.showResume("two","resume-json/two.json?ok",function(res){
+				that.resumeTwo.call(that,res);
+			});
 			break;
 			case this.resumeArr[2]:
-			this.showResume("three","resume-json/three.json",this.resumeThree);
+			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			this.showResume("three","resume-json/three.json?sd",function(res){
+				that.resumeThree.call(that,res);
+			});
 			break;
 			case this.resumeArr[3]:
-			this.showResume("four","resume-json/four.json",this.resumeFour);
+			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			this.showResume("four","resume-json/four.json?ss",function(res){
+				that.resumeFour.call(that,res);
+			});
 			break;
 			case 2:
 			this.showMiniGame();
 			break;
 			case 6:
-			this.rollDiceShow(true);
 			this.showBlackRoom();
 			break;
 			default:
@@ -1028,14 +1063,51 @@ Game.prototype = {
 			break;
 		}
 	},
+	shortCutShowResume:function(){
+		var that = this;
+		document.addEventListener("keydown",function(e){
+			if(that.shortCutView) return;
+			that.shortCutView = true;
+			var code = e.keyCode;
+			that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			switch(code){
+				case 89:
+				// Y
+				that.showResume("one","resume-json/one.json?1",function(res){
+					that.resumeOne.call(that,res)
+				});
+				break;
+				case 80:
+				// P
+				that.showResume("two","resume-json/two.json?ok",function(res){
+					that.resumeTwo.call(that,res);
+				});
+				break;
+				case 66:
+				// B
+				that.showResume("three","resume-json/three.json?sd",function(res){
+					that.resumeThree.call(that,res);
+				});
+				break;
+				case 78:
+				// N
+				that.showResume("four","resume-json/four.json?ss",function(res){
+					that.resumeFour.call(that,res);
+				});
+				break;
+				default:
+				break;
+			}
+		},false)
+	},
 	showResume:function(name,url,callback){
-		this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 		// name 只是个标识
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){
 			if(xmlHttp.readyState === 4){
 				if(xmlHttp.status === 200){
-					callback(xmlHttp);
+					var res = JSON.parse(xmlHttp.responseText);
+					callback(res);
 				}else{
 				}
 			}
@@ -1044,15 +1116,32 @@ Game.prototype = {
 		xmlHttp.setRequestHeader("Content-Type","application/json");
 		xmlHttp.send(null);
 	},
-	resumeOne:function(res){},
-	resumeTwo:function(res){},
-	resumeThree:function(res){},
-	resumeFour:function(res){},
+	resumeOne:function(res){
+		// 个人信息
+		var html = '<h2>' + res.title + '</h2><p>姓名：' + res.name + '</p><p>性别：' + res.gender + '</p><p>出生日期：' + res.birth + '</p><p>学历：' + res.education + '<p>居住地：' + res.location + '</p><p>现在所在公司：' + res.company + '</p><p>前端开发经验：' + res.experience + '</p>'; 
+		this.gameResumeWrap.innerHTML = html;
+	},
+	resumeTwo:function(res){
+		// 联系方式
+		var html = '<h2>' + res.title + '</h2><p>手机：' + res.mobile + '</p><p>Email：' + res.email + '</p><p>QQ：' + res.qq + '</p><p>微博：' + res.weibo + '</p>';
+		this.gameResumeWrap.innerHTML = html;
+	},
+	resumeThree:function(res){
+		// 作品及博客
+		var html = '<h2>' + res.title + '</h2><p>博客：<a href="'+ res.blog +'" target="_blank">点击</a></p><p>GitHub：<a href="'+ res.github +'" target="_blank">点击</a></p><p>jQuery解析：<a href="'+ res["jquery-analysis"] +'" target="_blank">点击</a></p><p>jQuery插件：<a href="'+ res["jquery-plugins"] +'">点击</a><p>本游戏源码：<a href="'+ res["resume-game"] +'" target="_blank">点击</a></p><p>HTML5微信页面：<a href="'+ res["wifi-update"] +'" target="_blank">点击</a></p><p>PC网站：<a href="'+ res["1A"] +'" target="_blank">点击</a></p><p>其它：' + res.soon + '</p>'; 
+		this.gameResumeWrap.innerHTML = html;
+	},
+	resumeFour:function(res){
+		// 工作经历等
+		var html = '<h2>'+ res.title +'</h2><div class="game-work-exp">' + res.info + '</div>';
+		this.gameResumeWrap.innerHTML = html;
+	},
 	closeResume:function(){
 		var that = this;
 		this.gameResumeClose.addEventListener("click",function(){
+			that.shortCutView = false;
 			that.rollDiceShow(true);
-			this.parentNode.className = "game-resume-detail animated zoomOut";
+			this.parentNode.className = "game-resume-detail hide";
 		},false)
 	},
 	getSprites:function(name){

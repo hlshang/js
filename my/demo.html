@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -29,20 +29,6 @@
 			</div>
 			<div id="roll-dice-btn" class="roll-dice-btn"></div>
 		</div>
-		<div class="mini-game-wrap zoomOut animated">
-			<div class="poker-list-wrap">
-				<div class="poker-list-back one"></div>
-				<div class="poker-list"></div>
-			</div>
-			<div class="poker-list-wrap">
-				<div class="poker-list-back two"></div>
-				<div class="poker-list"></div>
-			</div>
-			<div class="poker-list-wrap">
-				<div class="poker-list-back three"></div>
-				<div class="poker-list"></div>
-			</div>
-		</div>
 	</div>
 	<div class="game-cover-wrap">
 		<div class="game-cover">
@@ -54,18 +40,42 @@
 				<div id="load-precent"></div>
 				<div id="load-precent-nums"></div>
 			</div>
-			<div class="start-game-btn hide">��ʼ�鿴����</div>
+			<div class="start-game-btn hide"></div>
 		</div>
 		<div class="select-role-wrap">
-			<div class="role-list boy" data-role="boy"></div>
-			<div class="role-list girl" data-role="girl"></div>
-			<div class="role-list runner" data-role="runner"></div>
+			<div class="role-list boy" data-role="boy">
+				<p></p>
+			</div>
+			<div class="role-list girl" data-role="girl">
+				<p></p>
+			</div>
+			<div class="role-list runner" data-role="runner">
+				<p></p>
+			</div>
 		</div>
 	</div>
 	<div class="game-cutdown"></div>
-	<div class="game-resume-detail zoomOut animated">
+	<div class="game-resume-detail hide">
+		<div class="game-resume-wrap"></div>
 		<span class="game-resume-close">x</span>
 	</div>
+	<div class="mini-game-wrap hide">
+		<p class="poker-tips-title">点击翻扑克牌，翻到<em>黑桃AEC</em>可解锁快速查看简历按键！！！</p>
+		<p class="poker-tips-wrap hide"></p>
+		<div class="poker-list-wrap">
+			<div class="poker-list-back"></div>
+			<div class="poker-list"></div>
+		</div>
+		<div class="poker-list-wrap">
+			<div class="poker-list-back"></div>
+			<div class="poker-list"></div>
+		</div>
+		<div class="poker-list-wrap">
+			<div class="poker-list-back"></div>
+			<div class="poker-list"></div>
+		</div>
+	</div>
+	<div class="game-black-room hide"></div>
 	<script>
 		var canvas,context;
 		document.addEventListener("DOMContentLoaded",function(){

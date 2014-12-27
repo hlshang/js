@@ -54,24 +54,23 @@ body{
 .game-resume{
 	position: absolute;
 	bottom: -20px;
-	width: 64px;
+	width: 63px;
 	height: 64px;
 }
 .game-resume.one{
 	left: -10px;
 	top: 60px;
-	background: url(../images/resume-1.png) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -69px -777px;
 }
 .game-resume.two{
 	right: -30px;
-	background: url(../images/resume-2.jpg) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -389px -823px;
 }
 .start-game-btn{
-	width: 259px;
+	width: 250px;
 	height: 50px;
 	margin:0 auto;
-	background:url(../images/start-btn.png) no-repeat left top;
-	text-indent: -999em;
+	background:url(../images/sub-img.png) no-repeat -139px -775px;
 	cursor: pointer;
 }
 .game-cover-wrap{
@@ -110,18 +109,28 @@ body{
 	width:150px;
 	height: 250px;
 	margin:150px 50px;
+  background-color: #57b921;
 	border:1px solid #2b6909;
 	border-radius: 5px;
 	cursor: pointer;
 }
-.role-list.boy{
-	background: url(../images/boy.png) no-repeat center center #57b921;
+.role-list p{
+  margin:50px auto 0;
 }
-.role-list.girl{
-	background: url(../images/girl.png) no-repeat center center #57b921;
+.role-list.boy p{
+  width: 51px;
+  height: 140px;
+	background: url(../images/sub-img.png) no-repeat -420px -483px;
 }
-.role-list.runner{
-	background: url(../images/runner.png) no-repeat center center #57b921;
+.role-list.girl p{
+  width: 49px;
+  height: 131px;
+	background: url(../images/sub-img.png) no-repeat -420px -623px;
+}
+.role-list.runner p{
+  width: 66px;
+  height: 123px;
+	background: url(../images/sub-img.png) no-repeat -420px -360px;
 }
 .game-cutdown{
 	position: absolute;
@@ -129,39 +138,56 @@ body{
 	top:50%;
 	width: 55px;
 	height: 63px;
-	/*font-size: 160px;*/
-	/*font-family: SimSun;*/
-	/*font-weight: bold;*/
 	-webkit-transform:translate(-50%,-50%);
 	-moz-transform:translate(-50%,-50%);
 	transform:translate(-50%,-50%);
-	/*color:orange;*/
 }
 .game-cutdown-1{
-	background: url(../images/cut-1.png) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -453px -823px;
 }
 .game-cutdown-2{
-	background: url(../images/cut-2.png) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -133px -825px;
 }
 .game-cutdown-3{
-	background: url(../images/cut-3.png) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -188px -825px;
 }
 .game-cutdown-4{
-	background: url(../images/cut-4.png) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -243px -825px;
 }
 .game-cutdown-5{
-	background: url(../images/cut-5.png) no-repeat left top;
+	background: url(../images/sub-img.png) no-repeat -298px -825px;
 }
 .game-resume-detail{
 	width: 500px;
 	height: 360px;
 	position: absolute;
+  z-index: 3;
 	left:50%;
 	top:50%;
 	margin-left:-250px;
 	margin-top: -180px;
 	color:#fafafa;
-	background: url(../images/resume-container.png) no-repeat left
+	background: url(../images/sub-img.png) no-repeat 0 0;
+}
+.game-resume-wrap{
+  position: absolute;
+  left: 50%;
+  top:45%;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-transform:translate(-50%,-50%);
+  -moz-transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%);
+}
+.game-work-exp{
+  min-width: 350px;
+}
+.game-resume-wrap h2{
+  margin-bottom: 15px;
+  text-align: center;
+}
+.game-resume-wrap a{
+  color: #000
 }
 .game-resume-close{
   position: absolute;
@@ -170,6 +196,17 @@ body{
   font-size: 40px;
   font-family: arial;
   cursor: pointer;
+}
+.game-black-room{
+  width: 500px;
+  position: absolute;
+  left: 50%;
+  top:50%;
+  margin-left: -250px;
+  background-color: #eee;
+  padding: 15px 20px;
+  font-size: 14px;
+  border-radius: 5px;
 }
 .roll-dice-wrap{
   position: absolute;
@@ -182,14 +219,12 @@ body{
 }
 .roll-dice-btn{
   margin:0 auto;
-  width: 70px;
-  height: 70px;
-  background: url(../images/start-dice.png) no-repeat left top;
-   background-size: 60px;
+  width: 69px;
+  height: 69px;
+  background: url(../images/sub-img.png) no-repeat -420px -754px;
 }
 .roll-dice-btn:hover{
-  background: url(../images/start-dice-hover.png) no-repeat left top;
-  background-size: 60px;
+  background: url(../images/sub-img.png) no-repeat 0 -777px;
   cursor: pointer;
 }
 .roll-count-select-wrap{
@@ -241,17 +276,39 @@ body{
 }
 .mini-game-wrap{
   position: absolute;
+  z-index: 4;
   width: 600px;
-  height: 300px;
+  height: 260px;
   left:50%;
   top:50%;
   margin-left: -300px;
-  margin-top: -150px;
+  margin-top: -130px;
   padding:30px 20px;
   background-color: #e5a62b;
   text-align: center;
-  overflow: hidden;
   border-radius: 5px;
+}
+.poker-tips-title{
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+}
+.poker-tips-wrap{
+  position: absolute;
+  z-index: 10;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  padding: 20px 10px;
+  border: 1px solid #333;
+  color: #fff;
+  background-color: #ec562d;
+  border-radius: 5px;
+}
+.mini-game-wrap em{
+  font-style: normal;
+  padding: 0 5px;
+  color:#000;
 }
 .poker-list-wrap{
   display: inline-block;
@@ -259,6 +316,7 @@ body{
   width: 140px;
   height: 208px;
   position: relative;
+  z-index: 9;
   overflow: hidden;
   border-radius: 5px;
 }
@@ -279,7 +337,7 @@ body{
 }
 .poker-list-back{
   z-index: 10;
-  background: url(../images/poker-back.jpg) no-repeat left top;
+  background: url(../images/sub-img.png) no-repeat 0 -360px;
 }
 .poker-list{
   -webkit-transform:rotateY(180deg);
@@ -290,19 +348,19 @@ body{
 .poker-list.cover{
 }
 .poker-list.one{
-  background: url(../images/poker-1.png) no-repeat left top;
+  background: url(../images/sub-img.png) no-repeat -140px -360px;
 }
 .poker-list.two{
-  background: url(../images/poker-5.png) no-repeat left top;
+  background: url(../images/sub-img.png) no-repeat -280px -360px;
 }
 .poker-list.three{
-  background: url(../images/poker-10.png) no-repeat left top;
+  background: url(../images/sub-img.png) no-repeat -280px -567px;
 }
 .poker-list.four{
-  background: url(../images/poker-12.png) no-repeat left top;
+  background: url(../images/sub-img.png) no-repeat -140px -568px;
 }
 .poker-list.five{
-  background: url(../images/poker-13.png) no-repeat left top;
+  background: url(../images/sub-img.png) no-repeat 0 -570px;
 }
 .rollOver0{
   -webkit-transform:rotateY(0deg);

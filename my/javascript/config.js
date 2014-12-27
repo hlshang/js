@@ -1,9 +1,9 @@
 // 公用的变量
 var Config = {
 	sourceList:{
-		"images":["images/main.png","images/embellish.png","images/jumpers.png","images/runners.png"],
+		"images":["images/main.png","images/embellish.png","images/jumpers.png","images/runners.png","images/sub-img.png"],
 		"audio":["sounds/start.mp3","sounds/dice.mp3","sounds/jumper.mp3","sounds/runner.mp3","sounds/resume.mp3","sounds/cutDown.mp3"],
-		"json":["resume-json/main.json?1220","resume-json/embellish.json","resume-json/jumpers.json?ok","resume-json/runners.json?oks"]
+		"json":["resume-json/main.json?1228","resume-json/embellish.json?1228","resume-json/jumpers.json?1228","resume-json/runners.json?1228"]
 	},
 	// 三种资源
 	imgSource : [],
@@ -25,6 +25,6 @@ var Config = {
 	// deg
 	deg : Math.PI/180,
 	slopeAngle : 25,
-	zoneWidth : 65,
-	zoneHeight : 65
+	zoneWidth : 60,
+	zoneHeight : 60
 }
