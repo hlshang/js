@@ -3,15 +3,30 @@
 	// 	resumeImg.src = "images/resume-1.png";
 	var	sourceNums = 0,
 		sourceArr = [];
-
+	// 检测是否为数组或者对象
+	var checkSource = {
+		checkType:function(source){
+			if(this.isArray(source) || this.isObject(source)){
+				return true;
+			}
+			return false;
+		},
+		isArray:function(obj){
+			return Array.isArray(obj) || toString.call(obj) === "[object Array]";
+		},
+		isObject:function(obj){
+			return toString.call(obj) === "[object Object]";
+		}
+	}
+		
 	var loadSources = {
 		progress:0,
 		init:function(source,callback){
-			if(!pb.checkType(source)){
+			if(!checkSource.checkType(source)){
 				alert("载入资源格式为数组或者对象！");
 				return false;
 			}
-			if(pb.isArray(source)){
+			if(checkSource.isArray(source)){
 				// 数组格式
 				var len = source.length;
 				for(var i = 0;i < len;i++){
@@ -20,7 +35,7 @@
 				sourceArr = source;
 			}
 
-			if(pb.isObject(source)){
+			if(checkSource.isObject(source)){
 				// 对象格式
 				for(var i in source){
 					// 统计资源总数
@@ -166,7 +181,7 @@
 			// context.drawImage(resumeImg,cWidth/2 - width/2 - radius + width * progress/100,cHeight/2 - height,height,height)
 		},
 		showPrecentNums:function(precents){
-			pb.init("load-precent-nums").innerHTML = precents + "%";
+			document.getElementById("load-precent-nums").innerHTML = precents + "%";
 		}
 	};
 
