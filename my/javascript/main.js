@@ -1030,25 +1030,25 @@ Game.prototype = {
 		switch(index){
 			case this.resumeArr[0]:
 			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("one","resume-json/one.json?1",function(res){
+			this.showResume("one","resume-json/one.json",function(res){
 				that.resumeOne.call(that,res);
 			});
 			break;
 			case this.resumeArr[1]:
 			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("two","resume-json/two.json?ok",function(res){
+			this.showResume("two","resume-json/two.json",function(res){
 				that.resumeTwo.call(that,res);
 			});
 			break;
 			case this.resumeArr[2]:
 			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("three","resume-json/three.json?sd",function(res){
+			this.showResume("three","resume-json/three.json",function(res){
 				that.resumeThree.call(that,res);
 			});
 			break;
 			case this.resumeArr[3]:
 			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("four","resume-json/four.json?ss",function(res){
+			this.showResume("four","resume-json/four.json",function(res){
 				that.resumeFour.call(that,res);
 			});
 			break;
@@ -1073,25 +1073,25 @@ Game.prototype = {
 			switch(code){
 				case 89:
 				// Y
-				that.showResume("one","resume-json/one.json?1",function(res){
+				that.showResume("one","resume-json/one.json",function(res){
 					that.resumeOne.call(that,res)
 				});
 				break;
 				case 80:
 				// P
-				that.showResume("two","resume-json/two.json?ok",function(res){
+				that.showResume("two","resume-json/two.json",function(res){
 					that.resumeTwo.call(that,res);
 				});
 				break;
 				case 66:
 				// B
-				that.showResume("three","resume-json/three.json?sd",function(res){
+				that.showResume("three","resume-json/three.json",function(res){
 					that.resumeThree.call(that,res);
 				});
 				break;
 				case 78:
 				// N
-				that.showResume("four","resume-json/four.json?ss",function(res){
+				that.showResume("four","resume-json/four.json",function(res){
 					that.resumeFour.call(that,res);
 				});
 				break;
@@ -1145,7 +1145,8 @@ Game.prototype = {
 		},false)
 	},
 	getSprites:function(name){
-		for(var i = 0;i < this.sprites.length;i++){
+		var len = this.sprites.length;
+		for(var i = 0;i < len;i++){
 			if(name === this.sprites[i].name){
 				return this.sprites[i];
 			}
