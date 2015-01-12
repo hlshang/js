@@ -251,7 +251,7 @@ function Game(){
 					that.diceLocReset();
 					that.rollDiceShow(true);
 					return;
-				};
+				}
 				var timeOut = setTimeout( function(){
 					self.startJumpMove();
 					that.diceLocReset();
