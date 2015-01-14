@@ -40,7 +40,7 @@ body{
 	font-size: 14px;
 	text-align: center;
 }
-#myCanvas{
+#myCanvas,#myCanvas-bg{
 	margin:10px auto;
 	display: block;
 }

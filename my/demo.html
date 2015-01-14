@@ -13,6 +13,8 @@
 </head>
 <body>
 	<div class="canvas-main">
+		<canvas id="myCanvas-bg" width="1080" height="540" class="hide">
+		</canvas>
 		<canvas id="myCanvas" width="1080" height="540" class="hide">
 			Your browser do not support canvas!
 		</canvas>
@@ -80,6 +82,9 @@
 		document.addEventListener("DOMContentLoaded",function(){
 			canvas = document.getElementById("myCanvas");
 			context = canvas.getContext("2d"); 
+
+			canvasBg = document.getElementById("myCanvas-bg");
+			canvasBgContext = canvasBg.getContext("2d");
 			
 			loadSources.init(Config.sourceList,function(){
 				// document.getElementById("load-precent-nums").className = "hide";

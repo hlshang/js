@@ -699,8 +699,8 @@ Game.prototype = {
 		// this.drawWalkMap();
 		// roles
 		this.updateRoles(time);
-		// 离屏canvas
-		this.offScreenCanvas();
+		// 离屏canvas（人物等主要元素）
+		this.offScreenCanvasMain();
 		// dice
 		this.drawDice(time);
 	},
@@ -712,6 +712,8 @@ Game.prototype = {
 		// this.createEmbelish();
 		// dice
 		this.createDice();
+		// 离屏canvas，分层canvas
+		this.offScreenCanvasBg();
 		// roles
 		// this.createRoles();
 	},
@@ -983,12 +985,14 @@ Game.prototype = {
 		this.jumperOffCanvas.width = 120;
 		this.jumperOffCanvas.height = 120;
 
+		this.jumper.paint(this.jumperOffContext);
+
 		// this.jumper.top = this.rolesInitialTop;
 		// this.jumper.left = this.rolesInitialLeft;
 		this.jumper.jumpTimer = new AnimationTimer(this.jumperJumpAniTime);
 		this.jumper.fallTimer = new AnimationTimer(this.jumperJumpAniTime);
 		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
-
+		
 		// runners
 		this.runner = new Sprite("runner",new SpriteSheets(Config.imgSource[3],
 																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
@@ -996,6 +1000,7 @@ Game.prototype = {
 		this.runnerOffContext = this.runnerOffCanvas.getContext("2d");
 		this.runnerOffCanvas.width = 61;
 		this.runnerOffCanvas.height = 123;
+		
 		this.runner.paint(this.runnerOffContext);
 
 		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
@@ -1007,11 +1012,9 @@ Game.prototype = {
 		this.currentRole === "jumper" ? this.drawJumper(time) : this.drawRunner(time);
 	},
 	drawJumper:function(time){
-		this.jumper.paint(this.jumperOffContext);
 		this.jumper.update(this.jumperOffCanvas,time);
 	},
 	drawRunner:function(time){
-		this.runner.paint(this.runnerOffCanvas);
 		this.runner.update(this.runnerOffCanvas,time);
 	},
 	drawElements:function(){
@@ -1067,25 +1070,27 @@ Game.prototype = {
 		// // 椅子
 		// this.chair.paint(context);
 	},
-	offScreenCanvas:function(){
+	offScreenCanvasBg:function(){
 		// walkMap（行走地图）
-		context.drawImage(this.mapOffCanvas,this.walkMapLeft,this.walkMapTop);
+		canvasBgContext.drawImage(this.mapOffCanvas,this.walkMapLeft,this.walkMapTop);
 		// enclosure（围栏）
-		context.drawImage(this.enclosureVOffCanvas,0,0);
-		context.drawImage(this.enclosureVOffCanvas,this.canvasWidth - 15,0);
-		context.drawImage(this.enclosureHOffCanvas,0,0);
-		context.drawImage(this.enclosureHOffCanvas,0,this.canvasHeight - 30);
+		canvasBgContext.drawImage(this.enclosureVOffCanvas,0,0);
+		canvasBgContext.drawImage(this.enclosureVOffCanvas,this.canvasWidth - 15,0);
+		canvasBgContext.drawImage(this.enclosureHOffCanvas,0,0);
+		canvasBgContext.drawImage(this.enclosureHOffCanvas,0,this.canvasHeight - 30);
 		// trees（大树）
-		context.drawImage(this.tree1OffCanvas,0,0);
-		context.drawImage(this.tree2OffCanvas,this.canvasWidth - 95 * 2,this.canvasHeight - 120);
+		canvasBgContext.drawImage(this.tree1OffCanvas,0,0);
+		canvasBgContext.drawImage(this.tree2OffCanvas,this.canvasWidth - 95 * 2,this.canvasHeight - 120);
 		// tent（帐篷）
-		context.drawImage(this.tentOffCanvas,this.canvasWidth - 160,0);
+		canvasBgContext.drawImage(this.tentOffCanvas,this.canvasWidth - 160,0);
 		// firewood（柴火）
-		context.drawImage(this.firewoodOffCanvas,this.canvasWidth - 128,160);
+		canvasBgContext.drawImage(this.firewoodOffCanvas,this.canvasWidth - 128,160);
 		// cask（木桶）
-		context.drawImage(this.caskOffCanvas,60,120);
+		canvasBgContext.drawImage(this.caskOffCanvas,60,120);
 		// chair（椅子）
-		context.drawImage(this.chairOffCanvas,50,400);
+		canvasBgContext.drawImage(this.chairOffCanvas,50,400);
+	},
+	offScreenCanvasMain:function(){
 		// jumper
 		context.drawImage(this.jumperOffCanvas,this.rolesInitialLeft,this.rolesInitialLeft);
 		// runner
