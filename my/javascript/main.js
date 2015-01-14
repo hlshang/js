@@ -60,8 +60,8 @@ function Game(){
 	// 行走地图宽度和高度（1/2）
 	this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
 	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
-	// 行走地图在画布中的位置（水平垂直居中）
-	this.walkMapLeft = this.canvasWidth / 2;
+	// 行走地图在画布中的离左上角的坐标（水平垂直居中）
+	this.walkMapLeft = this.canvasWidth / 2  - this.mapRealHorizontal;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
 	
 	// 一格的长度
@@ -694,39 +694,42 @@ Game.prototype = {
 	drawSprites:function(time){
 		context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
 		// embelish
-		this.drawEmbelish();
+		// this.drawEmbelish();
 		// walkMap
-		this.drawWalkMap();
+		// this.drawWalkMap();
+		// roles
+		this.updateRoles(time);
+		// 离屏canvas
+		this.offScreenCanvas();
 		// dice
 		this.drawDice(time);
-		// roles
-		this.drawRoles(time);
 	},
 	createSprites:function(){
 		// walkMap
-		this.createWalkMap();
+		// this.createWalkMap();
+		this.drawElements();
 		// embelish
-		this.createEmbelish();
+		// this.createEmbelish();
 		// dice
 		this.createDice();
 		// roles
-		this.createRoles();
+		// this.createRoles();
 	},
-	createWalkMap:function(){
-		this.mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"]));
-		this.mapBlockTop = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top.png"]));
-		this.mapBlockBottom = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-bottom.png"]));
-		this.mapBlockRight = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-right.png"]));
+	// createWalkMap:function(){
+	// 	this.mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"]));
+	// 	this.mapBlockTop = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top.png"]));
+	// 	this.mapBlockBottom = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-bottom.png"]));
+	// 	this.mapBlockRight = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-right.png"]));
 
-		this.mapBlockBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-blue.png"]));
-		this.mapBlockRed = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-red.png"]));
-		this.mapBlockGrey = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-grey.png"]));
-		this.mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"]));
-		this.mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"]));
-		this.mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"]));
-		this.mapBlockBlack = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-black.png"]));
-		this.mapTopCorner = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top-corner.png"]));
-	},
+	// 	this.mapBlockBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-blue.png"]));
+	// 	this.mapBlockRed = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-red.png"]));
+	// 	this.mapBlockGrey = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-grey.png"]));
+	// 	this.mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"]));
+	// 	this.mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"]));
+	// 	this.mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"]));
+	// 	this.mapBlockBlack = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-black.png"]));
+	// 	this.mapTopCorner = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top-corner.png"]));
+	// },
 	createDice:function(){
 		this.diceOne = new Sprite("diceThree",new SpriteSheets(Config.imgSource[0],
 																this.findCellData("diceThree",Config.jsonObj["main"])),
@@ -758,107 +761,32 @@ Game.prototype = {
 		this.runner.top = this.rolesInitialTop;
 		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
 	},
-	createEmbelish:function(){
-		// 水平围栏
-		this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[1],
-																				Config.jsonObj["embellish"]["enclosure-horizontal.png"]));
-		// 垂直围栏
-		this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[1],
-																				Config.jsonObj["embellish"]["enclosure-vertical.png"]));
-		// 大树1
-		this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-1.png"]));
-		// 大树2
-		this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-2.png"]));
-		this.tree2.top = this.canvasHeight - 120;
-		// 帐篷
-		this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tent.png"]));
-		this.tent.left = this.canvasWidth - 160;
-		// 柴火（两堆）
-		this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["firewood.png"]));
-		this.firewood.top = 160;
-		// 木桶（两堆）
-		this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["cask.png"]));
-		this.cask.top = 120;
-		// chair
-		this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["chair.PNG"]));
-		this.chair.left = 50;
-		this.chair.top = 400;
-	},
-	drawWalkMap:function(){
-		context.save();
-		context.translate(this.walkMapLeft,this.walkMapTop);
-		context.rotate(45 * Config.deg);
-		context.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
-
-		for(var i = 0;i < 24;i++){
-			if(i === 0){
-				this.mapBlockGreen.top = 60*24/4;
-				this.mapBlockGreen.left = 60 * 6;
-				this.mapBlockGreen.paint(context);
-			}
-			if(i === 2){
-				this.mapBlockGrey.top = 60*24/4;
-				this.mapBlockGrey.left = 60 * 4;
-				this.mapBlockGrey.paint(context);
-			}
-			if(i === 6){
-				this.mapBlockBlack.left = 0;
-				this.mapBlockBlack.top = 60 * 6;
-				this.mapBlockBlack.paint(context)
-			}
-			if(i === 12){
-				this.mapTopCorner.top = 0;
-				this.mapTopCorner.left = 0;
-				this.mapTopCorner.paint(context);
-			}
-			if(i < 6 && i !== 0 && i !== 2){
-				this.mapBlockBlue.top = 60*24/4;
-				this.mapBlockBottom.top = 60*24/4;
-
-				if(this.resumeArr.indexOf(i) !== -1){
-					this.mapBlockBlue.left = 60 * (6 - i);
-					this.mapBlockBlue.paint(context)
-				}else{
-					this.mapBlockBottom.left = 60 * (6 - i);
-					this.mapBlockBottom.paint(context)
-				}
-			}		
-			if(i > 6 && i < 12){
-				this.mapBlockRed.left = 0;
-				this.mapBlockRight.left = 0;
-				if(this.resumeArr.indexOf(i) !== -1){
-					this.mapBlockRed.top = 60*(12 - i);
-					this.mapBlockRed.paint(context)
-				}else{
-					this.mapBlockRight.top = 60*(12 - i);
-					this.mapBlockRight.paint(context)
-				}
-			}
-			if(i > 12 && i < 18){
-				this.mapBlockWhite.top = 0;
-				this.mapBlockBottom.top = 0;
-				if(this.resumeArr.indexOf(i) !== -1){
-					this.mapBlockWhite.left = 60 * (i - 12);
-					this.mapBlockWhite.paint(context)
-				}else{
-					this.mapBlockBottom.left = 60 * (i - 12);
-					this.mapBlockBottom.paint(context)
-				}
-			}
-			if(i >= 18 && i < 24){
-				this.mapBlockWBlue.left = 60 * 6;
-				this.mapBlockRight.left = 60 * 6;
-				if(this.resumeArr.indexOf(i) !== -1){
-					this.mapBlockWBlue.top = 60*(i - 18);
-					this.mapBlockWBlue.paint(context)
-				}else{
-					this.mapBlockRight.top = 60*(i - 18);
-					this.mapBlockRight.paint(context)
-				}
-			}
-		}
-		context.restore();
-	},
+	// createEmbelish:function(){
+	// 	// 水平围栏
+	// 	this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[1],
+	// 																			Config.jsonObj["embellish"]["enclosure-horizontal.png"]));
+	// 	// 垂直围栏
+	// 	this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[1],
+	// 																			Config.jsonObj["embellish"]["enclosure-vertical.png"]));
+	// 	// 大树1
+	// 	this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-1.png"]));
+	// 	// 大树2
+	// 	this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-2.png"]));
+	// 	this.tree2.top = this.canvasHeight - 120;
+	// 	// 帐篷
+	// 	this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tent.png"]));
+	// 	this.tent.left = this.canvasWidth - 160;
+	// 	// 柴火（两堆）
+	// 	this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["firewood.png"]));
+	// 	this.firewood.top = 160;
+	// 	// 木桶（两堆）
+	// 	this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["cask.png"]));
+	// 	this.cask.top = 120;
+	// 	// chair
+	// 	this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["chair.PNG"]));
+	// 	this.chair.left = 50;
+	// 	this.chair.top = 400;
+	// },
 	drawDice:function(time){
 		this.diceOne.paint(context);
 		this.diceOne.update(context,time);
@@ -866,61 +794,302 @@ Game.prototype = {
 		this.diceTwo.paint(context);
 		this.diceTwo.update(context,time);
 	},
-	drawRoles:function(time){
+	drawWalkMap:function(){
+		var mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"])),
+			mapBlockTop = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top.png"])),
+			mapBlockBottom = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-bottom.png"])),
+			mapBlockRight = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-right.png"])),
+
+			mapBlockBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-blue.png"])),
+			mapBlockRed = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-red.png"])),
+			mapBlockGrey = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-grey.png"])),
+			mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"])),
+			mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"])),
+			mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"])),
+			mapBlockBlack = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-black.png"])),
+			mapTopCorner = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top-corner.png"]));
+
+		this.mapOffCanvas = document.createElement("canvas");
+		this.mapOffContext = this.mapOffCanvas.getContext("2d");
+		this.mapOffCanvas.width = 2 * this.mapRealHorizontal;
+		this.mapOffCanvas.height = 2 * this.mapRealVertical;
+ 		this.mapOffContext.save();
+		this.mapOffContext.translate(this.mapRealHorizontal,this.mapRealVertical);
+		this.mapOffContext.rotate(45 * Config.deg);
+		this.mapOffContext.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
+
+		for(var i = 0;i < 24;i++){
+			if(i === 0){
+				mapBlockGreen.top = 60*24/4;
+				mapBlockGreen.left = 60 * 6;
+				mapBlockGreen.paint(this.mapOffContext);
+			}
+			if(i === 2){
+				mapBlockGrey.top = 60*24/4;
+				mapBlockGrey.left = 60 * 4;
+				mapBlockGrey.paint(this.mapOffContext);
+			}
+			if(i === 6){
+				mapBlockBlack.left = 0;
+				mapBlockBlack.top = 60 * 6;
+				mapBlockBlack.paint(this.mapOffContext)
+			}
+			if(i === 12){
+				mapTopCorner.top = 0;
+				mapTopCorner.left = 0;
+				mapTopCorner.paint(this.mapOffContext);
+			}
+			if(i < 6 && i !== 0 && i !== 2){
+				mapBlockBlue.top = 60*24/4;
+				mapBlockBottom.top = 60*24/4;
+
+				if(this.resumeArr.indexOf(i) !== -1){
+					mapBlockBlue.left = 60 * (6 - i);
+					mapBlockBlue.paint(this.mapOffContext)
+				}else{
+					mapBlockBottom.left = 60 * (6 - i);
+					mapBlockBottom.paint(this.mapOffContext)
+				}
+			}		
+			if(i > 6 && i < 12){
+				mapBlockRed.left = 0;
+				mapBlockRight.left = 0;
+				if(this.resumeArr.indexOf(i) !== -1){
+					mapBlockRed.top = 60*(12 - i);
+					mapBlockRed.paint(this.mapOffContext)
+				}else{
+					mapBlockRight.top = 60*(12 - i);
+					mapBlockRight.paint(this.mapOffContext)
+				}
+			}
+			if(i > 12 && i < 18){
+				mapBlockWhite.top = 0;
+				mapBlockBottom.top = 0;
+				if(this.resumeArr.indexOf(i) !== -1){
+					mapBlockWhite.left = 60 * (i - 12);
+					mapBlockWhite.paint(this.mapOffContext)
+				}else{
+					mapBlockBottom.left = 60 * (i - 12);
+					mapBlockBottom.paint(this.mapOffContext)
+				}
+			}
+			if(i >= 18 && i < 24){
+				mapBlockWBlue.left = 60 * 6;
+				mapBlockRight.left = 60 * 6;
+				if(this.resumeArr.indexOf(i) !== -1){
+					mapBlockWBlue.top = 60*(i - 18);
+					mapBlockWBlue.paint(this.mapOffContext)
+				}else{
+					mapBlockRight.top = 60*(i - 18);
+					mapBlockRight.paint(this.mapOffContext)
+				}
+			}
+		}
+		this.mapOffContext.restore();
+	},
+	drawEnclosure:function(){
+			// 水平围栏
+		var enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[1],
+																				Config.jsonObj["embellish"]["enclosure-horizontal.png"])),
+			// 垂直围栏
+			enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[1],
+																				Config.jsonObj["embellish"]["enclosure-vertical.png"]));
+		this.enclosureVOffCanvas = document.createElement("canvas");
+		this.enclosureVOffContext = this.enclosureVOffCanvas.getContext("2d");
+		this.enclosureVOffCanvas.width = 15;
+		this.enclosureVOffCanvas.height = 4 * 170;
+		for(var i = 0;i < 4 ;i++){
+			enclosureVertical.top = i * 170;
+			enclosureVertical.paint(this.enclosureVOffContext);
+		}
+
+		this.enclosureHOffCanvas = document.createElement("canvas");
+		this.enclosureHOffContext = this.enclosureHOffCanvas.getContext("2d");
+		this.enclosureHOffCanvas.width = 8 * 132;
+		this.enclosureHOffCanvas.height = 30;
+		for(var i = 0;i < 8;i++){
+			enclosureHorizontal.left = i * 132 + 11;
+			enclosureHorizontal.paint(this.enclosureHOffContext);
+		}
+	},
+	drawTrees:function(){
+			// 大树1
+		var tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-1.png"])),
+			// 大树2
+			tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-2.png"]));
+		this.tree1OffCanvas = document.createElement("canvas");
+		this.tree1OffContext = this.tree1OffCanvas.getContext("2d");
+		this.tree1OffCanvas.width = 129;
+		this.tree1OffCanvas.height = 124;
+		tree1.paint(this.tree1OffContext);
+
+		this.tree2OffCanvas = document.createElement("canvas");
+		this.tree2OffContext = this.tree2OffCanvas.getContext("2d");
+		this.tree2OffCanvas.width = 160;
+		this.tree2OffCanvas.height = 65;
+		for(var i = 0;i < 2;i++){
+			tree2.left = i * 95;
+			tree2.paint(this.tree2OffContext);
+		}
+	},
+	drawTent:function(){
+		// 帐篷
+		var tent = new Sprite("tent",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tent.png"]));
+		this.tentOffCanvas = document.createElement("canvas");
+		this.tentOffContext = this.tentOffCanvas.getContext("2d");
+		this.tentOffCanvas.width = 148;
+		this.tentOffCanvas.height = 159;
+		tent.paint(this.tentOffContext);
+	},
+	drawFireWood:function(){
+		// 柴火（两堆）
+		var firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["firewood.png"]));
+		this.firewoodOffCanvas = document.createElement("canvas");
+		this.firewoodOffContext = this.firewoodOffCanvas.getContext("2d");
+		this.firewoodOffCanvas.width = 96;
+		this.firewoodOffCanvas.height = 32;
+		for(var i = 0;i < 2;i++){
+			firewood.left = i * 64;
+			firewood.paint(this.firewoodOffContext);
+		}
+	},
+	drawCask:function(){
+		// 木桶（两堆）
+		var cask = new Sprite("cask",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["cask.png"]));
+		this.caskOffCanvas = document.createElement("canvas");
+		this.caskOffContext = this.caskOffCanvas.getContext("2d");
+		this.caskOffCanvas.width = 120;
+		this.caskOffCanvas.height = 45;
+		for(var i = 0;i < 2;i++){
+			cask.left = i * 60;
+			cask.paint(this.caskOffContext);
+		}
+	},
+	drawChair:function(){
+		// chair
+		var chair = new Sprite("chair",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["chair.PNG"]));
+		this.chairOffCanvas = document.createElement("canvas");
+		this.chairOffContext = this.chairOffCanvas.getContext("2d");
+		this.chairOffCanvas.width = 128;
+		this.chairOffCanvas.height = 64;
+		chair.paint(this.chairOffContext);
+	},
+	drawRoles:function(){
+		// jumpers
+		this.jumper = new Sprite("jumper",new SpriteSheets(Config.imgSource[2],
+																this.findCellData(this.role,Config.jsonObj["jumpers"])),this.jumperBehavior);
+		this.jumperOffCanvas = document.createElement("canvas");
+		this.jumperOffContext = this.jumperOffCanvas.getContext("2d");
+		this.jumperOffCanvas.width = 120;
+		this.jumperOffCanvas.height = 120;
+
+		// this.jumper.top = this.rolesInitialTop;
+		// this.jumper.left = this.rolesInitialLeft;
+		this.jumper.jumpTimer = new AnimationTimer(this.jumperJumpAniTime);
+		this.jumper.fallTimer = new AnimationTimer(this.jumperJumpAniTime);
+		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
+
+		// runners
+		this.runner = new Sprite("runner",new SpriteSheets(Config.imgSource[3],
+																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
+		this.runnerOffCanvas = document.createElement("canvas");
+		this.runnerOffContext = this.runnerOffCanvas.getContext("2d");
+		this.runnerOffCanvas.width = 61;
+		this.runnerOffCanvas.height = 123;
+		this.runner.paint(this.runnerOffContext);
+
+		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
+		
+		// this.runner.left = this.rolesInitialLeft;
+		// this.runner.top = this.rolesInitialTop;
+	},
+	updateRoles:function(time){
 		this.currentRole === "jumper" ? this.drawJumper(time) : this.drawRunner(time);
 	},
 	drawJumper:function(time){
-		this.jumper.paint(context);
-		this.jumper.update(context,time);
+		this.jumper.paint(this.jumperOffContext);
+		this.jumper.update(this.jumperOffCanvas,time);
 	},
 	drawRunner:function(time){
-		this.runner.paint(context);
-		this.runner.update(context,time)
+		this.runner.paint(this.runnerOffCanvas);
+		this.runner.update(this.runnerOffCanvas,time);
 	},
-	drawEmbelish:function(){
-		// 围栏
-		this.enclosureHorizontal.top = 0;
-		for(var i = 0;i < 8;i++){
-			this.enclosureHorizontal.left = i * 132 + 11;
-			this.enclosureHorizontal.paint(context);
-		}
-		this.enclosureHorizontal.top = this.canvasHeight - 30;
-		for(var i = 0;i < 8;i++){
-			this.enclosureHorizontal.left = i * 132 + 11;
-			this.enclosureHorizontal.paint(context);
-		}
-		this.enclosureVertical.left = 0;
-		for(var i = 0;i< 4 ;i++){
-			this.enclosureVertical.top = i * 170; 
-			this.enclosureVertical.paint(context);
-		}
-		this.enclosureVertical.left = this.canvasWidth - 15;
-		for(var i = 0;i< 4 ;i++){
-			this.enclosureVertical.top = i * 170;
-			this.enclosureVertical.paint(context);
-		}
+	drawElements:function(){
+		this.drawWalkMap();
+		this.drawEnclosure();
+		this.drawTrees();
+		this.drawTent();
+		this.drawFireWood();
+		this.drawCask();
+		this.drawChair();
 
-		// 各种静态装饰物
-		// 树1和树2
-		this.tree1.paint(context);
-		for(var i = 0;i < 2;i++){
-			this.tree2.left = this.canvasWidth - 95 * (i+1);
-			this.tree2.paint(context);
-		}
-		// 帐篷
-		this.tent.paint(context);
-		// 柴火
-		for(var i = 0;i < 2;i++){
-			this.firewood.left = this.canvasWidth - 32 * 2 * (i+1);
-			this.firewood.paint(context);
-		}
-		// 木桶
-		for(var i = 0;i < 2;i++){
-			this.cask.left = (i+1) * 60;
-			this.cask.paint(context);
-		}
-		// 椅子
-		this.chair.paint(context);
+		// // 围栏
+		// this.enclosureHorizontal.top = 0;
+		// for(var i = 0;i < 8;i++){
+		// 	this.enclosureHorizontal.left = i * 132 + 11;
+		// 	this.enclosureHorizontal.paint(context);
+		// }
+		// this.enclosureHorizontal.top = this.canvasHeight - 30;
+		// for(var i = 0;i < 8;i++){
+		// 	this.enclosureHorizontal.left = i * 132 + 11;
+		// 	this.enclosureHorizontal.paint(context);
+		// }
+		// this.enclosureVertical.left = 0;
+		// for(var i = 0;i< 4 ;i++){
+		// 	this.enclosureVertical.top = i * 170;
+		// 	this.enclosureVertical.paint(context);
+		// }
+		// this.enclosureVertical.left = this.canvasWidth - 15;
+		// for(var i = 0;i< 4 ;i++){
+		// 	this.enclosureVertical.top = i * 170;
+		// 	this.enclosureVertical.paint(context);
+		// }
+
+		// // 各种静态装饰物
+		// // 树1和树2
+		// this.tree1.paint(context);
+		// for(var i = 0;i < 2;i++){
+		// 	this.tree2.left = this.canvasWidth - 95 * (i+1);
+		// 	this.tree2.paint(context);
+		// }
+		// // 帐篷
+		// this.tent.paint(context);
+		// // 柴火
+		// for(var i = 0;i < 2;i++){
+		// 	this.firewood.left = this.canvasWidth - 32 * 2 * (i+1);
+		// 	this.firewood.paint(context);
+		// }
+		// // 木桶
+		// for(var i = 0;i < 2;i++){
+		// 	this.cask.left = (i+1) * 60;
+		// 	this.cask.paint(context);
+		// }
+		// // 椅子
+		// this.chair.paint(context);
+	},
+	offScreenCanvas:function(){
+		// walkMap（行走地图）
+		context.drawImage(this.mapOffCanvas,this.walkMapLeft,this.walkMapTop);
+		// enclosure（围栏）
+		context.drawImage(this.enclosureVOffCanvas,0,0);
+		context.drawImage(this.enclosureVOffCanvas,this.canvasWidth - 15,0);
+		context.drawImage(this.enclosureHOffCanvas,0,0);
+		context.drawImage(this.enclosureHOffCanvas,0,this.canvasHeight - 30);
+		// trees（大树）
+		context.drawImage(this.tree1OffCanvas,0,0);
+		context.drawImage(this.tree2OffCanvas,this.canvasWidth - 95 * 2,this.canvasHeight - 120);
+		// tent（帐篷）
+		context.drawImage(this.tentOffCanvas,this.canvasWidth - 160,0);
+		// firewood（柴火）
+		context.drawImage(this.firewoodOffCanvas,this.canvasWidth - 128,160);
+		// cask（木桶）
+		context.drawImage(this.caskOffCanvas,60,120);
+		// chair（椅子）
+		context.drawImage(this.chairOffCanvas,50,400);
+		// jumper
+		context.drawImage(this.jumperOffCanvas,this.rolesInitialLeft,this.rolesInitialLeft);
+		// runner
+		context.drawImage(this.runnerOffCanvas,this.rolesInitialLeft,this.rolesInitialTop);
 	},
 	selectRole:function(callback){
 		var $roleObj = this.roleListAll,
@@ -1009,7 +1178,7 @@ Game.prototype = {
 					that.pokerTipsWrap.innerHTML = res.info;
 				});
 			}else{
-				that.pokerTipsWrap.innerHTML = "你猜错啦！！！下次再来吧！！！";
+				that.pokerTipsWrap.innerHTML = "你猜错啦,下次再来吧！！！";
 			}
 		},500)
 		setTimeout(function(){
