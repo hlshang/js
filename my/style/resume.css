@@ -41,8 +41,13 @@ body{
 	text-align: center;
 }
 #myCanvas,#myCanvas-bg{
-	margin:10px auto;
-	display: block;
+  display: block;
+	margin:10px;
+}
+#myCanvas{
+  position: absolute;
+  left: 0;
+  top:0;
 }
 .game-cover-img{
 	position: relative;
@@ -83,7 +88,7 @@ body{
 	margin-top:-280px;
 	overflow: hidden;
 }
-.game-cover{
+.game-cover{  
 	position: absolute;
 	z-index:10;
 	top:0;
@@ -104,11 +109,17 @@ body{
 	background-color: #7baf5f;
 	text-align: center;
 }
+.select-role-title{
+  font-size: 50px;
+  color:#cd7200;
+  font-weight: normal;
+  margin-top: 60px;
+}
 .role-list{
 	display: inline-block;
 	width:150px;
 	height: 250px;
-	margin:150px 50px;
+	margin:50px;
   background-color: #57b921;
 	border:1px solid #2b6909;
 	border-radius: 5px;
@@ -161,7 +172,7 @@ body{
 	width: 500px;
 	height: 360px;
 	position: absolute;
-  z-index: 3;
+  z-index: 1001;
 	left:50%;
 	top:50%;
 	margin-left:-250px;
@@ -211,7 +222,7 @@ body{
 .roll-dice-wrap{
   position: absolute;
   left:50%;
-  top:50%;
+  top:45%;
   width: 200px;
   margin-left: -100px;
   z-index: 1000;
@@ -333,6 +344,8 @@ body{
   transition-timing-function: ease;
   -webkit-transition-duration: .6s;
   transition-duration: .6s;
+  -webkit-transition-property:-webkit-transform;
+  transition-property:transform;
   cursor: pointer;
 }
 .poker-list-back{

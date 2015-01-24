@@ -54,7 +54,7 @@ function Game(){
 	this.matrixSlope = 45 * Config.deg - Config.slopeAngle * Config.deg;
 
 	// 行走地图的真实高度和宽度（比行走图多一格）
-	this.mapRealHorizontal = (60 * 6.5 * Math.tan(this.matrixSlope) + 60 * 6.5 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapRealHorizontal = (60 * 7 * Math.tan(this.matrixSlope) + 60 * 7 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
 	this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.slopeAngle);
 	
 	// 行走地图宽度和高度（1/2）
@@ -65,7 +65,7 @@ function Game(){
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
 	
 	// 一格的长度
-	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6);
+	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6) - 5;
 	// 一格的高度
 	this.verticalPacePix = Math.floor(this.mapVertical / 6);
 	// 每一步的时间
@@ -82,7 +82,7 @@ function Game(){
 	this.jumperVerticalUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 	this.jumperVerticalDownSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 	this.jumperJumpUpSpeed = (this.jumperGridMeter * 2.3 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1.1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
 	this.runnerAniTime = 300;
@@ -248,8 +248,10 @@ function Game(){
 				that.diceNumShow(that.diceTotal);
 				// 在小黑屋里面 直接返回
 				if(this.isInBlackRoom()){
-					that.diceLocReset();
 					that.rollDiceShow(true);
+					setTimeout(function(){
+						that.diceLocReset();
+					},800)
 					return;
 				}
 				var timeOut = setTimeout( function(){
@@ -381,6 +383,11 @@ function Game(){
 			}
 			
 			if(sprite.moveTimer.isExpired()){
+				// 起点和顶点重新定位
+				if(that.currentPointer === 12){
+					that.runner.top = that.rolesHalfLeft;
+					that.runner.left = that.rolesHalfTop;
+				}
 				if(that.currentPointer === 24){
 					that.jumper.top = that.rolesInitialTop;
 					that.jumper.left = that.rolesInitialLeft;
@@ -483,6 +490,10 @@ function Game(){
 				}
 			}
 			if(sprite.runTimer.isExpired()){
+				if(that.currentPointer === 12){
+					that.runner.top = that.rolesHalfTop;
+					that.runner.left = that.rolesHalfLeft;
+				}
 				if(that.currentPointer === 24){
 					that.runner.top = that.rolesInitialTop;
 					that.runner.left = that.rolesInitialLeft;
@@ -532,9 +543,10 @@ Game.prototype = {
 
 		this.confirmRoleWH();
 		this.clearPause();
-		this.rollDiceShow(true);
-		this.createSprites();
 		this.createResumeLoc();
+		this.rollDiceShow(true);
+
+		this.createSprites();
 		this.startShakeDice();
 		this.closeResume();
 
@@ -697,25 +709,24 @@ Game.prototype = {
 		// this.drawEmbelish();
 		// walkMap
 		// this.drawWalkMap();
-		// roles
-		this.updateRoles(time);
-		// 离屏canvas（人物等主要元素）
-		this.offScreenCanvasMain();
 		// dice
 		this.drawDice(time);
+		// roles
+		this.updateRoles(time);
+		
+		// 离屏canvas（人物等主要元素）
+		// this.offScreenCanvasMain();
 	},
 	createSprites:function(){
 		// walkMap
 		// this.createWalkMap();
 		this.drawElements();
-		// embelish
-		// this.createEmbelish();
+		// roles
+		this.createRoles();
 		// dice
 		this.createDice();
 		// 离屏canvas，分层canvas
 		this.offScreenCanvasBg();
-		// roles
-		// this.createRoles();
 	},
 	// createWalkMap:function(){
 	// 	this.mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"]));
@@ -816,7 +827,7 @@ Game.prototype = {
 		this.mapOffCanvas.width = 2 * this.mapRealHorizontal;
 		this.mapOffCanvas.height = 2 * this.mapRealVertical;
  		this.mapOffContext.save();
-		this.mapOffContext.translate(this.mapRealHorizontal,this.mapRealVertical);
+		this.mapOffContext.translate(this.mapRealHorizontal,0);
 		this.mapOffContext.rotate(45 * Config.deg);
 		this.mapOffContext.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
 
@@ -982,10 +993,8 @@ Game.prototype = {
 																this.findCellData(this.role,Config.jsonObj["jumpers"])),this.jumperBehavior);
 		this.jumperOffCanvas = document.createElement("canvas");
 		this.jumperOffContext = this.jumperOffCanvas.getContext("2d");
-		this.jumperOffCanvas.width = 120;
-		this.jumperOffCanvas.height = 120;
-
-		this.jumper.paint(this.jumperOffContext);
+		this.jumperOffCanvas.width = 150;
+		this.jumperOffCanvas.height = 150;
 
 		// this.jumper.top = this.rolesInitialTop;
 		// this.jumper.left = this.rolesInitialLeft;
@@ -998,10 +1007,8 @@ Game.prototype = {
 																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
 		this.runnerOffCanvas = document.createElement("canvas");
 		this.runnerOffContext = this.runnerOffCanvas.getContext("2d");
-		this.runnerOffCanvas.width = 61;
-		this.runnerOffCanvas.height = 123;
-		
-		this.runner.paint(this.runnerOffContext);
+		this.runnerOffCanvas.width = 50;
+		this.runnerOffCanvas.height = 83;
 
 		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
 		
@@ -1012,10 +1019,12 @@ Game.prototype = {
 		this.currentRole === "jumper" ? this.drawJumper(time) : this.drawRunner(time);
 	},
 	drawJumper:function(time){
-		this.jumper.update(this.jumperOffCanvas,time);
+		this.jumper.paint(context);
+		this.jumper.update(context,time);
 	},
 	drawRunner:function(time){
-		this.runner.update(this.runnerOffCanvas,time);
+		this.runner.paint(context);
+		this.runner.update(context,time);
 	},
 	drawElements:function(){
 		this.drawWalkMap();
@@ -1025,7 +1034,7 @@ Game.prototype = {
 		this.drawFireWood();
 		this.drawCask();
 		this.drawChair();
-
+		this.drawRoles()
 		// // 围栏
 		// this.enclosureHorizontal.top = 0;
 		// for(var i = 0;i < 8;i++){
@@ -1090,12 +1099,12 @@ Game.prototype = {
 		// chair（椅子）
 		canvasBgContext.drawImage(this.chairOffCanvas,50,400);
 	},
-	offScreenCanvasMain:function(){
-		// jumper
-		context.drawImage(this.jumperOffCanvas,this.rolesInitialLeft,this.rolesInitialLeft);
-		// runner
-		context.drawImage(this.runnerOffCanvas,this.rolesInitialLeft,this.rolesInitialTop);
-	},
+	// offScreenCanvasMain:function(){
+	// 	// jumper
+	// 	context.drawImage(this.jumperOffCanvas,this.rolesInitialLeft,this.rolesInitialTop);
+	// 	// runner
+	// 	context.drawImage(this.runnerOffCanvas,this.rolesInitialLeft,this.rolesInitialTop);
+	// },
 	selectRole:function(callback){
 		var $roleObj = this.roleListAll,
 			len = $roleObj.length,
@@ -1123,8 +1132,8 @@ Game.prototype = {
 	},
 	confirmRoleWH:function(){
 		if(this.role === "runner"){
-			this.roleWidth = 30;
-			this.roleHeight = 50;
+			this.roleWidth = 50;
+			this.roleHeight = 30;
 		}else {
 			this.roleWidth = 150;
 			this.roleHeight = 100;
@@ -1132,6 +1141,9 @@ Game.prototype = {
 		// 人物初始位置
 		this.rolesInitialLeft = this.canvasWidth / 2 - this.roleWidth / 2;
 		this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - this.roleHeight - this.verticalPacePix;
+		// 人物在顶点的位置
+		this.rolesHalfLeft = this.rolesInitialLeft;
+		this.rolesHalfTop = this.rolesInitialTop - 12 * this.verticalPacePix;
 	},
 	showBlackRoom:function(){
 		var that = this;
@@ -1243,34 +1255,38 @@ Game.prototype = {
 			if(that.shortCutView) return;
 			that.shortCutView = true;
 			var code = e.keyCode;
-			that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 			switch(code){
 				case 89:
-				// Y
-				that.showResume("one","resume-json/one.json",function(res){
-					that.resumeOne.call(that,res)
-				});
-				break;
+					// Y
+					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+					that.showResume("one","resume-json/one.json",function(res){
+						that.resumeOne.call(that,res)
+					});
+					break;
 				case 80:
-				// P
-				that.showResume("two","resume-json/two.json",function(res){
-					that.resumeTwo.call(that,res);
-				});
-				break;
+					// P
+					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+					that.showResume("two","resume-json/two.json",function(res){
+						that.resumeTwo.call(that,res);
+					});
+					break;
 				case 66:
-				// B
-				that.showResume("three","resume-json/three.json",function(res){
-					that.resumeThree.call(that,res);
-				});
-				break;
+					// B
+					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+					that.showResume("three","resume-json/three.json",function(res){
+						that.resumeThree.call(that,res);
+					});
+					break;
 				case 78:
-				// N
-				that.showResume("four","resume-json/four.json",function(res){
-					that.resumeFour.call(that,res);
-				});
-				break;
+					// N
+					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+					that.showResume("four","resume-json/four.json",function(res){
+						that.resumeFour.call(that,res);
+					});
+					break;
 				default:
-				break;
+					that.shortCutView = false;
+					break;
 			}
 		},false)
 	},
@@ -1302,7 +1318,7 @@ Game.prototype = {
 	},
 	resumeThree:function(res){
 		// 作品及博客
-		var html = '<h2>' + res.title + '</h2><p>博客：<a href="'+ res.blog +'" target="_blank">点击</a></p><p>GitHub：<a href="'+ res.github +'" target="_blank">点击</a></p><p>jQuery解析：<a href="'+ res["jquery-analysis"] +'" target="_blank">点击</a></p><p>jQuery插件：<a href="'+ res["jquery-plugins"] +'">点击</a><p>本游戏源码：<a href="'+ res["resume-game"] +'" target="_blank">点击</a></p><p>HTML5微信页面：<a href="'+ res["wifi-update"] +'" target="_blank">点击</a></p><p>PC网站：<a href="'+ res["1A"] +'" target="_blank">点击</a></p><p>其它：' + res.soon + '</p>'; 
+		var html = '<h2>' + res.title + '</h2><p>博客：<a href="'+ res.blog +'" target="_blank">点击</a></p><p>GitHub：<a href="'+ res.github +'" target="_blank">点击</a></p><p>jQuery解析：<a href="'+ res["jquery-analysis"] +'" target="_blank">点击</a></p><p>jQuery插件：<a href="'+ res["jquery-plugins"] +'" target="_blank">点击</a><p>本游戏源码：<a href="'+ res["resume-game"] +'" target="_blank">点击</a></p><p>HTML5微信页面：<a href="'+ res["wifi-update"] +'" target="_blank">点击</a></p><p>PC网站：<a href="'+ res["1A"] +'" target="_blank">点击</a></p><p>其它：' + res.soon + '</p>'; 
 		this.gameResumeWrap.innerHTML = html;
 	},
 	resumeFour:function(res){

@@ -13,9 +13,9 @@
 </head>
 <body>
 	<div class="canvas-main">
-		<canvas id="myCanvas-bg" width="1080" height="540" class="hide">
+		<canvas id="myCanvas-bg" width="1080" height="540">
 		</canvas>
-		<canvas id="myCanvas" width="1080" height="540" class="hide">
+		<canvas id="myCanvas" width="1080" height="540">
 			Your browser do not support canvas!
 		</canvas>
 		<div class="roll-num-show"></div>
@@ -44,6 +44,7 @@
 			<div class="start-game-btn hide"></div>
 		</div>
 		<div class="select-role-wrap">
+			<h6 class="select-role-title">请选择游戏角色</h6>
 			<div class="role-list boy" data-role="boy">
 				<p></p>
 			</div>
@@ -90,7 +91,7 @@
 				// document.getElementById("load-precent-nums").className = "hide";
 				document.querySelector(".game-cover").removeChild(document.querySelector(".load-precent-wrap"));
 				document.querySelector(".start-game-btn").className = "start-game-btn";
-				context.clearRect(0,0,canvas.width,canvas.height);
+				// context.clearRect(0,0,canvas.width,canvas.height);
 				var game = new Game();
 				game.start();
 			});
