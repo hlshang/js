@@ -3,6 +3,8 @@ function Game(){
 	// json cells 缓存
 	this.jsonCells = {};
 
+	// 倒计时秒数
+	this.cutDownSec = 3;
 	// 角色 boy or girl or runner 默认为boy
 	this.role = "girl";
 	// 角色分类 两种 jumper and runner
@@ -326,17 +328,6 @@ function Game(){
 					var framePerSecond = 1/that.commonFps;
 					sprite.velocityY = (this.jumperVerticalDownSpeed + Config.GRAVITY_FORCE * (sprite.fallTimer.getElapsedTime() / 1000)) * that.pixPerMeter * framePerSecond;
 					sprite.top +=  sprite.velocityY;
-					// 修正垂直距离差
-					// this.distanceGap = that.verticalPacePix * 1.05 - Math.abs(sprite.top - this.originTop);
-					// if(this.distanceGap > 0){
-					// 	this.originTop = 0;
-					// 	if(that.currentPointer > 12 && that.currentPointer < 25){
-					// 		// sprite.left -= this.distanceGap;
-					// 		sprite.top += this.distanceGap
-					// 	}else{
-					// 		sprite.top -= this.distanceGap;
-					// 	}
-					// }
 				}else{
 					that.startMovePer = false;
 					if(that.startMoveAll){
@@ -529,7 +520,7 @@ Game.prototype = {
 		this.selectRole(function(){
 			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
 				document.body.removeChild(that.gameCoverWrap);
-				that.cutDown(3,function(){
+				that.cutDown(that.cutDownSec,function(){
 					document.body.removeChild(that.gameCutDown);
 					that.startGame();
 				});
@@ -607,17 +598,6 @@ Game.prototype = {
 			that.lastRunnerLoc();
 			that.diceStartRotate()
 		},false)
-		// pb.init("roll-dice-btn").addEventListener("click",function(){
-		// 	if(that.pauseGame) return;
-		// 	that.playSound(that.diceSound);
-		// 	that.diceRotateReset();
-		// 	that.diceOneNum = Math.floor(Math.random() * 6);
-		// 	that.diceTwoNum = Math.floor(Math.random() * 6);
-		// 	that.diceTotals();
-		// 	// 确定每次掷完筛子后人物的位置
-		// 	that.lastRunnerLoc();
-		// 	that.diceStartRotate()
-		// },false)
 	},
 	rollDiceShow:function(show){
 		var that = this;
@@ -705,21 +685,12 @@ Game.prototype = {
 	},
 	drawSprites:function(time){
 		context.clearRect(0,0,this.canvasWidth,this.canvasHeight);
-		// embelish
-		// this.drawEmbelish();
-		// walkMap
-		// this.drawWalkMap();
 		// dice
 		this.drawDice(time);
 		// roles
 		this.updateRoles(time);
-		
-		// 离屏canvas（人物等主要元素）
-		// this.offScreenCanvasMain();
 	},
 	createSprites:function(){
-		// walkMap
-		// this.createWalkMap();
 		this.drawElements();
 		// roles
 		this.createRoles();
@@ -728,21 +699,6 @@ Game.prototype = {
 		// 离屏canvas，分层canvas
 		this.offScreenCanvasBg();
 	},
-	// createWalkMap:function(){
-	// 	this.mapBlockLeft = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-left.png"]));
-	// 	this.mapBlockTop = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top.png"]));
-	// 	this.mapBlockBottom = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-bottom.png"]));
-	// 	this.mapBlockRight = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-right.png"]));
-
-	// 	this.mapBlockBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-blue.png"]));
-	// 	this.mapBlockRed = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-red.png"]));
-	// 	this.mapBlockGrey = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-grey.png"]));
-	// 	this.mapBlockWhite = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-white.png"]));
-	// 	this.mapBlockGreen = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-green.png"]));
-	// 	this.mapBlockWBlue = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-wblue.png"]));
-	// 	this.mapBlockBlack = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["block-black.png"]));
-	// 	this.mapTopCorner = new Sprite("map-block",new drawStaticImage(Config.imgSource[0],Config.jsonObj["main"]["map-block-top-corner.png"]));
-	// },
 	createDice:function(){
 		this.diceOne = new Sprite("diceThree",new SpriteSheets(Config.imgSource[0],
 																this.findCellData("diceThree",Config.jsonObj["main"])),
@@ -774,32 +730,6 @@ Game.prototype = {
 		this.runner.top = this.rolesInitialTop;
 		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
 	},
-	// createEmbelish:function(){
-	// 	// 水平围栏
-	// 	this.enclosureHorizontal = new Sprite("enclosure-horizontal",new drawStaticImage(Config.imgSource[1],
-	// 																			Config.jsonObj["embellish"]["enclosure-horizontal.png"]));
-	// 	// 垂直围栏
-	// 	this.enclosureVertical = new Sprite("enclosure-vertical",new drawStaticImage(Config.imgSource[1],
-	// 																			Config.jsonObj["embellish"]["enclosure-vertical.png"]));
-	// 	// 大树1
-	// 	this.tree1 = new Sprite("tree1",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-1.png"]));
-	// 	// 大树2
-	// 	this.tree2 = new Sprite("tree2",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tree-2.png"]));
-	// 	this.tree2.top = this.canvasHeight - 120;
-	// 	// 帐篷
-	// 	this.tent = new Sprite("tent",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["tent.png"]));
-	// 	this.tent.left = this.canvasWidth - 160;
-	// 	// 柴火（两堆）
-	// 	this.firewood = new Sprite("firewood",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["firewood.png"]));
-	// 	this.firewood.top = 160;
-	// 	// 木桶（两堆）
-	// 	this.cask = new Sprite("cask",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["cask.png"]));
-	// 	this.cask.top = 120;
-	// 	// chair
-	// 	this.chair = new Sprite("chair",new drawStaticImage(Config.imgSource[1],Config.jsonObj["embellish"]["chair.PNG"]));
-	// 	this.chair.left = 50;
-	// 	this.chair.top = 400;
-	// },
 	drawDice:function(time){
 		this.diceOne.paint(context);
 		this.diceOne.update(context,time);
@@ -996,8 +926,6 @@ Game.prototype = {
 		this.jumperOffCanvas.width = 150;
 		this.jumperOffCanvas.height = 150;
 
-		// this.jumper.top = this.rolesInitialTop;
-		// this.jumper.left = this.rolesInitialLeft;
 		this.jumper.jumpTimer = new AnimationTimer(this.jumperJumpAniTime);
 		this.jumper.fallTimer = new AnimationTimer(this.jumperJumpAniTime);
 		this.jumper.moveTimer = new AnimationTimer(this.jumperMoveAniTime);
@@ -1011,9 +939,6 @@ Game.prototype = {
 		this.runnerOffCanvas.height = 83;
 
 		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
-		
-		// this.runner.left = this.rolesInitialLeft;
-		// this.runner.top = this.rolesInitialTop;
 	},
 	updateRoles:function(time){
 		this.currentRole === "jumper" ? this.drawJumper(time) : this.drawRunner(time);
@@ -1035,49 +960,6 @@ Game.prototype = {
 		this.drawCask();
 		this.drawChair();
 		this.drawRoles()
-		// // 围栏
-		// this.enclosureHorizontal.top = 0;
-		// for(var i = 0;i < 8;i++){
-		// 	this.enclosureHorizontal.left = i * 132 + 11;
-		// 	this.enclosureHorizontal.paint(context);
-		// }
-		// this.enclosureHorizontal.top = this.canvasHeight - 30;
-		// for(var i = 0;i < 8;i++){
-		// 	this.enclosureHorizontal.left = i * 132 + 11;
-		// 	this.enclosureHorizontal.paint(context);
-		// }
-		// this.enclosureVertical.left = 0;
-		// for(var i = 0;i< 4 ;i++){
-		// 	this.enclosureVertical.top = i * 170;
-		// 	this.enclosureVertical.paint(context);
-		// }
-		// this.enclosureVertical.left = this.canvasWidth - 15;
-		// for(var i = 0;i< 4 ;i++){
-		// 	this.enclosureVertical.top = i * 170;
-		// 	this.enclosureVertical.paint(context);
-		// }
-
-		// // 各种静态装饰物
-		// // 树1和树2
-		// this.tree1.paint(context);
-		// for(var i = 0;i < 2;i++){
-		// 	this.tree2.left = this.canvasWidth - 95 * (i+1);
-		// 	this.tree2.paint(context);
-		// }
-		// // 帐篷
-		// this.tent.paint(context);
-		// // 柴火
-		// for(var i = 0;i < 2;i++){
-		// 	this.firewood.left = this.canvasWidth - 32 * 2 * (i+1);
-		// 	this.firewood.paint(context);
-		// }
-		// // 木桶
-		// for(var i = 0;i < 2;i++){
-		// 	this.cask.left = (i+1) * 60;
-		// 	this.cask.paint(context);
-		// }
-		// // 椅子
-		// this.chair.paint(context);
 	},
 	offScreenCanvasBg:function(){
 		// walkMap（行走地图）
@@ -1099,12 +981,6 @@ Game.prototype = {
 		// chair（椅子）
 		canvasBgContext.drawImage(this.chairOffCanvas,50,400);
 	},
-	// offScreenCanvasMain:function(){
-	// 	// jumper
-	// 	context.drawImage(this.jumperOffCanvas,this.rolesInitialLeft,this.rolesInitialTop);
-	// 	// runner
-	// 	context.drawImage(this.runnerOffCanvas,this.rolesInitialLeft,this.rolesInitialTop);
-	// },
 	selectRole:function(callback){
 		var $roleObj = this.roleListAll,
 			len = $roleObj.length,
@@ -1356,10 +1232,6 @@ Game.prototype = {
 	},
 	findCellData:function(name,jsonObj){
 		var cellDatas = [];
-		// jsonCells中存在，则直接返回
-		// if(name in this.jsonCells){
-		// 	return this.jsonCells[name];
-		// }
 		for(var i in jsonObj){
 			if(i.indexOf(name) !== -1){
 				cellDatas.push(jsonObj[i]);
@@ -1377,10 +1249,6 @@ Game.prototype = {
 			}
 		})
 	},
-	// diceTotals:function(){
-	// 	this.diceTotal = this.diceOneNum + this.diceTwoNum + 2;
-	// 	console.log(this.diceTotal)
-	// },
 	currentRunnerLoc:function(){
 		this.currentPointer++;
 		if(this.currentPointer === 25){
@@ -1441,17 +1309,6 @@ Game.prototype = {
 			}
 		},changeTime)
 	}
-	// drawGround:function(){
-	// 	this.grassland = new Sprite("grassland",new SpriteSheets(Config.imgSource[1],
-	// 															this.findCellData("grassland.png",Config.jsonObj["embellish"])))
-	// 	for(var i = 0;i < this.grasslandY;i++){
-	// 		for(var j = 0;j < this.grasslandX;j++){
-	// 			this.grassland.left = j * Config.grassWidth;
-	// 			this.grassland.top = i * Config.grassHeight;
-	// 			this.grassland.paint(context);
-	// 		}
-	// 	}
-	// },
 }
 var gameEasing = {
 	liner:function(p){
