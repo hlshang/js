@@ -1,14 +1,15 @@
 function Game(){
 	var that = this;
+
+	this.canvasWidth = canvas.width;
+	this.canvasHeight = canvas.height;
 	// json cells 缓存
 	this.jsonCells = {};
-
-	// 倒计时秒数
-	this.cutDownSec = 3;
-	// 角色 boy or girl or runner 默认为boy
-	this.role = "girl";
 	// 角色分类 两种 jumper and runner
 	this.currentRole = "jumper";
+	// 角色 boy or girl or runner 默认为boy
+	this.role = "boy";
+	// 角色的宽高
 	this.roleWidth = 0;
 	this.roleHeight = 0;
 	// 跳跃者是否开始动作 不跳跃时有动作
@@ -19,8 +20,6 @@ function Game(){
 	this.entranceBlackRoom = false;
 	// 逃离小黑屋需投掷的骰子次数
 	this.fleeBlackRoom = 3;
-	this.canvasWidth = canvas.width;
-	this.canvasHeight = canvas.height;
 	// 假定屏幕高为10m
 	this.canvasPresumeHeight = 10;
 	this.canvasHalfPersumeHeight = this.canvasPresumeHeight / 2;
@@ -38,6 +37,7 @@ function Game(){
 	// 骰子是否结束转动
 	this.oneEndRotate = false;
 	this.twoEndRotate = false;
+	// 摇骰子时鼠标的状态
 	this.mousedown = false;
 	this.mouseup = false;
 	// 开始丢骰子
@@ -62,6 +62,7 @@ function Game(){
 	// 行走地图宽度和高度（1/2）
 	this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
 	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
+
 	// 行走地图在画布中的离左上角的坐标（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2  - this.mapRealHorizontal;
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
@@ -70,7 +71,7 @@ function Game(){
 	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6) - 5;
 	// 一格的高度
 	this.verticalPacePix = Math.floor(this.mapVertical / 6);
-	// 每一步的时间
+	// 跳跃者每一步的时间
 	this.jumperMoveAniTime = 300;
 	// 跳跃和下降的时间，为移动时间的一半
 	this.jumperJumpAniTime = this.jumperMoveAniTime / 2;
@@ -137,7 +138,7 @@ function Game(){
 	this.diceSound = Config.mediaSource[1];
 	// 跳跃音效
 	this.jumperSound = Config.mediaSource[2]
-	// 跑步者音效
+	// 跑步音效
 	this.runnerSound = Config.mediaSource[3];
 	// resume sound
 	this.resumeSound = Config.mediaSource[4];
@@ -145,7 +146,7 @@ function Game(){
 	this.cutSound = Config.mediaSource[5];
 
 	this.coverSlideTime = 400;
-	this.pauseGame = false;
+	this.pauseGameTag = false;
 	this.commonFps = 60;
 	this.resumeArr = [];
 
@@ -158,9 +159,9 @@ function Game(){
 				sprite.painter.cellsIndex = 6;
 			}else{
 				if(this.lastAdvance === 6){
-					this.lastAdvance = -1;
+					this.lastAdvance = 0;
 				}
-				sprite.painter.cellsIndex = ++this.lastAdvance;
+				sprite.painter.cellsIndex = this.lastAdvance++;
 			}
 		},
 		execute:function(sprite,context,time){
@@ -210,9 +211,9 @@ function Game(){
 				sprite.painter.cellsIndex = 6;
 			}else{
 				if(this.lastAdvance === 6){
-					this.lastAdvance = -1;
+					this.lastAdvance = 0;
 				}
-				sprite.painter.cellsIndex = ++this.lastAdvance;
+				sprite.painter.cellsIndex = this.lastAdvance++;
 			}
 		},
 		isInBlackRoom:function(){
@@ -520,7 +521,7 @@ Game.prototype = {
 		this.selectRole(function(){
 			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
 				document.body.removeChild(that.gameCoverWrap);
-				that.cutDown(that.cutDownSec,function(){
+				that.cutDown(that.cutDownTime,function(){
 					document.body.removeChild(that.gameCutDown);
 					that.startGame();
 				});
@@ -533,6 +534,7 @@ Game.prototype = {
 		this.playSound(this.startSound);
 
 		this.confirmRoleWH();
+		this.pauseGame();
 		this.clearPause();
 		this.createResumeLoc();
 		this.rollDiceShow(true);
@@ -547,7 +549,7 @@ Game.prototype = {
 	},
 	animate:function(time){
 		var that = this;
-		if(this.pauseGame){
+		if(this.pauseGameTag){
 			setTimeout(function(){
 				window.requestAnimationFrame(function(time){
 					that.animate.call(that,time);
@@ -593,7 +595,6 @@ Game.prototype = {
 			that.diceRotateReset();
 			that.diceDetailNum(that.diceTotal);
 			that.rollDiceShow();
-			// that.diceTotals();
 			// 确定每次掷完筛子后人物的位置
 			that.lastRunnerLoc();
 			that.diceStartRotate()
@@ -1167,6 +1168,8 @@ Game.prototype = {
 		},false)
 	},
 	showResume:function(name,url,callback){
+		// resume sound
+		this.playSound(this.resumeSound);
 		// name 只是个标识
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){
@@ -1244,8 +1247,20 @@ Game.prototype = {
 		var that = this;
 		document.addEventListener("keydown",function(e){
 			var code = e.keyCode;
+			// Enter
 			if(code === 13){
-				that.pauseGame = false;
+				that.pauseGameTag = false;
+			}
+		})
+	},
+	pauseGame:function(){
+		var that = this;
+		if(this.pauseGameTag) return;
+		document.addEventListener("keydown",function(e){
+			var code = e.keyCode;
+			// Space
+			if(code === 32){
+				that.pauseGameTag = true;
 			}
 		})
 	},
