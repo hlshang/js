@@ -49,6 +49,12 @@ body{
   left: 0;
   top:0;
 }
+#fps-show{
+  position: absolute;
+  left:0;
+  top:-20px;
+  font-size: 12px;
+}
 .game-cover-img{
 	position: relative;
 	width: 310px;

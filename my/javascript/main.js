@@ -56,11 +56,11 @@ function Game(){
 	this.matrixSlope = 45 * Config.deg - Config.slopeAngle * Config.deg;
 
 	// 行走地图的真实高度和宽度（比行走图多一格）
-	this.mapRealHorizontal = (60 * 7 * Math.tan(this.matrixSlope) + 60 * 7 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapRealHorizontal = (60 * 7 * Math.tan(this.matrixSlope) + 60 * 7 * (1 / Math.cos(this.matrixSlope))) * Math.SQRT2 / 2;
 	this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.slopeAngle);
 	
 	// 行走地图宽度和高度（1/2）
-	this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.LOG2E / 2;
+	this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.SQRT2 / 2;
 	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
 
 	// 行走地图在画布中的离左上角的坐标（水平垂直居中）
@@ -68,7 +68,7 @@ function Game(){
 	this.walkMapTop = this.canvasHeight / 2 - this.mapRealVertical;
 	
 	// 一格的长度
-	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6) - 5;
+	this.horizontalPacePix = Math.floor(this.mapHorizontal / 6);
 	// 一格的高度
 	this.verticalPacePix = Math.floor(this.mapVertical / 6);
 	// 跳跃者每一步的时间
@@ -84,8 +84,8 @@ function Game(){
 	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
 	this.jumperVerticalUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 	this.jumperVerticalDownSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperJumpUpSpeed = (this.jumperGridMeter * 2.3 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1.1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperJumpUpSpeed = (this.jumperGridMeter * 2.0 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
 	this.runnerAniTime = 300;
@@ -113,6 +113,7 @@ function Game(){
 	// 是否正在快捷键查看简历
 	this.shortCutView = false;
 	// selector
+	this.fpsShow = document.getElementById("fps-show");
 	this.selectRoleWrap = document.querySelector(".select-role-wrap");
 	this.gameCutDown = document.querySelector(".game-cutdown");
 	this.roleListAll = document.querySelectorAll(".role-list");
@@ -542,6 +543,9 @@ Game.prototype = {
 		this.createSprites();
 		this.startShakeDice();
 		this.closeResume();
+
+		// show fps
+		this.showFps();
 
 		window.requestAnimationFrame(function(time){
 			that.animate.call(that,time);
@@ -1299,6 +1303,13 @@ Game.prototype = {
 		}
 		this.lastFrameTime = time;
 		return fps; 
+	},
+	showFps:function(){
+		var that = this;
+		this.fpsShow.innerHTML = this.commonFps.toFixed(0) + " fps";
+		setTimeout(function(){
+			that.showFps.call(that)
+		},300);
 	},
 	// 上下滑动
 	coverAni:function(obj,lastTop,aniTime,aniWay,fn){
