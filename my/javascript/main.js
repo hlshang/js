@@ -1074,7 +1074,7 @@ Game.prototype = {
 				that.showResume("shortCutKey","resume-json/shortCut-key.json",function(res){
 					that.shortCutShowResume();
 					that.pokerTipsWrap.innerHTML = res.info;
-				});
+				},true);
 			}else{
 				that.pokerTipsWrap.innerHTML = "你猜错啦,下次再来吧！！！";
 			}
