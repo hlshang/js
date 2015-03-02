@@ -82,10 +82,12 @@ function Game(){
 	// 人物向上/下跳动的垂直速度
 	// 跳跃高度为1.5倍的两格中心点的高度
 	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
-	this.jumperVerticalUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperVerticalDownSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperJumpUpSpeed = (this.jumperGridMeter * 2.0 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperJumpDownSpeed = (this.jumperGridMeter * 1.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	// 向上跳跃时和下降时的初始速度（向上行走）
+	this.jumperLeftUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	// 向上跳跃时和下降时的初始速度（向下行走）
+	this.jumperRightUpSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperRightDownSpeed = (this.jumperGridMeter * 2.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
 	this.runnerAniTime = 300;
@@ -219,9 +221,10 @@ function Game(){
 		},
 		isInBlackRoom:function(){
 			if(that.entranceBlackRoom){
-				that.fleeBlackRoom = that.fleeBlackRoom > 0 ? that.fleeBlackRoom-- : 3;
+				that.fleeBlackRoom--;
 				// 投掷三次或者点数相同，则跳出小黑屋
 				if(!that.fleeBlackRoom || that.diceOneNum === that.diceTwoNum){
+					that.fleeBlackRoom = 3;
 					that.entranceBlackRoom = false;
 					return false;
 				}
@@ -300,12 +303,12 @@ function Game(){
 		jumpDirection:function(){
 			if(that.currentPointer > 12 && that.currentPointer < 25){
 				this.direction = "down";
-				this.jumperVerticalUpSpeed = that.jumperVerticalDownSpeed;
-				this.jumperVerticalDownSpeed = that.jumperJumpUpSpeed;
+				this.jumperVerticalUpSpeed = that.jumperRightUpSpeed;
+				this.jumperVerticalDownSpeed = that.jumperRightDownSpeed;
 			}else{
 				this.direction = "up";
-				this.jumperVerticalUpSpeed = that.jumperVerticalUpSpeed;
-				this.jumperVerticalDownSpeed = that.jumperJumpDownSpeed;
+				this.jumperVerticalUpSpeed = that.jumperLeftUpSpeed;
+				this.jumperVerticalDownSpeed = that.jumperLeftDownSpeed;
 			}
 		},
 		execute:function(sprite,context,time){
@@ -1166,9 +1169,9 @@ Game.prototype = {
 	showResume:function(name,url,callback,hide){
 		if(!hide){
 			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			// resume sound
+			this.playSound(this.resumeSound);
 		}
-		// resume sound
-		this.playSound(this.resumeSound);
 		// name 只是个标识
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){
