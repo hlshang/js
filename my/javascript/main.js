@@ -219,8 +219,8 @@ function Game(){
 		},
 		isInBlackRoom:function(){
 			if(that.entranceBlackRoom){
-				that.fleeBlackRoom--;
-				// 投掷三次或者点数相同
+				that.fleeBlackRoom = that.fleeBlackRoom > 0 ? that.fleeBlackRoom-- : 3;
+				// 投掷三次或者点数相同，则跳出小黑屋
 				if(!that.fleeBlackRoom || that.diceOneNum === that.diceTwoNum){
 					that.entranceBlackRoom = false;
 					return false;
@@ -255,7 +255,7 @@ function Game(){
 					that.rollDiceShow(true);
 					setTimeout(function(){
 						that.diceLocReset();
-					},800)
+					},500)
 					return;
 				}
 				var timeOut = setTimeout( function(){
@@ -1096,38 +1096,34 @@ Game.prototype = {
 		var that = this;
 		switch(index){
 			case this.resumeArr[0]:
-			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("one","resume-json/one.json",function(res){
-				that.resumeOne.call(that,res);
-			});
-			break;
+				this.showResume("one","resume-json/one.json",function(res){
+					that.resumeOne.call(that,res);
+				});
+				break;
 			case this.resumeArr[1]:
-			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("two","resume-json/two.json",function(res){
-				that.resumeTwo.call(that,res);
-			});
-			break;
+				this.showResume("two","resume-json/two.json",function(res){
+					that.resumeTwo.call(that,res);
+				});
+				break;
 			case this.resumeArr[2]:
-			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("three","resume-json/three.json",function(res){
-				that.resumeThree.call(that,res);
-			});
-			break;
+				this.showResume("three","resume-json/three.json",function(res){
+					that.resumeThree.call(that,res);
+				});
+				break;
 			case this.resumeArr[3]:
-			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
-			this.showResume("four","resume-json/four.json",function(res){
-				that.resumeFour.call(that,res);
-			});
-			break;
+				this.showResume("four","resume-json/four.json",function(res){
+					that.resumeFour.call(that,res);
+				});
+				break;
 			case 2:
-			this.showMiniGame();
-			break;
+				this.showMiniGame();
+				break;
 			case 6:
-			this.showBlackRoom();
-			break;
+				this.showBlackRoom();
+				break;
 			default:
-			this.rollDiceShow(true);
-			break;
+				this.rollDiceShow(true);
+				break;
 		}
 	},
 	shortCutShowResume:function(){
@@ -1139,28 +1135,24 @@ Game.prototype = {
 			switch(code){
 				case 89:
 					// Y
-					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 					that.showResume("one","resume-json/one.json",function(res){
 						that.resumeOne.call(that,res)
 					});
 					break;
 				case 80:
 					// P
-					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 					that.showResume("two","resume-json/two.json",function(res){
 						that.resumeTwo.call(that,res);
 					});
 					break;
 				case 66:
 					// B
-					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 					that.showResume("three","resume-json/three.json",function(res){
 						that.resumeThree.call(that,res);
 					});
 					break;
 				case 78:
 					// N
-					that.gameResumeDetail.className = "game-resume-detail zoomIn animated";
 					that.showResume("four","resume-json/four.json",function(res){
 						that.resumeFour.call(that,res);
 					});
@@ -1171,7 +1163,10 @@ Game.prototype = {
 			}
 		},false)
 	},
-	showResume:function(name,url,callback){
+	showResume:function(name,url,callback,hide){
+		if(!hide){
+			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+		}
 		// resume sound
 		this.playSound(this.resumeSound);
 		// name 只是个标识
@@ -1215,6 +1210,8 @@ Game.prototype = {
 			that.shortCutView = false;
 			that.rollDiceShow(true);
 			this.parentNode.className = "game-resume-detail hide";
+			// 清空原有的内容
+			that.gameResumeWrap.innerHTML = "";
 		},false)
 	},
 	getSprites:function(name){

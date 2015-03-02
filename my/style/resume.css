@@ -311,11 +311,15 @@ body{
   margin-bottom: 20px;
 }
 .poker-tips-wrap{
+  width: 200px;
+  height: 30px;
   position: absolute;
   z-index: 10;
   left:50%;
   top:50%;
-  transform:translate(-50%,-50%);
+  margin-left: -100px;
+  margin-top: -15px;
+  /*transform:translate(-50%,-50%);*/
   padding: 20px 10px;
   border: 1px solid #333;
   color: #fff;
