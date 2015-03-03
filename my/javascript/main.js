@@ -84,10 +84,10 @@ function Game(){
 	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
 	// 向上跳跃时和下降时的初始速度（向上行走）
 	this.jumperLeftUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1.2 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 	// 向上跳跃时和下降时的初始速度（向下行走）
 	this.jumperRightUpSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperRightDownSpeed = (this.jumperGridMeter * 2.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperRightDownSpeed = (this.jumperGridMeter * 2.2 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
 	this.runnerAniTime = 300;
@@ -360,22 +360,21 @@ function Game(){
 			if(sprite.moveTimer.isRunning()){
 				var framePerSecond = 1/that.commonFps;
 				sprite.velocityX = that.jumperPixEverySec * framePerSecond;
-
 				if(that.currentPointer > 6 && that.currentPointer < 19){
 					sprite.left +=  sprite.velocityX;
 				}else{
 					sprite.left -=  sprite.velocityX;
 				}
-				// 修正平移距离差
-				this.distanceGap= Math.abs(sprite.left - this.originLeft) - that.horizontalPacePix;
-				if(this.distanceGap > 0){
-					this.originLeft = 0;
-					if(that.currentPointer > 6 && that.currentPointer < 19){
-						sprite.left -= this.distanceGap;
-					}else{
-						sprite.left += this.distanceGap;
-					}
-				}
+				// // 修正平移距离差
+				// this.distanceGap= Math.abs(sprite.left - this.originLeft) - that.horizontalPacePix;
+				// if(this.distanceGap > 0){
+				// 	this.originLeft = 0;
+				// 	if(that.currentPointer > 6 && that.currentPointer < 19){
+				// 		sprite.left -= this.distanceGap;
+				// 	}else{
+				// 		sprite.left += this.distanceGap;
+				// 	}
+				// }
 			}
 			
 			if(sprite.moveTimer.isExpired()){
@@ -422,7 +421,7 @@ function Game(){
 			}
 		}
 	};
-	this.jumperBehavior = [this.jumperJumpFallBehavior,this.jumperMoveBehavior,this.jumperActionBehavior];
+	this.jumperBehavior = [/*this.jumperJumpFallBehavior,*/this.jumperMoveBehavior,this.jumperActionBehavior];
 
 	this.runnerRunActionBehavior = {
 		lastAdvanceTime:0,
