@@ -56,12 +56,16 @@ function Game(){
 	this.matrixSlope = 45 * Config.deg - Config.slopeAngle * Config.deg;
 
 	// 行走地图的真实高度和宽度（比行走图多一格）
-	this.mapRealHorizontal = (60 * 7 * Math.tan(this.matrixSlope) + 60 * 7 * (1 / Math.cos(this.matrixSlope))) * Math.SQRT2 / 2;
-	this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.slopeAngle);
-	
+	// this.mapRealHorizontal = (60 * 7 * Math.tan(this.matrixSlope) + 60 * 7 * (1 / Math.cos(this.matrixSlope))) * Math.SQRT2 / 2;
+	// this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.slopeAngle);
+	this.mapRealHorizontal = 60 * 7 * Math.cos(this.matrixSlope) / Math.cos(this.slopeAngle);
+	this.mapRealVertical = this.mapRealHorizontal * Math.tan(this.matrixSlope); 
+
 	// 行走地图宽度和高度（1/2）
-	this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.SQRT2 / 2;
-	this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
+	// this.mapHorizontal = (60 * 6 * Math.tan(this.matrixSlope) + 60 * 6 * (1 / Math.cos(this.matrixSlope))) * Math.SQRT2 / 2;
+	// this.mapVertical = this.mapHorizontal * Math.tan(this.slopeAngle);
+	this.mapHorizontal = 60 * 6 * Math.cos(this.matrixSlope) / Math.cos(this.slopeAngle);
+	this.mapVertical = this.mapHorizontal * Math.tan(this.matrixSlope);
 
 	// 行走地图在画布中的离左上角的坐标（水平垂直居中）
 	this.walkMapLeft = this.canvasWidth / 2  - this.mapRealHorizontal;
@@ -84,16 +88,16 @@ function Game(){
 	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
 	// 向上跳跃时和下降时的初始速度（向上行走）
 	this.jumperLeftUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1.2 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 	// 向上跳跃时和下降时的初始速度（向下行走）
 	this.jumperRightUpSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperRightDownSpeed = (this.jumperGridMeter * 2.2 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperRightDownSpeed = (this.jumperGridMeter * 2 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
 	this.runnerAniTime = 300;
 	// 跑步者水平速度（每秒水平移动多少像素）
 	this.runnerHPixEverySec = Math.floor(this.horizontalPacePix / (this.runnerAniTime / 1000));
-	this.runnerVPixEverySec = this.runnerHPixEverySec * Math.tan(this.slopeAngle);
+	this.runnerVPixEverySec = this.runnerHPixEverySec * Math.tan(this.matrixSlope);
 	// 开始跳跃
 	this.startJump = false;
 	// 开始移动
@@ -380,8 +384,8 @@ function Game(){
 			if(sprite.moveTimer.isExpired()){
 				// 起点和顶点重新定位
 				if(that.currentPointer === 12){
-					that.runner.top = that.rolesHalfLeft;
-					that.runner.left = that.rolesHalfTop;
+					that.jumper.top = that.rolesHalfLeft;
+					that.jumper.left = that.rolesHalfTop;
 				}
 				if(that.currentPointer === 24){
 					that.jumper.top = that.rolesInitialTop;
@@ -421,7 +425,7 @@ function Game(){
 			}
 		}
 	};
-	this.jumperBehavior = [/*this.jumperJumpFallBehavior,*/this.jumperMoveBehavior,this.jumperActionBehavior];
+	this.jumperBehavior = [this.jumperJumpFallBehavior,this.jumperMoveBehavior,this.jumperActionBehavior];
 
 	this.runnerRunActionBehavior = {
 		lastAdvanceTime:0,
@@ -766,7 +770,7 @@ Game.prototype = {
  		this.mapOffContext.save();
 		this.mapOffContext.translate(this.mapRealHorizontal,0);
 		this.mapOffContext.rotate(45 * Config.deg);
-		this.mapOffContext.transform(1,-this.matrixSlope,-this.matrixSlope,1,0,0);
+		this.mapOffContext.transform(1,-Math.tan(this.slopeAngle),-Math.tan(this.slopeAngle),1,0,0);
 
 		for(var i = 0;i < 24;i++){
 			if(i === 0){
@@ -1078,7 +1082,7 @@ Game.prototype = {
 					that.pokerTipsWrap.innerHTML = res.info;
 				},true);
 			}else{
-				that.pokerTipsWrap.innerHTML = "你猜错啦,下次再来吧！！！";
+				that.pokerTipsWrap.innerHTML = "你猜错啦,手气不佳呀，下次再来吧！么么哒~";
 			}
 		},500)
 		setTimeout(function(){
