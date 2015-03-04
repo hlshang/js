@@ -476,10 +476,11 @@ function Game(){
 				var framePerSecond = 1/that.commonFps;
 				sprite.velocityX = that.runnerHPixEverySec * framePerSecond;
 				sprite.velocityY = that.runnerVPixEverySec * framePerSecond;
+
 				if(that.currentPointer > 6 && that.currentPointer < 19){
-					sprite.left +=  sprite.velocityX;
+					sprite.left += sprite.velocityX;
 				}else{
-					sprite.left -=  sprite.velocityX;
+					sprite.left -= sprite.velocityX;
 				}
 
 				if(that.currentPointer > 0 && that.currentPointer < 13){
