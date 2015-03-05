@@ -88,10 +88,10 @@ function Game(){
 	// 根据 vt + 0.5 * gt² = s (加速度方向为负)公式求出：
 	// 向上跳跃时和下降时的初始速度（向上行走）
 	this.jumperLeftUpSpeed = (this.jumperGridMeter * 2 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1.1 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperLeftDownSpeed = (this.jumperGridMeter * 1.15 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 	// 向上跳跃时和下降时的初始速度（向下行走）
 	this.jumperRightUpSpeed = (this.jumperGridMeter * 1 + 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
-	this.jumperRightDownSpeed = (this.jumperGridMeter * 2.2 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
+	this.jumperRightDownSpeed = (this.jumperGridMeter * 2.25 - 0.5 * Config.GRAVITY_FORCE * Math.pow(this.jumperJumpAniTime / 1000,2)) / (this.jumperJumpAniTime / 1000);
 
 	// 跑步者每一格的时间
 	this.runnerAniTime = 300;
@@ -429,26 +429,26 @@ function Game(){
 
 	this.runnerRunActionBehavior = {
 		lastAdvanceTime:0,
-		changeFrequencyTime:80,
+		changeFrequencyTime:100,
 		updateAdvance:function(sprite){
 			if(that.currentPointer >= 0 && that.currentPointer < 6){
-				if(sprite.painter.cellsIndex >= 7){
+				if(sprite.painter.cellsIndex >= 3){
 					sprite.painter.cellsIndex = 0;
 				}
 			}
 			if(that.currentPointer >= 6 && that.currentPointer < 12){
-				if(sprite.painter.cellsIndex >= 14){
-					sprite.painter.cellsIndex = 8;
+				if(sprite.painter.cellsIndex >= 7){
+					sprite.painter.cellsIndex = 4;
 				}
 			}
 			if(that.currentPointer >= 12 && that.currentPointer < 18){
-				if(sprite.painter.cellsIndex >= 21){
-					sprite.painter.cellsIndex = 16;
+				if(sprite.painter.cellsIndex >= 11){
+					sprite.painter.cellsIndex = 8;
 				}
 			}
 			if(that.currentPointer >= 18 && that.currentPointer < 24){
-				if(sprite.painter.cellsIndex >= 28){
-					sprite.painter.cellsIndex = 24;
+				if(sprite.painter.cellsIndex >= 15){
+					sprite.painter.cellsIndex = 12;
 				}
 			}
 		},
@@ -482,7 +482,6 @@ function Game(){
 				}else{
 					sprite.left -= sprite.velocityX;
 				}
-
 				if(that.currentPointer > 0 && that.currentPointer < 13){
 					sprite.top -= sprite.velocityY;
 				}else{
@@ -490,10 +489,6 @@ function Game(){
 				}
 			}
 			if(sprite.runTimer.isExpired()){
-				if(that.currentPointer === 12){
-					that.runner.top = that.rolesHalfTop;
-					that.runner.left = that.rolesHalfLeft;
-				}
 				if(that.currentPointer === 24){
 					that.runner.top = that.rolesInitialTop;
 					that.runner.left = that.rolesInitialLeft;
@@ -1020,18 +1015,18 @@ Game.prototype = {
 	},
 	confirmRoleWH:function(){
 		if(this.role === "runner"){
-			this.roleWidth = 50;
-			this.roleHeight = 30;
+			this.roleWidth = 55;
+			this.roleHeight = 80;
 		}else {
 			this.roleWidth = 150;
-			this.roleHeight = 100;
+			this.roleHeight = 150;
 		}
 		// 人物初始位置
 		this.rolesInitialLeft = this.canvasWidth / 2 - this.roleWidth / 2;
-		this.rolesInitialTop = this.walkMapTop + this.mapVertical * 2 - this.roleHeight - this.verticalPacePix;
+		this.rolesInitialTop = this.walkMapTop + this.mapRealVertical * 2 - this.roleHeight - this.verticalPacePix;
 		// 人物在顶点的位置
 		this.rolesHalfLeft = this.rolesInitialLeft;
-		this.rolesHalfTop = this.rolesInitialTop - 12 * this.verticalPacePix;
+		this.rolesHalfTop = this.rolesInitialTop - 2 * this.mapVertical;
 	},
 	showBlackRoom:function(){
 		var that = this;
