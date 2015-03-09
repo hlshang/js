@@ -153,6 +153,7 @@ function Game(){
 	this.cutSound = Config.mediaSource[5];
 
 	this.coverSlideTime = 400;
+	this.lastFrameTime = 0;
 	this.pauseGameTag = false;
 	this.commonFps = 60;
 	this.resumeArr = [];
@@ -525,7 +526,7 @@ Game.prototype = {
 			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
 				document.body.removeChild(that.gameCoverWrap);
 				that.cutDown(that.cutDownTime,function(){
-					document.body.removeChild(that.gameCutDown);
+					// document.body.removeChild(that.gameCutDown);
 					that.startGame();
 				});
 			})
@@ -548,6 +549,8 @@ Game.prototype = {
 
 		// show fps
 		this.showFps();
+		// window blur/focus
+		this.windowFocus();
 
 		window.requestAnimationFrame(function(time){
 			that.animate.call(that,time);
@@ -560,7 +563,7 @@ Game.prototype = {
 				window.requestAnimationFrame(function(time){
 					that.animate.call(that,time);
 				})
-			},100)
+			},200)
 		}else{
 			this.commonFps = this.fps(time);
 			this.drawSprites(time);
@@ -1246,27 +1249,6 @@ Game.prototype = {
 		this.jsonCells[name] = cellDatas;
 		return cellDatas;
 	},
-	clearPause:function(){
-		var that = this;
-		document.addEventListener("keydown",function(e){
-			var code = e.keyCode;
-			// Enter
-			if(code === 13){
-				that.pauseGameTag = false;
-			}
-		})
-	},
-	pauseGame:function(){
-		var that = this;
-		if(this.pauseGameTag) return;
-		document.addEventListener("keydown",function(e){
-			var code = e.keyCode;
-			// Space
-			if(code === 32){
-				that.pauseGameTag = true;
-			}
-		})
-	},
 	currentRunnerLoc:function(){
 		this.currentPointer++;
 		if(this.currentPointer === 25){
@@ -1309,6 +1291,44 @@ Game.prototype = {
 		setTimeout(function(){
 			that.showFps.call(that)
 		},300);
+	},
+	pauseGame:function(){
+		var that = this;
+		document.addEventListener("keydown",function(e){
+			var code = e.keyCode;
+			// Space
+			if(code === 32){
+				that.togglePaused();
+			}
+		})
+	},
+	togglePaused:function(){
+		var now = +new Date();
+		this.pauseGameTag = !this.pauseGameTag;
+
+		if(this.pauseGameTag){
+			// 记录开始暂停的时间点
+			this.pauseStartTime = now;
+		}else{
+			this.lastFrameTime += (now - this.pauseStartTime);
+		}
+	},
+	// 窗口失去/获取焦点时的暂停处理
+	windowFocus:function(){
+		var that = this;
+		window.onblur = function(){
+			if(!that.pauseGameTag){
+				that.togglePaused();
+			}
+		}
+		window.onfocus = function(){
+			if(that.pauseGameTag){
+				// 2s后继续
+				that.cutDown(2,function(){
+					that.togglePaused();
+				});
+			}
+		}
 	},
 	// 上下滑动
 	coverAni:function(obj,lastTop,aniTime,aniWay,fn){
