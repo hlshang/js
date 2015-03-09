@@ -539,7 +539,6 @@ Game.prototype = {
 
 		this.confirmRoleWH();
 		this.pauseGame();
-		this.clearPause();
 		this.createResumeLoc();
 		this.rollDiceShow(true);
 
@@ -683,6 +682,7 @@ Game.prototype = {
 				cutInterVal = setTimeout(function(){
 					if(i === time){
 						clearTimeout(cutInterVal);
+						$gameCutDown.className = "game-cutdown hide";
 						callback();
 						return false;
 					}
