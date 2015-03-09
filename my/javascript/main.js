@@ -577,7 +577,7 @@ Game.prototype = {
 			rollCountW,
 			rollCountDirect = "right";
 		this.rollBtn.addEventListener("mousedown",function(){
-			if(that.mousedown) return;
+			if(that.mousedown || that.pauseGameTag) return;
 			that.mousedown = true;
 			rollCountInter = setInterval(function(){
 				rollCountW = that.rollCountSelect.style.width ? that.rollCountSelect.style.width : 0;
@@ -595,7 +595,7 @@ Game.prototype = {
 			},16)
 		},false)
 		this.rollBtn.addEventListener("mouseup",function(){
-			if(that.mouseup) return;
+			if(that.mouseup || that.pauseGameTag) return;
 			that.mouseup = true;
 			clearInterval(rollCountInter);
 			that.playSound(that.diceSound);
