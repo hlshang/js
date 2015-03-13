@@ -48,27 +48,27 @@
 		loadMain:function(obj,callback){
 			var that = this,
 				imageObj = obj[0],
-				mediaObj = obj[1],
-				jsonObj = obj[2],
+				// mediaObj = obj[1],
+				jsonObj = obj[1],
 				imageId = 0,
-				mediaId = 0,
+				// mediaId = 0,
 				jsonId = 0,
 				jsonFailId = 0;
-			var mediaHandler = function(){
-				Config.mediaSource.push(this);
-				mediaId++;
-				if(mediaId < mediaObj.length){
-					loadMedia();
-				}
-				that.progress = (imageId + mediaId)/sourceNums;
-				that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
+			// var mediaHandler = function(){
+			// 	Config.mediaSource.push(this);
+			// 	mediaId++;
+			// 	if(mediaId < mediaObj.length){
+			// 		loadMedia();
+			// 	}
+			// 	that.progress = (imageId + mediaId)/sourceNums;
+			// 	that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
 
-				this.removeEventListener("canplay",mediaHandler,false);
+			// 	this.removeEventListener("canplay",mediaHandler,false);
 				
-				if(mediaId === mediaObj.length){
-					loadJson();
-				}
-			};
+			// 	if(mediaId === mediaObj.length){
+			// 		loadJson();
+			// 	}
+			// };
 			var loadImg = function(){
 				var	image = new Image();
 				image.src = imageObj[imageId];
@@ -83,7 +83,8 @@
 						that.progress = imageId/sourceNums;
 						that.showProgressBar(that.progress,imageObj[imageId - 1]);
 						if(imageId === imageObj.length){
-							loadMedia();
+							// loadMedia();
+							loadJson();
 						}
 					}
 				}
@@ -95,19 +96,19 @@
 				}
 			}
 
-			function loadMedia() {
-				var media = document.createElement("audio");
-				media.src = mediaObj[mediaId];
-				// 不支持video/audio，则跳过，不要音频文件也罢！
-				if(!media.play){
-					mediaId = mediaObj.length;
-					that.progress = (imageId + mediaId)/sourceNums;
-					that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
-					loadJson();
-					return;
-				}
-				media.addEventListener("canplay",mediaHandler,false)
-			}
+			// function loadMedia() {
+			// 	var media = document.createElement("audio");
+			// 	media.src = mediaObj[mediaId];
+			// 	// 不支持video/audio，则跳过，不要音频文件也罢！
+			// 	if(!media.play){
+			// 		mediaId = mediaObj.length;
+			// 		that.progress = (imageId + mediaId)/sourceNums;
+			// 		that.showProgressBar(that.progress,mediaObj[mediaId - 1]);
+			// 		loadJson();
+			// 		return;
+			// 	}
+			// 	media.addEventListener("canplay",mediaHandler,false)
+			// }
 
 			function loadJson(){
 				var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
@@ -119,7 +120,7 @@
 							if(jsonId < jsonObj.length){
 								loadJson();
 							}
-							that.progress = (imageId + mediaId + jsonId)/sourceNums;
+							that.progress = (imageId + jsonId)/sourceNums;
 							that.showProgressBar(that.progress,jsonObj[jsonId - 1]);
 							if(jsonId === jsonObj.length){
 								callback();

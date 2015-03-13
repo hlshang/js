@@ -138,19 +138,18 @@ function Game(){
 	this.pokerList = document.querySelectorAll(".poker-list");
 	this.pokerTipsWrap = document.querySelector(".poker-tips-wrap");
 	this.gameBlackRoom = document.querySelector(".game-black-room");
-	// 音效
-	//开始音效
-	this.startSound = Config.mediaSource[0];
-	// 骰子音效
-	this.diceSound = Config.mediaSource[1];
-	// 跳跃音效
-	this.jumperSound = Config.mediaSource[2]
-	// 跑步音效
-	this.runnerSound = Config.mediaSource[3];
-	// resume sound
-	this.resumeSound = Config.mediaSource[4];
 	// cutDown sound
-	this.cutSound = Config.mediaSource[5];
+	this.cutSound = document.getElementById("mp3-cutdown");
+	//开始音效
+	this.startSound = document.getElementById("mp3-start");
+	// 骰子音效
+	this.diceSound = document.getElementById("mp3-dice");
+	// 跳跃音效
+	this.jumperSound = document.getElementById("mp3-jumper");
+	// 跑步音效
+	this.runnerSound = document.getElementById("mp3-runner");
+	// resume sound
+	this.resumeSound = document.getElementById("mp3-resume");
 
 	this.coverSlideTime = 400;
 	this.lastFrameTime = 0;
@@ -247,8 +246,6 @@ function Game(){
 				that.jumper.moveTimer.start();
 			}
 			that.startMoveAll = true;
-			// play jumper sound
-			// that.playSound(that.jumperSound);
 		},
 		execute:function(sprite,context,time){
 			var self = this;
@@ -300,9 +297,6 @@ function Game(){
 	this.diceTwoBehaivor = [this.diceTwoPaintBehaivor,this.diceTwoMoveBehaivor];
 
 	this.jumperJumpFallBehavior = {
-		originTop:0,
-		distanceGap:0,
-		distanceGapB:0,
 		direction:"up",
 		runnerVerticalSpeed : 0,
 		jumpDirection:function(){
@@ -318,9 +312,6 @@ function Game(){
 		},
 		execute:function(sprite,context,time){
 			if(!that.startJump) return;
-			if(!this.originTop){
-				this.originTop = sprite.top;
-			}
 			if(sprite.jumpTimer.isRunning()){
 				// 确认方向
 				this.jumpDirection();
@@ -490,6 +481,7 @@ function Game(){
 				}
 			}
 			if(sprite.runTimer.isExpired()){
+				// 修正起点位置
 				if(that.currentPointer === 24){
 					that.runner.top = that.rolesInitialTop;
 					that.runner.left = that.rolesInitialLeft;
@@ -513,8 +505,6 @@ function Game(){
 		}
 	};
 	this.runnerBehavior = [this.runnerRunActionBehavior,this.runnerMoveBehavior];
-
-	this.sprites = [];
 }
 
 Game.prototype = {
@@ -526,7 +516,7 @@ Game.prototype = {
 			that.coverAni(that.selectRoleWrap,-560,that.coverSlideTime,gameEasing.easeIn,function(){
 				document.body.removeChild(that.gameCoverWrap);
 				that.cutDown(that.cutDownTime,function(){
-					// document.body.removeChild(that.gameCutDown);
+					// 开始游戏
 					that.startGame();
 				});
 			})
@@ -562,7 +552,7 @@ Game.prototype = {
 				window.requestAnimationFrame(function(time){
 					that.animate.call(that,time);
 				})
-			},200)
+			},100)
 		}else{
 			this.commonFps = this.fps(time);
 			this.drawSprites(time);
@@ -631,6 +621,7 @@ Game.prototype = {
 		},1500)
 	},
 	diceDetailNum:function(diceAll){
+		// 根据总筛子数，随机分配每个筛子的点数
 		var diceTotalReal = diceAll - 2;
 		if(diceTotalReal > 5){
 			this.diceOneNum = this.intervalRandom(diceTotalReal - 5,5)
@@ -773,18 +764,18 @@ Game.prototype = {
 
 		for(var i = 0;i < 24;i++){
 			if(i === 0){
-				mapBlockGreen.top = 60*24/4;
-				mapBlockGreen.left = 60 * 6;
+				mapBlockGreen.top = 360;// 60 * 24 / 4
+				mapBlockGreen.left = 360;// 60 * 6
 				mapBlockGreen.paint(this.mapOffContext);
 			}
 			if(i === 2){
-				mapBlockGrey.top = 60*24/4;
-				mapBlockGrey.left = 60 * 4;
+				mapBlockGrey.top = 360;// 60 * 24 / 4
+				mapBlockGrey.left = 240;// 60 * 4
 				mapBlockGrey.paint(this.mapOffContext);
 			}
 			if(i === 6){
 				mapBlockBlack.left = 0;
-				mapBlockBlack.top = 60 * 6;
+				mapBlockBlack.top = 360;// 60 * 6
 				mapBlockBlack.paint(this.mapOffContext)
 			}
 			if(i === 12){
@@ -793,8 +784,8 @@ Game.prototype = {
 				mapTopCorner.paint(this.mapOffContext);
 			}
 			if(i < 6 && i !== 0 && i !== 2){
-				mapBlockBlue.top = 60*24/4;
-				mapBlockBottom.top = 60*24/4;
+				mapBlockBlue.top = 360;// 60 * 24 / 4
+				mapBlockBottom.top = 360;// 60 * 24 / 4
 
 				if(this.resumeArr.indexOf(i) !== -1){
 					mapBlockBlue.left = 60 * (6 - i);
@@ -808,10 +799,10 @@ Game.prototype = {
 				mapBlockRed.left = 0;
 				mapBlockRight.left = 0;
 				if(this.resumeArr.indexOf(i) !== -1){
-					mapBlockRed.top = 60*(12 - i);
+					mapBlockRed.top = 60 * (12 - i);
 					mapBlockRed.paint(this.mapOffContext)
 				}else{
-					mapBlockRight.top = 60*(12 - i);
+					mapBlockRight.top = 60 * (12 - i);
 					mapBlockRight.paint(this.mapOffContext)
 				}
 			}
@@ -827,13 +818,13 @@ Game.prototype = {
 				}
 			}
 			if(i >= 18 && i < 24){
-				mapBlockWBlue.left = 60 * 6;
-				mapBlockRight.left = 60 * 6;
+				mapBlockWBlue.left = 360;// 60 * 6
+				mapBlockRight.left = 360;// 60 * 6
 				if(this.resumeArr.indexOf(i) !== -1){
-					mapBlockWBlue.top = 60*(i - 18);
+					mapBlockWBlue.top = 60 * (i - 18);
 					mapBlockWBlue.paint(this.mapOffContext)
 				}else{
-					mapBlockRight.top = 60*(i - 18);
+					mapBlockRight.top = 60 * (i - 18);
 					mapBlockRight.paint(this.mapOffContext)
 				}
 			}
@@ -945,8 +936,8 @@ Game.prototype = {
 																this.findCellData(this.role,Config.jsonObj["runners"])),this.runnerBehavior);
 		this.runnerOffCanvas = document.createElement("canvas");
 		this.runnerOffContext = this.runnerOffCanvas.getContext("2d");
-		this.runnerOffCanvas.width = 50;
-		this.runnerOffCanvas.height = 83;
+		this.runnerOffCanvas.width = 55;
+		this.runnerOffCanvas.height = 80;
 
 		this.runner.runTimer = new AnimationTimer(this.runnerAniTime);
 	},
@@ -1169,8 +1160,10 @@ Game.prototype = {
 		},false)
 	},
 	showResume:function(name,url,callback,hide){
+		var that = this;
 		if(!hide){
 			this.gameResumeDetail.className = "game-resume-detail zoomIn animated";
+			this.gameResumeWrap.className = "game-resume-wrap loading";
 			// resume sound
 			this.playSound(this.resumeSound);
 		}
@@ -1178,6 +1171,8 @@ Game.prototype = {
 		var xmlHttp = new XMLHttpRequest() || new ActiveXObject("Microsoft.XMLHTTP");
 		xmlHttp.onreadystatechange = function(){
 			if(xmlHttp.readyState === 4){
+				// 去除loading
+				that.gameResumeWrap.className = "game-resume-wrap";
 				if(xmlHttp.status === 200){
 					var res = JSON.parse(xmlHttp.responseText);
 					callback(res);
@@ -1219,15 +1214,15 @@ Game.prototype = {
 			that.gameResumeWrap.innerHTML = "";
 		},false)
 	},
-	getSprites:function(name){
-		var len = this.sprites.length;
-		for(var i = 0;i < len;i++){
-			if(name === this.sprites[i].name){
-				return this.sprites[i];
-			}
-		}
-		return null;
-	},
+	// getSprites:function(name){
+	// 	var len = this.sprites.length;
+	// 	for(var i = 0;i < len;i++){
+	// 		if(name === this.sprites[i].name){
+	// 			return this.sprites[i];
+	// 		}
+	// 	}
+	// 	return null;
+	// },
 	soundIsPlaying:function(sound){
 		return !sound.ended && sound.currentTime > 0;
 	},
