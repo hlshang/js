@@ -3,12 +3,46 @@
 	margin: 0
 }
 body{
-	font-family: "å¾®è½¯é›…é»‘";
+	font-family: "Î¢ÈíÑÅºÚ";
 	background-color: #eee;
 }
 .hide{
 	display: none;
 }
+.loading{
+  position: absolute;
+  left:50%;
+  top:50%;
+  -webkit-transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%);
+}
+.loading:before,.loading:after,.loading {
+  border-radius: 50%;
+  width: 2.5em;
+  height: 2.5em;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation: bouncedelay 1.8s infinite ease-in-out;
+  animation: bouncedelay 1.8s infinite ease-in-out;
+}
+.loading {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+.loading:before {
+  left: -3.5em;
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+.loading:after {
+  left: 3.5em;
+}
+.loading:before,.loading:after {
+  content: '';
+  position: absolute;
+  top: 0;
+}
+
 .canvas-main{
 	position: absolute;
 	left: 50%;
@@ -17,7 +51,7 @@ body{
 	margin-top:-280px;
 	width: 1100px;
 	height: 560px;
-	background: url(../images/grass-bg.png) repeat left top;
+	background: url(../img/grass-bg.png) repeat left top;
 	border-radius: 5px;
 }
 .load-precent-wrap{
@@ -60,7 +94,7 @@ body{
 	width: 310px;
 	height: 222px;
 	margin:100px auto 80px;
-	background: url(../images/game-cover.png) no-repeat left top;
+	background: url(../img/game-cover.png) no-repeat left top;
 }
 .game-resume{
 	position: absolute;
@@ -71,17 +105,17 @@ body{
 .game-resume.one{
 	left: -10px;
 	top: 60px;
-	background: url(../images/sub-img.png) no-repeat -69px -777px;
+	background: url(../img/sub-img.png) no-repeat -69px -777px;
 }
 .game-resume.two{
 	right: -30px;
-	background: url(../images/sub-img.png) no-repeat -389px -823px;
+	background: url(../img/sub-img.png) no-repeat -389px -823px;
 }
 .start-game-btn{
 	width: 250px;
 	height: 50px;
 	margin:0 auto;
-	background:url(../images/sub-img.png) no-repeat -139px -775px;
+	background:url(../img/sub-img.png) no-repeat -139px -775px;
 	cursor: pointer;
 }
 .game-cover-wrap{
@@ -137,17 +171,17 @@ body{
 .role-list.boy p{
   width: 51px;
   height: 138px;
-	background: url(../images/sub-img.png) no-repeat -420px -485px;
+	background: url(../img/sub-img.png) no-repeat -420px -485px;
 }
 .role-list.girl p{
   width: 49px;
   height: 131px;
-	background: url(../images/sub-img.png) no-repeat -420px -623px;
+	background: url(../img/sub-img.png) no-repeat -420px -623px;
 }
 .role-list.runner p{
   width: 80px;
   height: 124px;
-	background: url(../images/sub-img.png) no-repeat -420px -360px;
+	background: url(../img/sub-img.png) no-repeat -420px -360px;
 }
 .game-cutdown{
 	position: absolute;
@@ -155,24 +189,25 @@ body{
 	top:50%;
 	width: 55px;
 	height: 63px;
+  z-index: 1002;
 	-webkit-transform:translate(-50%,-50%);
 	-moz-transform:translate(-50%,-50%);
 	transform:translate(-50%,-50%);
 }
 .game-cutdown-1{
-	background: url(../images/sub-img.png) no-repeat -453px -823px;
+	background: url(../img/sub-img.png) no-repeat -453px -823px;
 }
 .game-cutdown-2{
-	background: url(../images/sub-img.png) no-repeat -133px -825px;
+	background: url(../img/sub-img.png) no-repeat -133px -825px;
 }
 .game-cutdown-3{
-	background: url(../images/sub-img.png) no-repeat -188px -825px;
+	background: url(../img/sub-img.png) no-repeat -188px -825px;
 }
 .game-cutdown-4{
-	background: url(../images/sub-img.png) no-repeat -243px -825px;
+	background: url(../img/sub-img.png) no-repeat -243px -825px;
 }
 .game-cutdown-5{
-	background: url(../images/sub-img.png) no-repeat -298px -825px;
+	background: url(../img/sub-img.png) no-repeat -298px -825px;
 }
 .game-resume-detail{
 	width: 500px;
@@ -184,7 +219,7 @@ body{
 	margin-left:-250px;
 	margin-top: -180px;
 	color:#fafafa;
-	background: url(../images/sub-img.png) no-repeat 0 0;
+	background: url(../img/sub-img.png) no-repeat 0 0;
 }
 .game-resume-wrap{
   position: absolute;
@@ -238,10 +273,10 @@ body{
   margin:0 auto;
   width: 69px;
   height: 69px;
-  background: url(../images/sub-img.png) no-repeat -420px -754px;
+  background: url(../img/sub-img.png) no-repeat -420px -754px;
 }
 .roll-dice-btn:hover{
-  background: url(../images/sub-img.png) no-repeat 0 -777px;
+  background: url(../img/sub-img.png) no-repeat 0 -777px;
   cursor: pointer;
 }
 .roll-count-select-wrap{
@@ -360,7 +395,7 @@ body{
 }
 .poker-list-back{
   z-index: 10;
-  background: url(../images/sub-img.png) no-repeat 0 -360px;
+  background: url(../img/sub-img.png) no-repeat 0 -360px;
 }
 .poker-list{
   -webkit-transform:rotateY(180deg);
@@ -371,19 +406,19 @@ body{
 .poker-list.cover{
 }
 .poker-list.one{
-  background: url(../images/sub-img.png) no-repeat -140px -360px;
+  background: url(../img/sub-img.png) no-repeat -140px -360px;
 }
 .poker-list.two{
-  background: url(../images/sub-img.png) no-repeat -280px -360px;
+  background: url(../img/sub-img.png) no-repeat -280px -360px;
 }
 .poker-list.three{
-  background: url(../images/sub-img.png) no-repeat -280px -567px;
+  background: url(../img/sub-img.png) no-repeat -280px -567px;
 }
 .poker-list.four{
-  background: url(../images/sub-img.png) no-repeat -140px -568px;
+  background: url(../img/sub-img.png) no-repeat -140px -568px;
 }
 .poker-list.five{
-  background: url(../images/sub-img.png) no-repeat 0 -570px;
+  background: url(../img/sub-img.png) no-repeat 0 -570px;
 }
 .rollOver0{
   -webkit-transform:rotateY(0deg);
@@ -624,8 +659,8 @@ body{
   }
 
   100% {
-    -webkit-transform: ;
-            transform: ;
+    -webkit-transform: perspective(400px);
+            transform: perspective(400px);
   }
 }
 
@@ -657,8 +692,8 @@ body{
   }
 
   100% {
-    -webkit-transform: ;
-            transform: ;
+    -webkit-transform: perspective(400px);
+            transform: perspective(400px);
   }
 }
 
@@ -667,4 +702,25 @@ body{
           backface-visibility: visible !important;
   -webkit-animation-name: flipInY;
           animation-name: flipInY;
+}
+
+@-webkit-keyframes bouncedelay {
+  0%,
+  80%,
+  100% {
+    box-shadow: 0 2.5em 0 -1.3em #fff;
+  }
+  40% {
+    box-shadow: 0 2.5em 0 0 #fff;
+  }
+}
+@keyframes bouncedelay {
+  0%,
+  80%,
+  100% {
+    box-shadow: 0 2.5em 0 -1.3em #fff;
+  }
+  40% {
+    box-shadow: 0 2.5em 0 0 #fff;
+  }
 }
