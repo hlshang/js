@@ -4,12 +4,21 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
 	<title>My resume</title>
-	<link rel="stylesheet" type="text/css" href="style/resume.css">
-	<script src="javascript/config.js"></script>
-	<script src="javascript/animator.js"></script>
-	<script src="javascript/sprite.js"></script>
-	<script src="javascript/load.js"></script>
-	<script src="javascript/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/resume-min.css">
+	<script src="js/config-min.js"></script>
+	<script src="js/animator-min.js"></script>
+	<script src="js/sprite-min.js"></script>
+	<script src="js/load-min.js"></script>
+	<script src="js/main-min.js"></script>
+	<script>
+	document.addEventListener("DOMContentLoaded",function(){
+		if(/Android|iPad|iPhone|iPod|SymbianOS|Windows Phone/i.test(navigator.userAgent)){
+			var mScript = document.createElement("script");
+			mScript.src = "js/mobile-min.js";
+			document.body.appendChild(mScript);
+		}
+	},false)
+	</script>
 </head>
 <body>
 	<audio src="sounds/cutDown.mp3" id="mp3-cutdown" preload="auto"></audio>
@@ -38,12 +47,20 @@
 			</div>
 			<div id="roll-dice-btn" class="roll-dice-btn"></div>
 		</div>
+		<ol start="0" class="rules-wrap">
+			<li class="rules-list">连续按住START按钮并且松开可以选择骰子数（即人物要走的格数）。</li>
+			<li class="rules-list">在四个格中有简历内容（个人信息，联系方式等），人物跳到对应的格中则显示对应的简历内容。</li>
+			<li class="rules-list">跳到游戏环节并且游戏获得胜利即可快速查看简历。</li>
+			<li class="rules-list">好像也挺简单的，没什么好说的!</li>
+			<li class="rules-close-btn">x</li>
+		</ol>
+		<div class="audio-btn"></div>
 	</div>
 	<div class="game-cover-wrap">
 		<div class="game-cover">
 			<div class="game-cover-img">
-				<p class="game-resume one flipInY animated-slow infinite"></p>
-				<p class="game-resume two tada animated-slow infinite"></p>
+				<p class="game-resume one"></p>
+				<p class="game-resume two"></p>
 			</div>
 			<div class="load-precent-wrap">
 				<div id="load-precent"></div>
@@ -86,8 +103,9 @@
 		</div>
 	</div>
 	<div class="game-black-room hide"></div>
+	<div class="orientation-tip hide">横屏玩游戏效果更佳吆！</div>
 	<script>
-		var canvas,context;
+		var canvas,context,canvasBg,canvasBgContext;
 		document.addEventListener("DOMContentLoaded",function(){
 			canvas = document.getElementById("myCanvas");
 			context = canvas.getContext("2d"); 
@@ -96,10 +114,6 @@
 			canvasBgContext = canvasBg.getContext("2d");
 			
 			loadSources.init(Config.sourceList,function(){
-				// document.getElementById("load-precent-nums").className = "hide";
-				document.querySelector(".game-cover").removeChild(document.querySelector(".load-precent-wrap"));
-				document.querySelector(".start-game-btn").className = "start-game-btn";
-				// context.clearRect(0,0,canvas.width,canvas.height);
 				var game = new Game();
 				game.start();
 			});

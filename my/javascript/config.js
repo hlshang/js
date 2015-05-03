@@ -3,7 +3,14 @@ var Config = {
 	sourceList:{
 		"images":["img/main.png","img/embellish.png","img/jumpers.png","img/runners.png","img/sub-img.png"],
 		// "audio":["sounds/start.mp3","sounds/dice.mp3","sounds/jumper.mp3","sounds/runner.mp3","sounds/resume.mp3","sounds/cutDown.mp3"],
-		"json":["resume-json/main.json?1228","resume-json/embellish.json?1228","resume-json/jumpers.json?1228","resume-json/runners.json?0305"]
+		"json":["resume-json/main.json?0503","resume-json/embellish.json?0503","resume-json/jumpers.json?0503","resume-json/runners.json?0503"]
+	},
+	resumeJson:{
+		"personalInfo":"resume-json/resume-personalInfo.json?0503",
+		"contact":"resume-json/resume-contact.json?0503",
+		"blog":"resume-json/resume-blog.json?0503",
+		"experience":"resume-json/resume-experience.json?0503",
+		"shortCutKey":"resume-json/shortCut-key.json?0503"
 	},
 	// 三种资源
 	imgSource : [],
@@ -24,7 +31,7 @@ var Config = {
 	GRAVITY_FORCE : 9.81,
 	// deg
 	deg : Math.PI/180,
-	slopeAngle : 25,
+	slopeAngle : 22,
 	zoneWidth : 60,
 	zoneHeight : 60
-}
+};

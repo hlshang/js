@@ -1,10 +1,11 @@
-*{
+ï»¿*{
 	padding: 0;
 	margin: 0
 }
 body{
-	font-family: "Î¢ÈíÑÅºÚ";
-	background-color: #eee;
+	font-family: "å¾®è½¯é›…é»‘";
+	background-color: #6eb54f;
+  -webkit-user-select:none;
 }
 .hide{
 	display: none;
@@ -127,6 +128,7 @@ body{
 	margin-left: -550px;
 	margin-top:-280px;
 	overflow: hidden;
+  z-index: 1003;
 }
 .game-cover{  
 	position: absolute;
@@ -239,7 +241,11 @@ body{
   text-align: center;
 }
 .game-resume-wrap a{
-  color: #000
+  color: #eee;
+  margin-right: 5px;
+}
+.game-resume-wrap a:hover{
+  color:#ccc;
 }
 .game-resume-close{
   position: absolute;
@@ -250,11 +256,11 @@ body{
   cursor: pointer;
 }
 .game-black-room{
-  width: 500px;
   position: absolute;
   left: 50%;
   top:50%;
-  margin-left: -250px;
+  -webkit-transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%);
   background-color: #eee;
   padding: 15px 20px;
   font-size: 14px;
@@ -274,6 +280,7 @@ body{
   width: 69px;
   height: 69px;
   background: url(../img/sub-img.png) no-repeat -420px -754px;
+  -webkit-touch-callout:none;
 }
 .roll-dice-btn:hover{
   background: url(../img/sub-img.png) no-repeat 0 -777px;
@@ -385,12 +392,12 @@ body{
   -webkit-backface-visibility: hidden !important;
   -ms-backface-visibility: hidden !important;
   backface-visibility: hidden !important;
-  -webkit-transition-timing-function: ease;
-  transition-timing-function: ease;
-  -webkit-transition-duration: .6s;
-  transition-duration: .6s;
-  -webkit-transition-property:-webkit-transform;
-  transition-property:transform;
+  -webkit-transform: translateZ(0);
+  -ms-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-transition: transform .6s ease;
+  -ms-transition: transform .6s ease;
+  transition: transform .6s ease;
   cursor: pointer;
 }
 .poker-list-back{
@@ -402,8 +409,6 @@ body{
   -ms-transform:rotateY(180deg);
   transform:rotateY(180deg);
   z-index: 9;
-}
-.poker-list.cover{
 }
 .poker-list.one{
   background: url(../img/sub-img.png) no-repeat -140px -360px;
@@ -419,6 +424,64 @@ body{
 }
 .poker-list.five{
   background: url(../img/sub-img.png) no-repeat 0 -570px;
+}
+.audio-btn{
+  position: absolute;
+  z-index: 9998;
+  right: 20px;
+  top:20px;
+  width: 25px;
+  height: 26px;
+  background: url(../img/audio-btn.png) no-repeat 0 0;
+  background-size: 25px auto;
+  cursor: pointer;
+}
+.audio-btn.close{
+  background-position: 0 -26px;
+}
+.rules-wrap{
+  position: absolute;
+  z-index: 9999;
+  left:50%;
+  top:20%;
+  -webkit-transform:translate(-50%,-50%);
+  transform:translate(-50%,-50%);
+  opacity: 0;
+  font-size: 14px;
+  list-style-position: inside;
+  padding:20px;
+  background-color: #fff;
+  border-radius: 10px;
+  -webkit-transition: all .3s ease-in;
+  -ms-transition: all .3s ease-in;
+  transition: all .3s ease-in;
+}
+.rules-wrap.position{
+  top:50%;
+  opacity: 1;
+}
+.rules-close-btn{
+  position: absolute;
+  right: 10px;
+  top:0;
+  font-size: 24px;
+  list-style-type: none;
+  cursor: pointer;
+}
+.rules-list{
+  margin:10px 0;
+}
+.orientation-tip{
+  position: absolute;
+  z-index: 9999;
+  left: 0;
+  top:0;
+  width: 100%;
+  height: 100%;
+  padding-top: 50%;
+  font-size: 14px;
+  background-color: #fff;
+  text-align: center;
 }
 .rollOver0{
   -webkit-transform:rotateY(0deg);
@@ -476,7 +539,7 @@ body{
   -webkit-animation-name: zoomIn;
           animation-name: zoomIn;
 }
-@-webkit-keyframes zoomOut {
+/*@-webkit-keyframes zoomOut {
   0% {
     opacity: 1;
   }
@@ -702,7 +765,7 @@ body{
           backface-visibility: visible !important;
   -webkit-animation-name: flipInY;
           animation-name: flipInY;
-}
+}*/
 
 @-webkit-keyframes bouncedelay {
   0%,
